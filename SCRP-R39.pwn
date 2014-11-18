@@ -8,6 +8,8 @@
 
 im not 'ap with your attd.
 
+what i will say is this..
+
 - Faction Skins
 - Faction Weapons
 - Faction Pay
