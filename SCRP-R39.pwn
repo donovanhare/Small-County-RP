@@ -3215,6 +3215,7 @@ public CheckBans(playerid)
 	}
 	return 1;
 }
+
 IssueBan(playerid, adminname[], reason[])
 {
 	new query[256], ip[18];
@@ -4333,7 +4334,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 				else if(Icons[i][Type] == 11) return InformationBox(playerid, "~g~Repair Garage~n~~w~To repair your vehicle use the command ~y~/repair~w~.");
 				else if(Icons[i][Type] == 12) return InformationBox(playerid, "~g~DMV~n~~w~ The driving test cost $1000 to take. To proceed use the command ~y~/dmv~w~.");				
 				else if(Icons[i][Type] == 13) return InformationBox(playerid, "~y~Lockers~n~~w~ To access the locker please use ~y~/locker~w~.");
-				
+				else if(Icons[i][Type] == 14) return InformationBox(playerid, "~p~Vehicle Modification Center~n~~w~ Mechanics can perform vehicle modifications to personal vehicles here using the command ~y~/vmods~w~.");
 			}
 		}
 	}
@@ -6474,6 +6475,7 @@ CMD:key(playerid, params[])
              		format(str, sizeof(str), "* %s places the key in the door, locking it.*", GetRoleplayName(playerid), str);
 					SendLocalMessage(playerid, str, 20.0, COLOR_RP, COLOR_RP);
 					Houses[id][Locked] = 1;
+					MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Locked", 1);
 					return 1;
      	        }
      	        else
@@ -6481,6 +6483,7 @@ CMD:key(playerid, params[])
      	            format(str, sizeof(str), "* %s places the key in the door, unlocking it.*", GetRoleplayName(playerid), str);
 					SendLocalMessage(playerid, str, 20.0, COLOR_RP, COLOR_RP);
 					Houses[id][Locked] = 0;
+					MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Locked", 0);
 					return 1;
      	        }
      	    }
@@ -6497,12 +6500,14 @@ CMD:key(playerid, params[])
              		format(str, sizeof(str), "* %s places the key in the door, locking it.*", GetRoleplayName(playerid), str);
 					SendLocalMessage(playerid, str, 20.0, COLOR_RP, COLOR_RP);
 					Biz[id][Locked] = 1;
+					MYSQL_Update_Interger(Houses[id][SQLID], "Biz", "Locked", 1);
 					return 1;
      	        }
      	        else
      	        {
      	            format(str, sizeof(str), "* %s places the key in the door, unlocking it.*", GetRoleplayName(playerid), str);
 					SendLocalMessage(playerid, str, 20.0, COLOR_RP, COLOR_RP);
+					MYSQL_Update_Interger(Houses[id][SQLID], "Biz", "Locked", 1);
 					Biz[id][Locked] = 0;
 					return 1;
      	        }
@@ -8247,7 +8252,7 @@ stock VehicleMods_Hydraulics(playerid)
 	new str[128], dialog[400];
 	for (new i = 0; i < sizeof(Mod_Hydraulics); ++i)
 	{
-		format(str, sizeof(str), "%s $%d\n", Mod_Hydraulics[i][2], Mod_Hydraulics[i][1]);
+		format(str, sizeof(str), "%s ("COL_GREEN"$%d"COL_WHITE")\n", Mod_Hydraulics[i][2], Mod_Hydraulics[i][1]);
         strcat(dialog, str, sizeof(dialog));
 	}
 	format(str, sizeof(str), "\n"COL_RED"Remove Modification");
@@ -8267,6 +8272,8 @@ Dialog:VehicleMods_Hydraulics(playerid, response, listitem, inputtext[])
 	if(listitem != sizeof(Mod_Hydraulics))
 	{
 		if(component == Mod_Hydraulics[listitem][0]) return SendErrorMessage(playerid, "You already have hydraulics installed.");
+		if(PlayerInfo[playerid][Cash] < Mod_Hydraulics[listitem][1]) return SendErrorMessage(playerid, ERROR_MONEY);
+		GivePlayerMoneyEx(playerid, -Mod_Hydraulics[listitem][1]);
 		AddVehicleComponent(vid, Mod_Hydraulics[listitem][0]);
 		Query_Set_PlayerVehicle(vid, "Hydraulics", Mod_Hydraulics[listitem][0]);
 	}
@@ -8297,7 +8304,7 @@ stock VehicleMods_Nitrous(playerid)
 	new str[128], dialog[400];
 	for (new i = 0; i < sizeof(Mod_NOS); ++i)
 	{
-		format(str, sizeof(str), "%s ("COL_GREEN"$%d)\n", Mod_NOS[i][2], Mod_NOS[i][1]);
+		format(str, sizeof(str), "%s ("COL_GREEN"$%d"COL_WHITE")\n", Mod_NOS[i][2], Mod_NOS[i][1]);
         strcat(dialog, str, sizeof(dialog));
 	}
 	format(str, sizeof(str), "\n"COL_RED"Remove Modification");
@@ -8317,6 +8324,8 @@ Dialog:VehicleMods_Nitrous(playerid, response, listitem, inputtext[])
 	if(listitem != sizeof(Mod_NOS))
 	{
 		if(component == Mod_NOS[listitem][0]) return SendErrorMessage(playerid, "You already have this type of NOS installed.");
+		if(PlayerInfo[playerid][Cash] < Mod_NOS[listitem][1]) return SendErrorMessage(playerid, ERROR_MONEY);
+		GivePlayerMoneyEx(playerid, -Mod_NOS[listitem][1]);
 		AddVehicleComponent(vid, Mod_NOS[listitem][0]);
 		Query_Set_PlayerVehicle(vid, "Nitrous", Mod_NOS[listitem][0]);
 	}
@@ -8358,7 +8367,7 @@ stock VehicleMod_Wheels(playerid)
 	new str[128], dialog[400];
 	for (new i = 0; i < sizeof(Mod_Wheels); ++i)
 	{
-		format(str, sizeof(str), "%s ($%d)\n", Mod_Wheels[i][2], Mod_Wheels[i][1]);
+		format(str, sizeof(str), "%s ("COL_GREEN"$%d"COL_WHITE")\n", Mod_Wheels[i][2], Mod_Wheels[i][1]);
         strcat(dialog, str, sizeof(dialog));
 	}
 	format(str, sizeof(str), "\n"COL_RED"Remove Modification");
@@ -8378,6 +8387,8 @@ Dialog:VehicleMod_Wheels(playerid, response, listitem, inputtext[])
 	if(listitem != sizeof(Mod_Wheels))
 	{
 		if(component == Mod_Wheels[listitem][0]) return SendErrorMessage(playerid, "You already have these wheels installed.");
+		if(PlayerInfo[playerid][Cash] < Mod_Wheels[listitem][1]) return SendErrorMessage(playerid, ERROR_MONEY);
+		GivePlayerMoneyEx(playerid, -Mod_Wheels[listitem][1]);
 		AddVehicleComponent(vid, Mod_Wheels[listitem][0]);
 		Query_Set_PlayerVehicle(vid, "Wheels", Mod_Wheels[listitem][0]);
 	}
@@ -8399,28 +8410,24 @@ Dialog:VehicleMod_Wheels(playerid, response, listitem, inputtext[])
 CMD:vmods(playerid, params[])
 {
 	new vid = GetPlayerVehicleID(playerid);
-	if(MasterAccount[playerid][Admin] > 0)
+	if(PlayerInfo[playerid][Job] == MECHANIC_JOB)
 	{	
-		if(vid != INVALID_VEHICLE_ID)
+		if(InRangeOfIcon(playerid, 14))
 		{
-			if(Vehicles[vid][Type] == 1 && Vehicles[vid][Owner] == PlayerInfo[playerid][SQLID])
+			if(vid != INVALID_VEHICLE_ID)
 			{
-				VehicleMods_MainMenu(playerid);		
+				if(Vehicles[vid][Type] == 1)// Command to offer vmods?  && Vehicles[vid][Owner] == PlayerInfo[playerid][SQLID]
+				{
+					VehicleMods_MainMenu(playerid);		
+				}
+				else SendErrorMessage(playerid, "Modifications cannot be done to this vehicle.");
+				
 			}
-			else
-			{
-				SendErrorMessage(playerid, "Modifications cannot be done to this vehicle.");
-			}
+			else SendErrorMessage(playerid, "You need to be in a vehicle!");
 		}
-		else
-		{
-			SendErrorMessage(playerid, "You need to be in a vehicle!");
-		}
+		else SendErrorMessage(playerid, ERROR_LOCATION);
 	}
-	else
-	{
-		SendErrorMessage(playerid, ERROR_ADMIN);
-	}
+	else SendErrorMessage(playerid, ERROR_JOB);
 	return 1;
 }
 
@@ -13744,7 +13751,7 @@ stock Icon_List_Creation(playerid)
 
 stock Icon_List_Type(playerid)
 {
-  	Dialog_Show(playerid, IconType, DIALOG_STYLE_LIST, "Icon System","Please select the icon type:\nRegular Vehicle Dealership\nFast Vehicle Dealership\nCommercial Dealership\nPayDay\nBank\nATM\nPay Phone\nNothing\nScrap Dealer\nSpray Garage\nRepair Garage\nDMV\nFaction Locker","Select","Cancel");
+  	Dialog_Show(playerid, IconType, DIALOG_STYLE_LIST, "Icon System","Please select the icon type:\nRegular Vehicle Dealership\nFast Vehicle Dealership\nCommercial Dealership\nPayDay\nBank\nATM\nPay Phone\nNothing\nScrap Dealer\nSpray Garage\nRepair Garage\nDMV\nFaction Locker\nVehicle Mod Garage","Select","Cancel");
     return 1;
 }
 
@@ -13835,16 +13842,19 @@ Dialog:IconCreation(playerid, response, listitem, inputtext[])
 
 	GetPlayerPos(playerid, pos[0], pos[1], pos[2]);
 
+	IconID = Total_Icons_Created ++;
+
 	mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO Icons (PosX,PosY,PosZ,World,Interior,Type,Faction,Icon) VALUES(%f, %f, %f, %d, %d, 0, 0, %d)",
 
 									pos[0],
 									pos[1],
 									pos[2],
-									Icons[IconID][World],
-									Icons[IconID][Interior],
+									GetPlayerVirtualWorld(playerid),
+									GetPlayerInterior(playerid),
 									strval(modelid));
 
-	mysql_tquery(SQL_CONNECTION, query, "GetIconID", "i", playerid);
+	mysql_tquery(SQL_CONNECTION, query, "GetIconID");
+
 
 	Icons[IconID][PosX] = pos[0];
 	Icons[IconID][PosY] = pos[1];
@@ -13857,10 +13867,10 @@ Dialog:IconCreation(playerid, response, listitem, inputtext[])
 	return 1;
 }
 
-forward GetIconID(playerid);
-public GetIconID(playerid)
+forward GetIconID();
+public GetIconID()
 {
-	IconID = cache_insert_id();
+	Icons[IconID][SQLID] = cache_insert_id();
 	return 1;
 }
 
