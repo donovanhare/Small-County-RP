@@ -91,7 +91,7 @@ driving theory
 #define ERROR_CONNECTED															"The player that you are requesting isn't connected."
 //==============================================================================
 #define PAYDAY_STANDARD                                                         250
-#define PAYDAY_FACTION	                                                        400
+#define PAYDAY_FACTION	                                                        300
 #define PAYDAY_DONATOR	                                                        2500
 #define PAYDAY_ADMIN	                                                        3750
 #define PAYDAY_XP_STANDARD                                                      1
@@ -714,7 +714,7 @@ new CompactDisks[][][] =
 
 new MaleSkins[][] =
 {
-    1, 2, 3, 4, 5, 6, 7, 101, 136, 14, 142, 15, 17,
+    1, 2, 3, 4, 5, 6, 7, 14, 15, 17, 101, 136, 142,
 	170, 184, 186, 185, 188, 234, 250, 37, 38, 36, 59,
 	60, 72, 95, 98, 29, 217, 223, 240, 242, 299, 297, 296
 
@@ -2168,7 +2168,7 @@ public GivePayday(playerid)
 	{
 		//400 * rank - 100
 	    new Salary;
-	    Salary = PAYDAY_FACTION * PlayerInfo[playerid][Rank] - 100;
+	    Salary = PAYDAY_FACTION * PlayerInfo[playerid][Rank] / 2;
         GivePlayerPayday(playerid, Salary);
 
         new fid = GetFactionIDFromSQLID(PlayerInfo[playerid][Faction]);
@@ -12039,8 +12039,14 @@ Dialog:FLIST(playerid, response, listitem, inputtext[])
 	 	format(str, sizeof(str), "Max Rank: ["COL_LBLUE"%s"COL_WHITE"]\n", GetRankNameFromID(listitem, Factions[listitem][MaxRank]));
         strcat(dialog, str, sizeof(dialog));
 
-	 	format(str, sizeof(str), "Faction Rank Names\n", GetRankNameFromID(listitem, Factions[listitem][CommandRank]));
+	 	format(str, sizeof(str), "Faction Rank Names\n");
         strcat(dialog, str, sizeof(dialog));
+
+        if(MasterAccount[playerid][Admin] > 5)
+    	{
+    		format(str, sizeof(str), "Faction Payouts\n");
+        	strcat(dialog, str, sizeof(dialog));
+    	}
 
 		Dialog_Show(playerid, FLIST2, DIALOG_STYLE_LIST, "Faction Manager", dialog, "Edit","Cancel");
 	}
@@ -12092,6 +12098,10 @@ Dialog:FLIST2(playerid, response, listitem, inputtext[])
 	else if(listitem == 4)
 	{
 		Dialog_Show(playerid, RANK, DIALOG_STYLE_LIST, "Faction Rank Editor",  GetRankList(facid[playerid]), "Select","Cancel");
+	}
+	else if(listitem == 5)
+	{
+		Dialog_Show(playerid, RANK, DIALOG_STYLE_LIST, "Faction Pay Editor",  GetRankList(facid[playerid]), "Select","Cancel");
 	}
 	return 1;
 }
