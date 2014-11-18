@@ -1,17 +1,11 @@
 /*
 
-something here
-but i dont know what
 
 			|-----------------------------------------------------------------------------------------------------------------------------|
 			|				||                                    BY: Donovan            	                 		 	||                |
        		|  				   ------------------------------------------------------------------------------------------                 |
 			|                                       	  | Small County Roleplay |     	         	                                  |
 			|-----------------------------------------------------------------------------------------------------------------------------|
-
-Cleaning up
-
-- Just Joking
 
 
 - Faction Skins
@@ -14035,6 +14029,7 @@ SetPlayerSkinEx(playerid, skinid)
 
 Dialog:LockerUniform(playerid, response, listitem, inputtext[])
 {
+	if(!response) Locker_Main(playerid);
 	if(IsLawEnforcement(playerid))
 	{
 		if(listitem == 0) SetPlayerSkin(playerid, 280);
@@ -14077,6 +14072,7 @@ Dialog:LockerUniform(playerid, response, listitem, inputtext[])
 
 Dialog:LockerEquipment(playerid, response, listitem, inputtext[])
 {
+	if(!response) Locker_Main(playerid);
 	if(IsLawEnforcement(playerid))
 	{
 		if(listitem == 0) GivePlayerGun(playerid, 3, 1);
