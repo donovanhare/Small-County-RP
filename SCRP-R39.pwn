@@ -6,7 +6,7 @@
 			|                                       	  | Small County Roleplay |     	         	                                  |
 			|-----------------------------------------------------------------------------------------------------------------------------|
 
-im not 'ap with your attd.
+im not 'ap with your attd. btw
 nor am I hap with you
 - Faction Skins
 - Faction Weapons
