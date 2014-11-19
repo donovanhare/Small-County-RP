@@ -2168,7 +2168,7 @@ public GivePayday(playerid)
 	{
 		//400 * rank - 100
 	    new Salary;
-	    Salary = PAYDAY_FACTION * PlayerInfo[playerid][Rank] / 2;
+	    Salary = (PAYDAY_FACTION * PlayerInfo[playerid][Rank]) / 2;
         GivePlayerPayday(playerid, Salary);
 
         new fid = GetFactionIDFromSQLID(PlayerInfo[playerid][Faction]);
@@ -5313,7 +5313,7 @@ CMD:radiohelp(playerid, params[])
 {
 	Line(playerid);
 	SendClientMessage(playerid, COLOR_YELLOW, "Radio Commands:");
-	SendClientMessage(playerid, COLOR_WHITE, "/radio /radiotune /radioinfo");//ron/off
+	SendClientMessage(playerid, COLOR_WHITE, "/(r)adio /radiotune /radioinfo /radioon /radiooff");
 	Line(playerid);
 	return 1;
 }
@@ -5335,7 +5335,7 @@ CMD:fhelp(playerid, params[])
 		{
 			format(str, sizeof(str), " %s Commands:", Factions[fid][Name]);
 			SendClientMessage(playerid, COLOR_YELLOW, str);
-			SendClientMessage(playerid, COLOR_WHITE, "/door /fine /cuff /jail /pnc /radar /megaphone /radio /locker /changeuniform");
+			SendClientMessage(playerid, COLOR_WHITE, "/door /fine /(un)cuff /(un)jail /pnc /radar /megaphone /radio /locker /changeuniform");
 		}
 
 		if(PlayerInfo[playerid][Faction] > 0 && PlayerInfo[playerid][Rank] >= Factions[fid][CommandRank])
@@ -10801,10 +10801,15 @@ CMD:demote(playerid, params[])
 	return 1;
 }
 
+#define RADIO_NONE 0
+#define RADIO_ON 2
+#define RADIO_OFF 1
+
 CMD:radio(playerid, params[])
 {
 	new msg[128], str[128];
-	if(Inventory[playerid][Radio] > 0)
+	if(Inventory[playerid][Radio] == RADIO_NONE) return SendErrorMessage(playerid, "You don't have a radio.");
+	if(Inventory[playerid][Radio] == RADIO_ON)
 	{
 		if(Inventory[playerid][RadioFreq] > 0)
 		{
@@ -10814,29 +10819,72 @@ CMD:radio(playerid, params[])
 			SendFreqMessage(playerid, Inventory[playerid][RadioFreq], str);
 			format(str, sizeof(str), "[Radio] %s: %s", GetRoleplayName(playerid), msg);
 			SendLocalMessage(playerid, str, 12.0, COLOR_SLATEGRAY, COLOR_SLATEGRAY);
-		}	
+		}
+		else SendErrorMessage(playerid, "Invalid frequency.");	
 	}
-	else SendErrorMessage(playerid, "You don't have a radio to use!");
+	else SendErrorMessage(playerid, "Your radio isn't on!");
 	
 	return 1;
 }
 ALTCMD:r->radio;
 
+
+CMD:radioon(playerid, params[])
+{
+	if(Inventory[playerid][Radio] > RADIO_NONE)
+	{
+		if(Inventory[playerid][Radio] == RADIO_OFF)
+		{
+			new str[128];
+			Inventory[playerid][Radio] = RADIO_ON;
+			MYSQL_Update_Account(playerid, "Radio", Inventory[playerid][Radio]);
+			format(str, sizeof(str), "* %s flicks a switch on the side of their radio turning it on. *", GetRoleplayName(playerid));
+			SendLocalMessage(playerid, str, 12.0, COLOR_RP, COLOR_RP);
+		}
+		else SendErrorMessage(playerid, "Your radio is already on!");
+	}
+	else SendErrorMessage(playerid, "You don't have a radio to use!");
+	return 1;
+}
+ALTCMD:ron->radioon;
+
+CMD:radiooff(playerid, params[])
+{
+	if(Inventory[playerid][Radio] > RADIO_NONE)
+	{
+		if(Inventory[playerid][Radio] == RADIO_ON)
+		{
+			new str[128];
+			Inventory[playerid][Radio] = RADIO_OFF;
+			MYSQL_Update_Account(playerid, "Radio", Inventory[playerid][Radio]);
+			format(str, sizeof(str), "* %s flicks a switch on the side of their radio turning it off. *", GetRoleplayName(playerid));
+			SendLocalMessage(playerid, str, 12.0, COLOR_RP, COLOR_RP);
+		}
+		else SendErrorMessage(playerid, "Your radio is already off!");
+	}
+	else SendErrorMessage(playerid, "You don't have a radio to use!");
+	return 1;
+}
+ALTCMD:roff->radiooff;
+
 CMD:radiotune(playerid, params[])
 {
-	if(Inventory[playerid][Radio] > 0)
+	if(Inventory[playerid][Radio] > RADIO_NONE)
 	{
-		new frequency, str[128];
-		if(sscanf(params, "d", frequency)) return SendClientMessage(playerid, COLOR_GRAY, "/radiotune [frequency]");
-		if(frequency == Inventory[playerid][RadioFreq]) return SendErrorMessage(playerid, "You are already on this frequency!");
-		if(frequency < 1 || frequency > 9999) return SendErrorMessage(playerid, "You can only tune your radio between the frequencies 1 - 9999 MHz.");
+		if(Inventory[playerid][Radio] == RADIO_ON)
+		{
+			new frequency, str[128];
+			if(sscanf(params, "d", frequency)) return SendClientMessage(playerid, COLOR_GRAY, "/radiotune [frequency]");
+			if(frequency == Inventory[playerid][RadioFreq]) return SendErrorMessage(playerid, "You are already on this frequency!");
+			if(frequency < 1 || frequency > 9999) return SendErrorMessage(playerid, "You can only tune your radio between the frequencies 1 - 9999 MHz.");
 
-		Inventory[playerid][RadioFreq] = frequency;
-		MYSQL_Update_Account(playerid, "RadioFreq", Inventory[playerid][RadioFreq]);
+			Inventory[playerid][RadioFreq] = frequency;
+			MYSQL_Update_Account(playerid, "RadioFreq", Inventory[playerid][RadioFreq]);
 
-		format(str, sizeof(str), "* %s fiddles with their radio for a moment, changing the frequency. *", GetRoleplayName(playerid));
-		SendLocalMessage(playerid, str, 10.0, COLOR_RP, COLOR_RP);
-		
+			format(str, sizeof(str), "* %s fiddles with their radio for a moment, changing the frequency. *", GetRoleplayName(playerid));
+			SendLocalMessage(playerid, str, 10.0, COLOR_RP, COLOR_RP);
+		}
+		else SendErrorMessage(playerid, "Your radio is off!");
 	}
 	else SendErrorMessage(playerid, "You don't have a radio to use!");
 	
@@ -10969,6 +11017,42 @@ CMD:jail(playerid, params[])
 	return 1;
 }
 
+
+CMD:unjail(playerid, params[])
+{
+	if(IsLawEnforcement(playerid))
+	{
+		new player;
+		if(sscanf(params, "u", player)) return SendClientMessage(playerid, COLOR_GRAY, "/unjail [playerid]");
+      	{
+      		if(player == playerid) return SendErrorMessage(playerid, "You cannot unjail yourself.");
+      		if(IsInRangeOfPlayer(playerid, player, 5))
+  			{
+	  				if(PlayerInfo[player][Jail] > 0)
+					{
+							new str[128];
+							PlayerInfo[player][Jail] = 0;
+							MYSQL_Update_Account(player, "Jail", PlayerInfo[player][Jail]);
+
+		      				SetPlayerPosEx(player, -229.1438, 971.7680, 19.4704, 0, 0);
+	      					ClearPlayerWeapons(player);
+
+		      				format(str, sizeof(str), "[INFO] %s has been UNJAILED by %s.", GetRoleplayName(player), GetRoleplayName(playerid));
+		      				SendFactionMessage(1, COLOR_INDIANRED, str);
+		      				SendClientMessage(player, COLOR_INDIANRED, str);
+		      				SendAdminsMessage(6, COLOR_SLATEGRAY, str);
+						
+		  				
+		      		}
+		      		else SendErrorMessage(playerid, "This player is not in jailed!");
+
+  			}
+  			else SendErrorMessage(playerid, "You are too far away from the specified player.");
+      	}		
+	}
+	else SendErrorMessage(playerid, ERROR_FACTION); 
+	return 1;
+}
 
 CMD:megaphone(playerid, params[])
 {
@@ -11654,10 +11738,14 @@ stock SendFreqMessage(pid, freq, msg[])
 		{
 			if(x != pid)
 			{
-			    if(Inventory[x][RadioFreq] == freq)
-			    {
-					SendClientMessage(x, COLOR_SLATEBLUE, msg);
+				if(Inventory[x][Radio] == RADIO_ON)
+				{
+					if(Inventory[x][RadioFreq] == freq)
+				    {
+						SendClientMessage(x, COLOR_SLATEBLUE, msg);
+					}
 				}
+			    
 			}
 		}
 	}
