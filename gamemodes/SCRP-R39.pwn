@@ -5313,7 +5313,7 @@ CMD:radiohelp(playerid, params[])
 {
 	Line(playerid);
 	SendClientMessage(playerid, COLOR_YELLOW, "Radio Commands:");
-	SendClientMessage(playerid, COLOR_WHITE, "/radio /radiotune /radioinfo");//ron/off
+	SendClientMessage(playerid, COLOR_WHITE, "/(r)adio /radiotune /radioinfo /radioon /radiooff");
 	Line(playerid);
 	return 1;
 }
@@ -10822,7 +10822,7 @@ CMD:radio(playerid, params[])
 		}
 		else SendErrorMessage(playerid, "Invalid frequency.");	
 	}
-	else SendErrorMessage(playerid, "You radio isn't on!");
+	else SendErrorMessage(playerid, "Your radio isn't on!");
 	
 	return 1;
 }
@@ -10839,7 +10839,7 @@ CMD:radioon(playerid, params[])
 			Inventory[playerid][Radio] = RADIO_ON;
 			MYSQL_Update_Account(playerid, "Radio", Inventory[playerid][Radio]);
 			format(str, sizeof(str), "* %s flicks a switch on the side of their radio turning it on. *", GetRoleplayName(playerid));
-			SendLocalMessage(playerid, str, 12.0, COLOR_SLATEGRAY, COLOR_SLATEGRAY);
+			SendLocalMessage(playerid, str, 12.0, COLOR_RP, COLOR_RP);
 		}
 		else SendErrorMessage(playerid, "Your radio is already on!");
 	}
@@ -10858,7 +10858,7 @@ CMD:radiooff(playerid, params[])
 			Inventory[playerid][Radio] = RADIO_OFF;
 			MYSQL_Update_Account(playerid, "Radio", Inventory[playerid][Radio]);
 			format(str, sizeof(str), "* %s flicks a switch on the side of their radio turning it off. *", GetRoleplayName(playerid));
-			SendLocalMessage(playerid, str, 12.0, COLOR_SLATEGRAY, COLOR_SLATEGRAY);
+			SendLocalMessage(playerid, str, 12.0, COLOR_RP, COLOR_RP);
 		}
 		else SendErrorMessage(playerid, "Your radio is already off!");
 	}
@@ -10869,19 +10869,22 @@ ALTCMD:roff->radiooff;
 
 CMD:radiotune(playerid, params[])
 {
-	if(Inventory[playerid][Radio] > 0)
+	if(Inventory[playerid][Radio] > RADIO_NONE)
 	{
-		new frequency, str[128];
-		if(sscanf(params, "d", frequency)) return SendClientMessage(playerid, COLOR_GRAY, "/radiotune [frequency]");
-		if(frequency == Inventory[playerid][RadioFreq]) return SendErrorMessage(playerid, "You are already on this frequency!");
-		if(frequency < 1 || frequency > 9999) return SendErrorMessage(playerid, "You can only tune your radio between the frequencies 1 - 9999 MHz.");
+		if(Inventory[playerid][Radio] == RADIO_ON)
+		{
+			new frequency, str[128];
+			if(sscanf(params, "d", frequency)) return SendClientMessage(playerid, COLOR_GRAY, "/radiotune [frequency]");
+			if(frequency == Inventory[playerid][RadioFreq]) return SendErrorMessage(playerid, "You are already on this frequency!");
+			if(frequency < 1 || frequency > 9999) return SendErrorMessage(playerid, "You can only tune your radio between the frequencies 1 - 9999 MHz.");
 
-		Inventory[playerid][RadioFreq] = frequency;
-		MYSQL_Update_Account(playerid, "RadioFreq", Inventory[playerid][RadioFreq]);
+			Inventory[playerid][RadioFreq] = frequency;
+			MYSQL_Update_Account(playerid, "RadioFreq", Inventory[playerid][RadioFreq]);
 
-		format(str, sizeof(str), "* %s fiddles with their radio for a moment, changing the frequency. *", GetRoleplayName(playerid));
-		SendLocalMessage(playerid, str, 10.0, COLOR_RP, COLOR_RP);
-		
+			format(str, sizeof(str), "* %s fiddles with their radio for a moment, changing the frequency. *", GetRoleplayName(playerid));
+			SendLocalMessage(playerid, str, 10.0, COLOR_RP, COLOR_RP);
+		}
+		else SendErrorMessage(playerid, "Your radio is off!");
 	}
 	else SendErrorMessage(playerid, "You don't have a radio to use!");
 	

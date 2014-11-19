@@ -5443,7 +5443,7 @@ CMD:enter(playerid)
 
 	}
 
-    if(id > 0)
+    else if(id > 0)
 	{
         if(Houses[id][Locked] == 0)
         {
@@ -5489,7 +5489,7 @@ CMD:exit(playerid)
     }
 
 
-    if(IsPlayerInRangeOfPoint(playerid, 5.0, Biz[bID][InteriorX], Biz[bID][InteriorY], Biz[bID][InteriorZ]))
+    else if(IsPlayerInRangeOfPoint(playerid, 5.0, Biz[bID][InteriorX], Biz[bID][InteriorY], Biz[bID][InteriorZ]))
     {
         SetPlayerPosEx(playerid, Biz[bID][PosX], Biz[bID][PosY], Biz[bID][PosZ], 0, 0);
         PlayerInfo[playerid][bEntered] = 0;
@@ -5603,23 +5603,13 @@ new GeneralStore[][] =
 {
    //{Itemid???? Item, price}
    {125,	"Mobile Phone"}, 
-   {50, 	"Watch"},  
-   {15, 	"Water Bottle"}, 
-   {45,	 	"Cigarettes"}, 
-   {2, 		"Lighter"},		
-   {12, 	"Rope"},
    {2400, 	"Vehicle Radio"},
    {400, 	"Radio"}
 };
 
 #define PHONE 												  				     0
-#define WATCH                                                        		     1
-#define WATERBOTTLE                                                 		     2
-#define CIGARETTES                                                     		   	 3
-#define LIGHTER                                                         		 4
-#define ROPE                                                             		 5
-#define VRADIO 																	 6
-#define RADIO 																	 7
+#define VRADIO 																	 1
+#define RADIO 																	 2
 
 CMD:buy(playerid, params[])
 {

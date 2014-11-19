@@ -28800,3 +28800,182 @@ v0.3z-R4, (C)2005-2014 SA-MP Team
 [11:10:32] Incoming connection: 127.0.0.1:62835
 [11:10:32] [join] Foster has joined the server (0:127.0.0.1)
 [11:15:19] [part] Harold_Foster has left the server (0:1)
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3z-R4, (C)2005-2014 SA-MP Team
+
+[18:31:06] 
+[18:31:06] Server Plugins
+[18:31:06] --------------
+[18:31:06]  Loading plugin: mysql
+[18:31:06]  >> plugin.mysql: R39-2 successfully loaded.
+[18:31:06]   Loaded.
+[18:31:06]  Loading plugin: sscanf
+[18:31:06] 
+
+[18:31:06]  ===============================
+
+[18:31:06]       sscanf plugin loaded.     
+
+[18:31:06]    (c) 2009 Alex "Y_Less" Cole
+
+[18:31:06]    0.3d-R2 500 Players "dnee"
+
+[18:31:06]  ===============================
+
+[18:31:06]   Loaded.
+[18:31:06]  Loading plugin: crashdetect
+[18:31:06]   CrashDetect v4.13 is OK.
+[18:31:06]   Loaded.
+[18:31:06]  Loading plugin: streamer
+[18:31:06]   Loaded.
+[18:31:06]  Loading plugin: Whirlpool
+[18:31:06]  
+[18:31:06]  ==================
+[18:31:06]  
+[18:31:06]   Whirlpool loaded
+[18:31:06]  
+[18:31:06]  ==================
+[18:31:06]  
+[18:31:06]   Loaded.
+[18:31:06]  Loaded 5 plugins.
+
+[18:31:06] 
+[18:31:06] Filterscripts
+[18:31:06] ---------------
+[18:31:06]   Loading filterscript 'sound.amx'...
+[18:31:06]   Unable to load filterscript 'sound.amx'.
+[18:31:06]   Loaded 0 filterscripts.
+
+[18:31:07] ------------------------------------------------------------------------------
+[18:31:07] [MYSQL]: ERROR: Connection to `Server01`@'127.0.0.1' failed!
+[18:31:07] ------------------------------------------------------------------------------
+[18:31:07] 18:31:00
+[18:31:07]   Filterscript 'Mapping.amx' loaded.
+[18:31:07] ------------------------------------------------------------------------------
+[18:31:07]                        Small County Roleplay - Started!						 
+[18:31:07] ------------------------------------------------------------------------------
+[18:31:07] Number of vehicle models: 0
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3z-R4, (C)2005-2014 SA-MP Team
+
+[18:31:33] 
+[18:31:33] Server Plugins
+[18:31:33] --------------
+[18:31:33]  Loading plugin: mysql
+[18:31:33]  >> plugin.mysql: R39-2 successfully loaded.
+[18:31:33]   Loaded.
+[18:31:33]  Loading plugin: sscanf
+[18:31:33] 
+
+[18:31:33]  ===============================
+
+[18:31:33]       sscanf plugin loaded.     
+
+[18:31:33]    (c) 2009 Alex "Y_Less" Cole
+
+[18:31:33]    0.3d-R2 500 Players "dnee"
+
+[18:31:33]  ===============================
+
+[18:31:33]   Loaded.
+[18:31:33]  Loading plugin: crashdetect
+[18:31:33]   CrashDetect v4.13 is OK.
+[18:31:33]   Loaded.
+[18:31:33]  Loading plugin: streamer
+[18:31:33]   Loaded.
+[18:31:33]  Loading plugin: Whirlpool
+[18:31:33]  
+[18:31:33]  ==================
+[18:31:33]  
+[18:31:33]   Whirlpool loaded
+[18:31:33]  
+[18:31:33]  ==================
+[18:31:33]  
+[18:31:33]   Loaded.
+[18:31:33]  Loaded 5 plugins.
+
+[18:31:33] 
+[18:31:33] Filterscripts
+[18:31:33] ---------------
+[18:31:33]   Loaded 0 filterscripts.
+
+[18:31:34] ------------------------------------------------------------------------------
+[18:31:34] [MYSQL]: ERROR: Connection to `Server01`@'127.0.0.1' failed!
+[18:31:34] ------------------------------------------------------------------------------
+[18:31:34] 18:31:00
+[18:31:34]   Filterscript 'Mapping.amx' loaded.
+[18:31:34] ------------------------------------------------------------------------------
+[18:31:34]                        Small County Roleplay - Started!						 
+[18:31:34] ------------------------------------------------------------------------------
+[18:31:34] Number of vehicle models: 0
+
+----------
+Loaded log file: "server_log.txt".
+----------
+
+SA-MP Dedicated Server
+----------------------
+v0.3z-R4, (C)2005-2014 SA-MP Team
+
+[18:38:38] 
+[18:38:38] Server Plugins
+[18:38:38] --------------
+[18:38:38]  Loading plugin: mysql
+[18:38:38]  >> plugin.mysql: R39-2 successfully loaded.
+[18:38:38]   Loaded.
+[18:38:38]  Loading plugin: sscanf
+[18:38:38] 
+
+[18:38:38]  ===============================
+
+[18:38:38]       sscanf plugin loaded.     
+
+[18:38:38]    (c) 2009 Alex "Y_Less" Cole
+
+[18:38:38]    0.3d-R2 500 Players "dnee"
+
+[18:38:38]  ===============================
+
+[18:38:38]   Loaded.
+[18:38:38]  Loading plugin: crashdetect
+[18:38:38]   CrashDetect v4.13 is OK.
+[18:38:38]   Loaded.
+[18:38:38]  Loading plugin: streamer
+[18:38:38]   Loaded.
+[18:38:38]  Loading plugin: Whirlpool
+[18:38:38]  
+[18:38:38]  ==================
+[18:38:38]  
+[18:38:38]   Whirlpool loaded
+[18:38:38]  
+[18:38:38]  ==================
+[18:38:38]  
+[18:38:38]   Loaded.
+[18:38:38]  Loaded 5 plugins.
+
+[18:38:38] 
+[18:38:38] Filterscripts
+[18:38:38] ---------------
+[18:38:38]   Loaded 0 filterscripts.
+
+[18:38:39] ------------------------------------------------------------------------------
+[18:38:39] [MYSQL]: ERROR: Connection to `Server01`@'127.0.0.1' failed!
+[18:38:39] ------------------------------------------------------------------------------
+[18:38:39] 18:38:00
+[18:38:39]   Filterscript 'Mapping.amx' loaded.
+[18:38:39] ------------------------------------------------------------------------------
+[18:38:39]                        Small County Roleplay - Started!						 
+[18:38:39] ------------------------------------------------------------------------------
+[18:38:39] Number of vehicle models: 0

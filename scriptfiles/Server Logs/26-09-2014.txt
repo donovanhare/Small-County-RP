@@ -1,9 +1,0 @@
-[21:13:01] Harold_Foster(0): /hot
-[21:13:03] Harold_Foster(0): /v inf
-[21:13:05] Harold_Foster(0): /hot
-[21:13:06] Harold_Foster(0): /hot
-[21:18:01] Harold_Foster(0): /hot
-[21:18:04] Harold_Foster(0): /v inf
-[21:18:05] Harold_Foster(0): /hot
-[21:18:07] Harold_Foster(0): /hot
-[21:18:09] Harold_Foster(0): /hot

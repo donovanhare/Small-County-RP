@@ -1,8 +1,0 @@
-[11:09:22] Harold_Foster(0): /v inf
-[11:10:43] Harold_Foster(0): /v inf
-[11:10:44] Harold_Foster(0): /ron
-[11:10:50] Harold_Foster(0): /r hasda
-[11:11:18] Harold_Foster(0): /rtune 11
-[11:11:30] Harold_Foster(0): /roff
-[11:11:32] Harold_Foster(0): /r asdasd
-[11:12:28] Harold_Foster(0): /ron
