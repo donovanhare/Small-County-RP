@@ -1,0 +1,90 @@
+
+--------------------------
+SA-MP Server: 0.3z
+
+Exception At Address: 0x73211BB0 Module: (MSVCR90.dll)
+
+Registers:
+EAX: 0xC14C8C1C	EBX: 0x1000D416	ECX: 0x7FFFFFFE	EDX: 0x00000073
+ESI: 0x00000000	EDI: 0xC14C8C1C	EBP: 0x0018D600	ESP: 0x0018D37C
+EFLAGS: 0x00010202
+
+Stack:
++0000: 0x023C8598   0x00000000   0x00000000   0x00000109
++0010: 0x00000000   0x00000000   0x00000007   0x0272A3C8
++0020: 0x02720000   0x0272FFE0   0x02728B50   0x027219D8
++0030: 0x027207D0   0x00000001   0x0018D624   0x00000000
++0040: 0x00000000   0x00000000   0x1000D416   0x00000000
++0050: 0x00000000   0x00000000   0x7E05FE82   0x0000001C
++0060: 0x0018D7B8   0x00000000   0xC14C8C1C   0xFFFFFFFF
++0070: 0x73000109   0x00000000   0x00000180   0x027230F8
++0080: 0x00000001   0x00000982   0x731F5B00   0x02722FE8
++0090: 0x0000077F   0x0272A3D0   0x00000040   0x000007FF
++00A0: 0x74B718FC   0x00000201   0x00000000   0x0018D434
++00B0: 0x731E2E2B   0x02767B50   0x00000000   0x0A00000A
++00C0: 0x02727C58   0x0018D47C   0x731F57B4   0x73257408
++00D0: 0x00000000   0x000007FF   0x0000000C   0x88000B83
++00E0: 0x027200C4   0x00000001   0x0018D450   0x00000002
++00F0: 0x00000008   0x0272A3D0   0x0272A3D0   0x0272A3CB
++0100: 0x00000000   0x00B7CF2B   0x02720000   0x01B718FC
++0110: 0x0018D3D4   0x023C8598   0x77E5FC4A   0x7603C92E
++0120: 0x00000264   0x0018D4D4   0x0018D4DC   0x00000008
++0130: 0x0000000E   0xFFFFFFFF   0x00000003   0x7325D6A0
+
+--------------------------
+
+Loaded Modules:
+samp-server.exe	A: 0x00400000 - 0x004F5000	(C:\Users\Donovan\Documents\SAMP Related\Server\AP-Designs Release V1.4\samp-server.exe)
+ntdll.dll	A: 0x77E40000 - 0x77FC0000	(C:\Windows\SysWOW64\ntdll.dll)
+kernel32.dll	A: 0x776A0000 - 0x777B0000	(C:\Windows\syswow64\kernel32.dll)
+KERNELBASE.dll	A: 0x76030000 - 0x76077000	(C:\Windows\syswow64\KERNELBASE.dll)
+SHELL32.dll	A: 0x768D0000 - 0x7751A000	(C:\Windows\syswow64\SHELL32.dll)
+msvcrt.dll	A: 0x76600000 - 0x766AC000	(C:\Windows\syswow64\msvcrt.dll)
+SHLWAPI.dll	A: 0x75D30000 - 0x75D87000	(C:\Windows\syswow64\SHLWAPI.dll)
+GDI32.dll	A: 0x762D0000 - 0x76360000	(C:\Windows\syswow64\GDI32.dll)
+USER32.dll	A: 0x761C0000 - 0x762C0000	(C:\Windows\syswow64\USER32.dll)
+ADVAPI32.dll	A: 0x766C0000 - 0x76760000	(C:\Windows\syswow64\ADVAPI32.dll)
+sechost.dll	A: 0x77640000 - 0x77659000	(C:\Windows\SysWOW64\sechost.dll)
+RPCRT4.dll	A: 0x77810000 - 0x77900000	(C:\Windows\syswow64\RPCRT4.dll)
+SspiCli.dll	A: 0x75860000 - 0x758C0000	(C:\Windows\syswow64\SspiCli.dll)
+CRYPTBASE.dll	A: 0x75850000 - 0x7585C000	(C:\Windows\syswow64\CRYPTBASE.dll)
+LPK.dll	A: 0x77660000 - 0x7766A000	(C:\Windows\syswow64\LPK.dll)
+USP10.dll	A: 0x75C90000 - 0x75D2D000	(C:\Windows\syswow64\USP10.dll)
+WSOCK32.dll	A: 0x718C0000 - 0x718C7000	(C:\Windows\system32\WSOCK32.dll)
+WS2_32.dll	A: 0x77900000 - 0x77935000	(C:\Windows\syswow64\WS2_32.dll)
+NSI.dll	A: 0x76430000 - 0x76436000	(C:\Windows\syswow64\NSI.dll)
+WINMM.dll	A: 0x72DE0000 - 0x72E12000	(C:\Windows\system32\WINMM.dll)
+IMM32.DLL	A: 0x758C0000 - 0x75920000	(C:\Windows\system32\IMM32.DLL)
+MSCTF.dll	A: 0x77520000 - 0x775EC000	(C:\Windows\syswow64\MSCTF.dll)
+nvinit.dll	A: 0x73190000 - 0x731B9000	(C:\Windows\SysWOW64\nvinit.dll)
+detoured.dll	A: 0x0F000000 - 0x0F006000	(C:\Program Files (x86)\NVIDIA Corporation\CoProcManager\detoured.dll)
+nvd3d9wrap.dll	A: 0x6CB10000 - 0x6CB63000	(C:\Program Files (x86)\NVIDIA Corporation\CoProcManager\nvd3d9wrap.dll)
+SETUPAPI.dll	A: 0x75920000 - 0x75ABD000	(C:\Windows\syswow64\SETUPAPI.dll)
+CFGMGR32.dll	A: 0x76370000 - 0x76397000	(C:\Windows\syswow64\CFGMGR32.dll)
+OLEAUT32.dll	A: 0x763A0000 - 0x7642F000	(C:\Windows\syswow64\OLEAUT32.dll)
+DEVOBJ.dll	A: 0x76080000 - 0x76092000	(C:\Windows\syswow64\DEVOBJ.dll)
+nvdxgiwrap.dll	A: 0x6CAD0000 - 0x6CB0B000	(C:\Program Files (x86)\NVIDIA Corporation\CoProcManager\nvdxgiwrap.dll)
+mysql.DLL	A: 0x10000000 - 0x10013000	(C:\Users\Donovan\Documents\SAMP Related\Server\AP-Designs Release V1.4\plugins\mysql.DLL)
+LIBMYSQL.dll	A: 0x02570000 - 0x026E6000	(C:\Users\Donovan\Documents\SAMP Related\Server\AP-Designs Release V1.4\LIBMYSQL.dll)
+MSVCR90.dll	A: 0x731C0000 - 0x73263000	(C:\Windows\WinSxS\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_50934f2ebcb7eb57\MSVCR90.dll)
+MSVCP90.dll	A: 0x74B70000 - 0x74BFE000	(C:\Windows\WinSxS\x86_microsoft.vc90.crt_1fc8b3b9a1e18e3b_9.0.30729.6161_none_50934f2ebcb7eb57\MSVCP90.dll)
+NLAapi.dll	A: 0x6E090000 - 0x6E0A0000	(C:\Windows\system32\NLAapi.dll)
+napinsp.dll	A: 0x6E080000 - 0x6E090000	(C:\Windows\system32\napinsp.dll)
+pnrpnsp.dll	A: 0x6E060000 - 0x6E072000	(C:\Windows\system32\pnrpnsp.dll)
+mswsock.dll	A: 0x71850000 - 0x7188C000	(C:\Windows\System32\mswsock.dll)
+DNSAPI.dll	A: 0x6E3E0000 - 0x6E424000	(C:\Windows\system32\DNSAPI.dll)
+winrnr.dll	A: 0x6E050000 - 0x6E058000	(C:\Windows\System32\winrnr.dll)
+WLIDNSP.DLL	A: 0x6DAA0000 - 0x6DAC7000	(C:\Program Files (x86)\Common Files\Microsoft Shared\Windows Live\WLIDNSP.DLL)
+PSAPI.DLL	A: 0x762C0000 - 0x762C5000	(C:\Windows\syswow64\PSAPI.DLL)
+wshbth.dll	A: 0x6DA90000 - 0x6DA9D000	(C:\Windows\system32\wshbth.dll)
+mdnsNSP.dll	A: 0x6DA60000 - 0x6DA81000	(C:\Program Files (x86)\Bonjour\mdnsNSP.dll)
+Iphlpapi.DLL	A: 0x71530000 - 0x7154C000	(C:\Windows\system32\Iphlpapi.DLL)
+WINNSI.DLL	A: 0x71520000 - 0x71527000	(C:\Windows\system32\WINNSI.DLL)
+rasadhlp.dll	A: 0x6E000000 - 0x6E006000	(C:\Windows\system32\rasadhlp.dll)
+sscanf.DLL	A: 0x002B0000 - 0x002BC000	(C:\Users\Donovan\Documents\SAMP Related\Server\AP-Designs Release V1.4\plugins\sscanf.DLL)
+MSVCR100.dll	A: 0x73060000 - 0x7311F000	(C:\Windows\system32\MSVCR100.dll)
+streamer.DLL	A: 0x63360000 - 0x6338D000	(C:\Users\Donovan\Documents\SAMP Related\Server\AP-Designs Release V1.4\plugins\streamer.DLL)
+audio.DLL	A: 0x63310000 - 0x6335F000	(C:\Users\Donovan\Documents\SAMP Related\Server\AP-Designs Release V1.4\plugins\audio.DLL)
+MSVCP100.dll	A: 0x73120000 - 0x73189000	(C:\Windows\system32\MSVCP100.dll)
+wshtcpip.dll	A: 0x71840000 - 0x71845000	(C:\Windows\System32\wshtcpip.dll)
+wship6.dll	A: 0x6D9D0000 - 0x6D9D6000	(C:\Windows\System32\wship6.dll)

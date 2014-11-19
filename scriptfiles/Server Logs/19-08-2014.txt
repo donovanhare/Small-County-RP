@@ -1,0 +1,294 @@
+[10:01:06] Harold_Foster(0): /payday
+[10:01:08] Harold_Foster(0): /payday
+[10:01:09] Harold_Foster(0): /payday
+[10:01:11] Harold_Foster(0): /payday
+[10:01:18] Harold_Foster(0): /balance
+[10:01:19] Harold_Foster(0): /balance
+[10:01:21] Harold_Foster(0): /balance
+[10:01:24] Harold_Foster(0): /balance
+[10:01:27] Harold_Foster(0): /balance
+[10:01:28] Harold_Foster(0): /balance
+[10:01:32] Harold_Foster(0): /balance
+[10:03:11] Harold_Foster(0): /withdraw
+[10:04:36] Harold_Foster(0): /inbiz
+[10:04:41] Harold_Foster(0): /exit
+[10:04:42] Harold_Foster(0): /exit
+[10:04:46] Harold_Foster(0): /gotob bank
+[10:04:50] Harold_Foster(0): /enter
+[10:04:56] Harold_Foster(0): /balance
+[10:05:18] Harold_Foster(0): /stats
+[10:05:46] Harold_Foster(0): /givepayday
+[10:06:00] Harold_Foster(0): /stats
+[10:06:02] Harold_Foster(0): /exit
+[10:08:35] Harold_Foster(0): /v inf
+[10:08:37] Harold_Foster(0): /delv
+[10:08:39] Harold_Foster(0): /v yank
+[10:09:37] Harold_Foster(0): /delv
+[10:13:35] Harold_Foster(0): /v str
+[10:14:33] Harold_Foster(0): /stats
+[10:15:27] Harold_Foster(0): /stats
+[10:15:44] Harold_Foster(0): /delv
+[10:50:52] Harold_Foster(0): /v ster
+[10:50:54] Harold_Foster(0): /v str
+[10:50:58] Harold_Foster(0): /delv
+[10:51:04] Harold_Foster(0): /createobject
+[10:51:13] Harold_Foster(0): /createobject 5736 Office?
+[10:51:25] Harold_Foster(0): /selectobject mouse
+[10:52:39] Harold_Foster(0): /deleteobject 31
+[10:52:41] Harold_Foster(0): /deleteobject 31
+[10:52:41] Harold_Foster(0): /deleteobject 31
+[10:52:42] Harold_Foster(0): /deleteobject 31
+[10:52:43] Harold_Foster(0): /deleteobject 31
+[10:52:48] Harold_Foster(0): /selectobject
+[10:52:49] Harold_Foster(0): /selectobject mouse
+[10:52:56] Harold_Foster(0): /deleteobject 142
+[10:53:51] Harold_Foster(0): /reloadobjects
+[10:54:13] Harold_Foster(0): /createobject 5735 Office?
+[10:54:24] Harold_Foster(0): /selectobject mouse
+[10:55:54] Harold_Foster(0): /selectobject mouse
+[10:56:37] Harold_Foster(0): /selectobject mouse
+[11:04:59] Harold_Foster(0): /restart
+[11:06:08] Harold_Foster(0): /v fre
+[11:08:24] Harold_Foster(0): /delv
+[11:08:26] Harold_Foster(0): /v pc
+[11:09:12] Harold_Foster(0): /delv
+[11:09:14] Harold_Foster(0): /v nr
+[11:09:44] Harold_Foster(0): /delv
+[11:09:48] Harold_Foster(0): /v san
+[11:11:10] Harold_Foster(0): /delv
+[11:11:12] Harold_Foster(0): /v nr
+[11:12:49] Harold_Foster(0): /delv
+[11:13:20] Harold_Foster(0): /e
+[11:13:26] Harold_Foster(0): /setp 0 faction 6
+[11:13:29] Harold_Foster(0): /setp 0 faction 5
+[11:13:31] Harold_Foster(0): /e
+[11:13:56] Harold_Foster(0): /afix
+[11:16:30] Harold_Foster(0): /e
+[11:18:24] Harold_Foster(0): /createobject 8614 Hospital Stairs
+[11:18:34] Harold_Foster(0): /selecto near
+[11:18:35] Harold_Foster(0): /selecto near
+[11:18:38] Harold_Foster(0): /selecto select
+[11:18:42] Harold_Foster(0): /selecto mouse
+[11:23:43] Harold_Foster(0): /deleteobject 33
+[11:23:51] Harold_Foster(0): /deleteobject 32
+[11:24:06] Harold_Foster(0): /reloadobjects
+[11:26:19] Harold_Foster(0): /createobject 8613 Hospital Stairs
+[11:26:26] Harold_Foster(0): /selecto mouse
+[11:28:14] Harold_Foster(0): /respawnvehicle
+[11:28:26] Harold_Foster(0): /v hyd
+[11:29:26] Harold_Foster(0): /delv
+[11:29:29] Harold_Foster(0): /gotov 16
+[11:29:39] Harold_Foster(0): /fmanager
+[11:29:55] Harold_Foster(0): /v lat
+[11:29:57] Harold_Foster(0): /v let
+[11:30:00] Harold_Foster(0): /v v
+[11:30:01] Harold_Foster(0): /delv
+[11:30:05] Harold_Foster(0): /v 416
+[11:30:06] Harold_Foster(0): /delv
+[11:30:09] Harold_Foster(0): /v 417
+[11:30:10] Harold_Foster(0): /delv
+[11:30:26] Harold_Foster(0): /createfv
+[11:30:34] Harold_Foster(0): /FMANAGER
+[11:31:28] Harold_Foster(0): /createfv 417 2 2 3 5
+[11:31:30] Harold_Foster(0): /e
+[11:31:32] Harold_Foster(0): /e
+[11:31:36] Harold_Foster(0): /setp 0 faction 3
+[11:31:37] Harold_Foster(0): /e
+[11:32:25] Harold_Foster(0): /reloadobjects
+[11:32:30] Harold_Foster(0): /e
+[11:33:18] Harold_Foster(0): /v stre
+[11:33:40] Harold_Foster(0): /repair
+[11:34:41] Harold_Foster(0): /delv
+[11:34:45] Harold_Foster(0): /v hyd
+[11:35:24] Harold_Foster(0): /afix
+[11:36:13] Harold_Foster(0): /delvall
+[11:36:35] Harold_Foster(0): /gotob wang
+[11:36:40] Harold_Foster(0): /enter
+[11:40:11] Harold_Foster(0): /unloadsv
+[11:40:14] Harold_Foster(0): /loadsv
+[11:40:21] Harold_Foster(0): /restart
+[11:41:26] Harold_Foster(0): /gotov 2
+[11:41:32] Harold_Foster(0): /e
+[11:41:36] Harold_Foster(0): /v pre
+[11:42:05] Harold_Foster(0): /delv
+[11:42:09] Harold_Foster(0): /delv
+[12:59:05] Harold_Foster(0): /v mu
+[12:59:43] Harold_Foster(0): /delv
+[13:00:05] Harold_Foster(0): /vinfo
+[13:00:30] Harold_Foster(0): /gotoh 2
+[13:00:40] Harold_Foster(0): /vinfo
+[13:00:43] Harold_Foster(0): /vinfo
+[13:00:49] Harold_Foster(0): /vinfo
+[13:00:54] Harold_Foster(0): /v inf
+[13:00:56] Harold_Foster(0): /vinfo
+[13:00:58] Harold_Foster(0): /delv
+[13:01:05] Harold_Foster(0): /stats
+[13:01:09] Harold_Foster(0): /vinfo
+[13:01:24] Harold_Foster(0): /gotov 47
+[13:01:34] Harold_Foster(0): /delv
+[13:01:35] Harold_Foster(0): e
+[13:02:09] Harold_Foster(0): /vinfo
+[13:04:14] Harold_Foster(0): /v flat
+[13:04:26] Harold_Foster(0): /respawnvehicle
+[13:04:35] Harold_Foster(0): /gotov 48
+[13:05:42] Harold_Foster(0): /e
+[13:17:53] Harold_Foster(0): /iconmanager
+[13:18:24] Harold_Foster(0): /buyvehicle
+[13:18:25] Harold_Foster(0): /buyvehicle
+[13:49:02] Harold_Foster(0): /buyvehicle
+[14:06:05] Harold_Foster(0): /reload icons
+[14:06:12] Harold_Foster(0): /buyvehicle
+[14:06:45] Harold_Foster(0): /setp 0 cash 10000
+[14:06:49] Harold_Foster(0): /setp 0 cash 100000
+[14:06:51] Harold_Foster(0): /buyvehicle
+[14:08:12] Harold_Foster(0): /buyvehicle
+[14:10:09] Harold_Foster(0): /buyvehicle
+[14:13:38] Harold_Foster(0): /buyvehicle
+[14:14:38] Harold_Foster(0): /restart
+[14:15:17] Harold_Foster(0): a
+[14:15:19] Harold_Foster(0): b
+[14:15:20] Harold_Foster(0): c
+[14:15:21] Harold_Foster(0): d
+[14:15:26] Harold_Foster(0): cunt
+[14:15:29] Harold_Foster(0): I hate ypou
+[14:16:19] Harold_Foster(0): You fff
+[14:16:21] Harold_Foster(0): ff
+[14:16:25] Harold_Foster(0): /buyvehicle
+[14:17:13] Harold_Foster(0): /restart
+[14:17:57] Harold_Foster(0): ffs
+[14:18:00] Harold_Foster(0): hurry up
+[14:18:06] Harold_Foster(0): you slow ass connection
+[14:18:10] Harold_Foster(0): I swear to FUCK
+[14:18:16] Harold_Foster(0): If this doesn't hurry up
+[14:18:29] Harold_Foster(0): I will FUCK some shit up, alright?
+[14:18:36] Harold_Foster(0): /buyvehicle
+[14:20:56] Harold_Foster(0): /buyvehicle
+[14:21:07] Harold_Foster(0): /buyvehicle
+[14:21:20] Harold_Foster(0): /setp 0 cash 300000
+[14:21:22] Harold_Foster(0): /buyvehicle
+[14:21:35] Harold_Foster(0): /buyvehicle
+[14:21:46] Harold_Foster(0): /buyvehicle
+[14:21:59] Harold_Foster(0): /buyvehicle
+[14:22:16] Harold_Foster(0): /buyvehicle
+[14:22:29] Harold_Foster(0): /buyvehicle
+[14:22:39] Harold_Foster(0): /buyvehicle
+[14:38:08] Harold_Foster(0): /buyvehicle
+[14:46:49] Harold_Foster(0): /buyvehicle
+[14:47:06] Harold_Foster(0): /gotov 45
+[14:47:10] Harold_Foster(0): /v inf
+[14:47:12] Harold_Foster(0): /vinfo
+[14:47:21] Harold_Foster(0): /delv
+[14:52:09] Harold_Foster(0): /v inf
+[14:52:10] Harold_Foster(0): /vinfo
+[14:53:42] Harold_Foster(0): /e
+[14:54:17] Harold_Foster(0): /scrapcar
+[14:54:24] Harold_Foster(0): /gotoi 9
+[14:54:27] Harold_Foster(0): /gotoi 8
+[14:54:31] Harold_Foster(0): /buyvehicle
+[14:54:51] Harold_Foster(0): /vinfo
+[14:54:53] Harold_Foster(0): /e
+[14:56:09] Harold_Foster(0): /savecar
+[14:57:06] Harold_Foster(0): /v mo
+[14:57:08] Harold_Foster(0): /vinfo
+[15:00:09] Harold_Foster(0): /v inf
+[15:00:13] Harold_Foster(0): /vinfo
+[15:00:15] Harold_Foster(0): /stats
+[15:02:09] Harold_Foster(0): /delv
+[15:02:22] Harold_Foster(0): /v sham
+[15:02:39] Harold_Foster(0): /delv
+[15:02:42] Harold_Foster(0): /delvall
+[15:03:00] Harold_Foster(0): /stats
+[15:03:03] Harold_Foster(0): /v inf
+[15:05:04] Harold_Foster(0): /e
+[15:05:13] Harold_Foster(0): /e
+[15:06:53] Harold_Foster(0): /afix
+[15:06:59] Harold_Foster(0): /spray
+[15:07:02] Harold_Foster(0): /spray 1 10
+[15:07:05] Harold_Foster(0): /spray 1 14
+[15:07:07] Harold_Foster(0): /spray 1 16
+[15:07:09] Harold_Foster(0): /spray 1 18
+[15:07:11] Harold_Foster(0): /spray 1 19
+[15:07:13] Harold_Foster(0): /spray 1 20
+[15:07:14] Harold_Foster(0): /spray 1 21
+[15:07:16] Harold_Foster(0): /spray 1 25
+[15:08:44] Harold_Foster(0): /e
+[15:08:46] Harold_Foster(0): /savecar
+[15:08:49] Harold_Foster(0): /delvall
+[15:08:58] Harold_Foster(0): /e
+[15:09:19] Harold_Foster(0): /afix
+[15:09:44] Harold_Foster(0): /spray 1
+[15:09:46] Harold_Foster(0): /spray 1 1
+[15:09:51] Harold_Foster(0): /spray 1 7
+[15:09:53] Harold_Foster(0): /spray 1 83
+[15:10:39] Harold_Foster(0): /savecar
+[15:10:40] Harold_Foster(0): /e
+[15:11:16] Harold_Foster(0): /e
+[15:11:48] Harold_Foster(0): /stats
+[15:31:39] Harold_Foster(0): /gotov 1
+[19:58:12] Harold_Foster(0): /v inf
+[19:58:13] Harold_Foster(0): /vinfo
+[19:58:46] Harold_Foster(0): /stats
+[19:59:33] Harold_Foster(0): /afix
+[20:00:01] Harold_Foster(0): /delv
+[20:00:36] Harold_Foster(0): /stats
+[20:01:35] Harold_Foster(0): /v l
+[20:01:52] Harold_Foster(0): /delv
+[20:01:56] Harold_Foster(0): /gotoi 6
+[20:01:58] Harold_Foster(0): /gotoi 8
+[20:02:46] Harold_Foster(0): /seticon
+[20:02:48] Harold_Foster(0): /seticon 8 pos
+[20:02:59] Harold_Foster(0): /seticon 8 pos
+[20:03:07] Harold_Foster(0): /v mule
+[20:03:11] Harold_Foster(0): /delv
+[20:03:13] Harold_Foster(0): /v ben
+[20:03:30] Harold_Foster(0): /v pon
+[20:03:45] Harold_Foster(0): /e
+[20:04:01] Harold_Foster(0): /v yank
+[20:04:10] Harold_Foster(0): /delv
+[20:04:22] Harold_Foster(0): /v rum
+[20:04:41] Harold_Foster(0): /e
+[20:35:22] Harold_Foster(0): /delv
+[20:35:24] Harold_Foster(0): /v ben
+[20:35:30] Harold_Foster(0): /delv
+[20:35:38] Harold_Foster(0): /createsv Ben
+[20:35:43] Harold_Foster(0): /createsv Ben 52 71
+[20:35:47] Harold_Foster(0): /e
+[20:36:00] Harold_Foster(0): /e
+[20:36:16] Harold_Foster(0): /l
+[20:36:19] Harold_Foster(0): /lights
+[20:36:28] Harold_Foster(0): /delv
+[20:36:46] Harold_Foster(0): /createsv rump 2 4
+[20:37:11] Harold_Foster(0): /delv
+[20:37:19] Harold_Foster(0): /createsv pon 4 4
+[20:58:29] Harold_Foster(0): /stats
+[20:58:38] Harold_Foster(0): /v la
+[20:58:44] Harold_Foster(0): /aengine
+[20:58:45] Harold_Foster(0): /e
+[20:58:49] Harold_Foster(0): /e
+[20:58:54] Harold_Foster(0): /delv
+[21:22:07] Harold_Foster(0): /createsv mule 73 5
+[21:22:08] Harold_Foster(0): /e
+[21:22:11] Harold_Foster(0): /aengine
+[21:22:25] Harold_Foster(0): /aengine
+[21:22:26] Harold_Foster(0): /aengine
+[21:23:06] Harold_Foster(0): /deletesv confirm
+[21:23:12] Harold_Foster(0): /createsv ben 73 5
+[21:23:18] Harold_Foster(0): /aengine
+[21:23:27] Harold_Foster(0): /savecar
+[21:23:33] Harold_Foster(0): /setvehicle
+[21:23:34] Harold_Foster(0): /setvehicle pos
+[21:23:37] Harold_Foster(0): /e
+[21:23:39] Harold_Foster(0): /e
+[21:23:47] Harold_Foster(0): /respawnvehicle
+[21:23:54] Harold_Foster(0): /aengine
+[21:24:14] Harold_Foster(0): /createsv rum 92 52
+[21:24:17] Harold_Foster(0): /aengine
+[21:24:44] Harold_Foster(0): /setvehicle pos
+[21:24:48] Harold_Foster(0): /aengine
+[21:25:05] Harold_Foster(0): /createsv pon 7 2
+[21:25:08] Harold_Foster(0): /e
+[21:25:09] Harold_Foster(0): /aengine
+[21:25:19] Harold_Foster(0): /setvehicle pos
+[21:25:21] Harold_Foster(0): /aengine
+[23:22:35] Harold_Foster(0): /selectobject mouse
+[23:22:46] Harold_Foster(0): /deleteobject

@@ -1,0 +1,12 @@
+[14:59:00] Pizza_Bean(0): /resetv
+[15:04:41] Pizza_Bean(0): /resetv
+[15:06:15] Pizza_Bean(0): /e
+[15:06:28] Pizza_Bean(0): /enter
+[15:06:32] Pizza_Bean(0): /buy
+[15:07:48] Pizza_Bean(0): /exit
+[15:08:50] Pizza_Bean(0): /e
+[15:08:52] Pizza_Bean(0): /e
+[15:08:52] Pizza_Bean(0): /e
+[15:08:58] Pizza_Bean(0): /enter
+[15:09:06] Pizza_Bean(0): /exit
+[21:20:14] Harold_Foster(0): /resetv

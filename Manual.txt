@@ -1,0 +1,66 @@
+/home/Donovan/samp03/gamemodes
+/etc/httpd/conf.d
+
+START SERVER
+screen ./samp03svr
+
+
+SCREEN NUMBER
+screen -ls 
+
+STOP SCREEN
+screen -X -S [session # you want to kill] quit
+
+
+STOP SERVER
+# killall -9 samp03svr
+
+TEAMSPEAK
+ps x
+screen ./ts3server_minimal_runscript.sh start inifile=ts3server.ini
+./ts3server_minimal_runscript.sh restart
+
+MYSQL START
+sudo service mysqld start
+sudo service httpd start
+
+sudo nano /etc/httpd/conf.d/phpMyAdmin.conf
+/etc/httpd/conf.d/httpd.conf
+
+
+<Directory "/usr/share/phpmyadmin">
+    Order allow,deny
+    Allow from all
+	Options FollowSymLinks
+	DirectoryIndex index.php
+	AllowOverride All
+</Directory>
+
+
+/etc/httpd/conf.d/phpmyadmin  == can change URL there
+
+
+
+
+
+shutdown /a
+
+
+
+
+
+
+
+https://www.digitalocean.com/community/tutorials/how-to-install-and-secure-phpmyadmin-on-a-centos-6-4-vps
+
+To make changes to sudo from putty/bash:
+
+Type visudo and press enter.
+Navigate to the place you wish to edit using the up and down arrow keys.
+Press insert to go into editing mode.
+Make your changes - for example: user ALL=(ALL) ALL.
+Note - it matters whether you use tabs or spaces when making changes.
+Once your changes are done press esc to exit editing mode.
+Now type :wq to save and press enter.
+You should now be back at bash.
+Now you can press ctrl + D to exit the session if you wish.

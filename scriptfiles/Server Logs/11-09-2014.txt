@@ -1,0 +1,226 @@
+[13:41:12] Harold_Foster(0): /gotob bar
+[13:41:22] Harold_Foster(0): /businessmanager
+[13:41:34] Harold_Foster(0): /businessmanager
+[13:50:51] Harold_Foster(0): /gotoh 3 outer
+[13:50:55] Harold_Foster(0): /housemanager
+[13:51:13] Harold_Foster(0): /reload houses
+[13:51:24] Harold_Foster(0): /housemanager
+[13:59:48] Harold_Foster(0): /v greenwood 3 
+[13:59:50] Harold_Foster(0): /v greenwood 3 0
+[13:59:54] Harold_Foster(0): /delv
+[13:59:56] Harold_Foster(0): /v greenwood 42 0
+[13:59:59] Harold_Foster(0): /v greenwood 43 0
+[14:00:02] Harold_Foster(0): /delvall
+[14:00:04] Harold_Foster(0): /delv
+[14:00:07] Harold_Foster(0): /v greenwood 0 0
+[14:00:09] Harold_Foster(0): /delv
+[14:00:11] Harold_Foster(0): /v greenwood 4 0
+[14:00:14] Harold_Foster(0): /v greenwood 99 0
+[14:00:18] Harold_Foster(0): /delv
+[14:00:23] Harold_Foster(0): /v greenwood 4 0
+[14:00:25] Harold_Foster(0): /delvall
+[14:00:26] Harold_Foster(0): /e
+[14:01:09] Harold_Foster(0): /v greenwood 4 4
+[14:01:12] Harold_Foster(0): /delvall
+[14:01:15] Harold_Foster(0): /e
+[14:01:22] Harold_Foster(0): /delv
+[14:01:24] Harold_Foster(0): /v mana
+[14:01:32] Harold_Foster(0): /stats
+[14:01:41] Harold_Foster(0): /delv
+[14:01:48] Harold_Foster(0): /v mana 4 4
+[14:01:51] Harold_Foster(0): /delv
+[14:02:35] Harold_Foster(0): /v mana
+[14:02:43] Harold_Foster(0): /delv
+[14:02:47] Harold_Foster(0): /createsv
+[14:02:54] Harold_Foster(0): /createsv mana 4 0
+[14:03:52] Harold_Foster(0): /unloadsv
+[14:03:54] Harold_Foster(0): /loadsv
+[14:04:08] Harold_Foster(0): /gotov 40
+[14:04:11] Harold_Foster(0): /gotov 39
+[14:04:12] Harold_Foster(0): /gotov 1
+[14:04:14] Harold_Foster(0): /gotov 3
+[14:04:30] Harold_Foster(0): /restart
+[14:05:11] Harold_Foster(0): /gotov 30
+[14:05:14] Harold_Foster(0): /gotov 50
+[14:05:17] Harold_Foster(0): /gotov 53
+[14:05:18] Harold_Foster(0): /gotov 52
+[14:05:20] Harold_Foster(0): /gotov 51
+[14:05:21] Harold_Foster(0): /gotov 50
+[14:05:44] Harold_Foster(0): /e
+[14:05:45] Harold_Foster(0): /e
+[14:05:46] Harold_Foster(0): /e
+[14:06:29] Harold_Foster(0): /vinfo
+[14:15:05] Harold_Foster(0): /gotov 2
+[14:15:12] Harold_Foster(0): /vinfo
+[14:19:12] Harold_Foster(0): /gotov 1
+[14:19:16] Harold_Foster(0): /gotov 0
+[14:19:17] Harold_Foster(0): /gotov 1
+[14:19:22] Harold_Foster(0): /downslap harold
+[14:19:28] Harold_Foster(0): /key
+[14:19:35] Harold_Foster(0): /lock
+[14:24:18] Harold_Foster(0): /gotov 13
+[14:24:48] Harold_Foster(0): /vinfo
+[14:24:52] Harold_Foster(0): /gotov 12
+[14:25:02] Harold_Foster(0): /vinfo
+[14:25:33] Harold_Foster(0): /vinfo
+[14:29:29] Harold_Foster(0): /vinfo
+[14:29:39] Harold_Foster(0): /gotov 13
+[14:29:41] Harold_Foster(0): /gotov 12
+[14:29:49] Harold_Foster(0): /vinfo
+[14:32:40] Harold_Foster(0): /vinfo
+[14:35:23] Harold_Foster(0): /vinfo
+[14:35:25] Harold_Foster(0): /e
+[14:35:38] Harold_Foster(0): /v inf
+[14:35:41] Harold_Foster(0): /vinfo
+[14:35:55] Harold_Foster(0): /vinfo
+[14:36:05] Harold_Foster(0): /vinfo
+[14:36:21] Harold_Foster(0): /e
+[14:39:31] Harold_Foster(0): /vinfo
+[14:39:33] Harold_Foster(0): /e
+[14:39:38] Harold_Foster(0): /gotov 50
+[14:40:52] Harold_Foster(0): /vinfo
+[14:41:01] Harold_Foster(0): /vinfo
+[14:41:12] Harold_Foster(0): /vinfo
+[14:41:29] Harold_Foster(0): /e
+[15:02:10] Harold_Foster(0): /delv
+[15:02:14] Harold_Foster(0): /stats
+[15:02:19] Harold_Foster(0): /stats
+[15:02:34] Harold_Foster(0): /gotob fost
+[15:02:37] Harold_Foster(0): /binfo
+[15:02:42] Harold_Foster(0): /gotob bank
+[15:02:43] Harold_Foster(0): /enter
+[15:02:47] Harold_Foster(0): /payday
+[15:03:00] Harold_Foster(0): /deposit 9000
+[15:03:05] Harold_Foster(0): /exit
+[15:06:14] Harold_Foster(0): /v inf
+[15:06:22] Harold_Foster(0): /delv
+[15:06:27] Harold_Foster(0): /e
+[15:06:38] Harold_Foster(0): /vinfo
+[15:08:54] Harold_Foster(0): /gotov 50
+[15:09:05] Harold_Foster(0): /vinfo
+[15:09:21] Harold_Foster(0): /e
+[15:09:54] Harold_Foster(0): /spray
+[15:09:59] Harold_Foster(0): /spray 1 1
+[15:10:05] Harold_Foster(0): /spray 2 0
+[15:10:56] Harold_Foster(0): /delv
+[15:11:45] Harold_Foster(0): /gotov 50
+[15:11:47] Harold_Foster(0): /gotov 49
+[15:11:54] Harold_Foster(0): /vinfo
+[15:12:17] Harold_Foster(0): /gotov 48
+[15:12:19] Harold_Foster(0): /gotov 47
+[15:12:23] Harold_Foster(0): /gotov 46
+[15:19:50] Harold_Foster(0): /gotov
+[15:19:56] Harold_Foster(0): /gotov 47
+[15:20:05] Harold_Foster(0): /vinfo
+[15:21:48] Harold_Foster(0): /v inf
+[15:22:07] Harold_Foster(0): /vinfo
+[15:24:54] Harold_Foster(0): /vinfo
+[15:25:00] Harold_Foster(0): /v san
+[15:29:25] Harold_Foster(0): /respawnvehicle
+[15:29:28] Harold_Foster(0): /respawnvehicle
+[15:44:10] Harold_Foster(0): /v inf
+[15:44:26] Harold_Foster(0): /vinfo
+[15:44:39] Harold_Foster(0): /gotov 46
+[15:45:42] Harold_Foster(0): /delv
+[15:45:55] Harold_Foster(0): /createsv
+[15:46:03] Harold_Foster(0): /createsv mana 4 1
+[15:46:04] Harold_Foster(0): /e
+[15:46:07] Harold_Foster(0): /vinfo
+[15:46:57] Harold_Foster(0): /e
+[15:46:59] Harold_Foster(0): /vinfo
+[15:56:13] Harold_Foster(0): /dmv
+[15:56:19] Harold_Foster(0): /iconmanager
+[15:56:31] Harold_Foster(0): /aengine
+[15:57:24] Harold_Foster(0): /setvehicle
+[15:57:29] Harold_Foster(0): /setvehicle pos
+[15:57:34] Harold_Foster(0): /setvehicle pos 1
+[16:02:43] Harold_Foster(0): /iconmanager
+[16:02:55] Harold_Foster(0): /dmv
+[16:22:57] Harold_Foster(0): /v inf
+[16:23:01] Harold_Foster(0): /s a
+[16:23:02] Harold_Foster(0): /b a
+[16:23:35] Harold_Foster(0): /dmv
+[16:24:30] Harold_Foster(0): /gotov 14
+[16:24:32] Harold_Foster(0): /gotov 13
+[16:24:38] Harold_Foster(0): /e
+[16:24:39] Harold_Foster(0): /e
+[16:24:41] Harold_Foster(0): /aengine
+[16:24:51] Harold_Foster(0): /delvall
+[16:25:48] Harold_Foster(0): /setvehicle pos 1
+[16:25:50] Harold_Foster(0): /e
+[16:25:54] Harold_Foster(0): /vinfo
+[16:26:02] Harold_Foster(0): /e
+[16:26:04] Harold_Foster(0): /aengine
+[16:26:10] Harold_Foster(0): /dmv
+[16:26:16] Harold_Foster(0): /e
+[16:26:18] Harold_Foster(0): /e
+[16:26:20] Harold_Foster(0): /vinfo
+[16:26:44] Harold_Foster(0): /aengine
+[16:27:14] Harold_Foster(0): /v inf
+[16:27:33] Harold_Foster(0): /e
+[16:27:36] Harold_Foster(0): /e
+[16:28:47] Harold_Foster(0): /logout
+[16:29:05] Harold_Foster(0): /logout
+[16:32:19] Harold_Foster(0): /e
+[16:32:33] Harold_Foster(0): /deleteobject
+[16:33:09] Harold_Foster(0): /a Fuck
+[16:41:37] Harold_Foster(0): /a a
+[16:41:57] Harold_Foster(0): /v inf
+[16:42:09] Harold_Foster(0): /logout
+[16:46:12] Harold_Foster(0): /logout
+[16:46:41] Harold_Foster(0): /logout
+[16:46:58] Harold_Foster(0): /logout
+[17:29:58] Harold_Foster(0): /v inf
+[17:29:59] Harold_Foster(0): 5136
+[17:30:08] Harold_Foster(0): /delv
+[17:30:13] Harold_Foster(0): /createobject 5136
+[17:30:19] Harold_Foster(0): /createobject 5136 DMV
+[17:30:37] Harold_Foster(0): /deleteobject
+[17:31:06] Harold_Foster(0): /createobject 5726 DMV
+[17:31:10] Harold_Foster(0): /slap harold
+[17:31:11] Harold_Foster(0): /slap harold
+[17:31:12] Harold_Foster(0): /slap harold
+[17:31:12] Harold_Foster(0): /slap haroldt
+[17:31:13] Harold_Foster(0): /slap haroldt
+[17:31:15] Harold_Foster(0): /slap haroldt
+[17:31:16] Harold_Foster(0): /slap harold
+[17:31:17] Harold_Foster(0): /slap harold
+[17:31:17] Harold_Foster(0): /slap harold
+[17:31:18] Harold_Foster(0): /slap haroldt
+[17:31:21] Harold_Foster(0): /gotob bank
+[17:31:36] Harold_Foster(0): /selectobject mouse
+[17:32:14] Harold_Foster(0): /deleteobject
+[17:34:16] Harold_Foster(0): /createobject 11431 dmv
+[17:34:46] Harold_Foster(0): /createobject 11566 dmv2
+[17:34:56] Harold_Foster(0): /deleteobject
+[17:35:05] Harold_Foster(0): /selectobject near
+[17:35:06] Harold_Foster(0): /selectobject near
+[17:35:08] Harold_Foster(0): /selectobject mouse
+[17:35:55] Harold_Foster(0): /selectobject mouse
+[17:36:50] Harold_Foster(0): /gotoi 8
+[17:36:51] Harold_Foster(0): /gotoi 9
+[17:36:56] Harold_Foster(0): /seticon
+[17:36:58] Harold_Foster(0): /seticon 9 pos
+[17:36:59] Harold_Foster(0): /seticon 9 pos 1
+[17:37:23] Harold_Foster(0): /v in
+[17:38:12] Harold_Foster(0): /delv
+[17:40:46] Harold_Foster(0): /createobject 10281 DMV Sign
+[17:40:56] Harold_Foster(0): /selectobject
+[17:41:01] Harold_Foster(0): /selectobject near
+[17:41:02] Harold_Foster(0): /selectobject near
+[17:41:06] Harold_Foster(0): /selectobject mouse
+[17:41:36] Harold_Foster(0): /deleteobject
+[22:51:42] Harold_Foster(0): /dmv
+[22:51:46] Harold_Foster(0): /kill
+[22:52:03] Harold_Foster(0): /v inf
+[22:52:14] Harold_Foster(0): /kill
+[22:52:37] Harold_Foster(0): /logout
+[22:52:42] Harold_Foster(0): /v inf
+[22:53:18] Harold_Foster(0): /kill
+[22:55:52] Harold_Foster(0): /v inf
+[22:56:11] Harold_Foster(0): /dmv
+[22:56:20] Harold_Foster(0): /kill
+[22:57:01] Harold_Foster(0): /v inf
+[22:57:04] Harold_Foster(0): /dmv
+[22:57:13] Harold_Foster(0): /dmv
+[22:57:17] Harold_Foster(0): /kill

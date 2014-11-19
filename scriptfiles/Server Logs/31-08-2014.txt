@@ -1,0 +1,28 @@
+[00:02:17] Harold_Foster(0): /viewaccounts
+[00:02:19] Harold_Foster(0): /viewaccounts Foster
+[00:02:22] Harold_Foster(0): /viewaccounts Foster
+[10:47:02] Foster(0): /delv
+[10:57:12] Harold_Foster(0): ha
+[10:58:00] Harold_Foster(0): v hyd
+[10:58:03] Harold_Foster(0): /v hyd
+[10:59:39] Harold_Foster(0): /delv
+[10:59:52] Harold_Foster(0): /stats
+[11:00:03] Harold_Foster(0): /v prem
+[11:00:22] Harold_Foster(0): /delv
+[11:00:24] Harold_Foster(0): /enter
+[11:00:32] Harold_Foster(0): /payday
+[11:01:00] Harold_Foster(0): /payday
+[11:01:05] Harold_Foster(0): /stats
+[11:01:06] Harold_Foster(0): /exit
+[11:01:14] Harold_Foster(0): /v ra
+[11:01:22] Harold_Foster(0): /delv
+[11:01:24] Harold_Foster(0): /gotob fost
+[11:01:28] Harold_Foster(0): /enter
+[11:01:32] Harold_Foster(0): /checksafe
+[11:01:41] Harold_Foster(0): /exit
+[11:02:26] Harold_Foster(0): /stats
+[11:02:37] Harold_Foster(0): /setp 0 faction
+[11:02:39] Harold_Foster(0): /fmanager
+[11:02:44] Harold_Foster(0): /setp 0 faction 4
+[11:02:45] Harold_Foster(0): /e
+[11:06:19] Harold_Foster(0): /e

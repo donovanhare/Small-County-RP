@@ -1,0 +1,36 @@
+[13:57:29] Harold_Foster(0): /v inf
+[13:57:40] Harold_Foster(0): /delv
+[13:57:45] Harold_Foster(0): /dmv
+[13:57:48] Harold_Foster(0): /v inf
+[13:58:07] Harold_Foster(0): /e
+[13:58:33] Harold_Foster(0): /respawnvehicle
+[13:58:40] Harold_Foster(0): /afix
+[13:58:44] Harold_Foster(0): /dmv
+[13:58:48] Harold_Foster(0): /e
+[13:59:12] Harold_Foster(0): /slap har
+[13:59:13] Harold_Foster(0): /slap har
+[13:59:13] Harold_Foster(0): /slap har
+[13:59:14] Harold_Foster(0): /slap har
+[14:01:45] Harold_Foster(0): /e
+[14:01:48] Harold_Foster(0): /aengine
+[14:01:49] Harold_Foster(0): /aengine
+[14:08:09] Harold_Foster(0): /crime 3
+[14:08:11] Harold_Foster(0): /crime 4
+[14:08:18] Harold_Foster(0): /crime 5
+[14:08:26] Harold_Foster(0): /crime 3
+[14:08:37] Harold_Foster(0): /crime 3
+[14:08:47] Harold_Foster(0): /crime 3
+[14:09:12] Harold_Foster(0): /crime 11
+[14:09:25] Harold_Foster(0): /crime 11
+[14:09:34] Harold_Foster(0): /v inf
+[14:10:16] Harold_Foster(0): /delv
+[21:50:43] Harold_Foster(0): /setp harold vworld 10
+[21:50:50] Harold_Foster(0): /setp harold vworld 0
+[21:50:54] Harold_Foster(0): /v inf
+[21:51:08] Harold_Foster(0): /delv
+[21:51:12] Harold_Foster(0): /v hyd
+[21:51:14] Harold_Foster(0): /delv
+[21:51:16] Harold_Foster(0): /v hyd
+[21:51:20] Harold_Foster(0): /slap ha
+[21:52:12] Harold_Foster(0): /v hyd
+[21:53:07] Harold_Foster(0): /delv

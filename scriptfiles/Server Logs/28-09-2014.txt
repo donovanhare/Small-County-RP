@@ -1,0 +1,7 @@
+[22:43:18] Harold_Foster(0): /starttrucking
+[22:43:19] Harold_Foster(0): /e
+[22:43:35] Harold_Foster(0): /afix
+[22:44:05] Harold_Foster(0): /afix
+[22:44:23] Harold_Foster(0): /unfreeze ha
+[22:46:38] Harold_Foster(0): /gotob dine
+[22:46:42] Harold_Foster(0): /getv 15

@@ -1,0 +1,46 @@
+[20:50:06] Harold_Foster(0): /changespawn
+[20:50:13] Harold_Foster(0): /logout
+[20:50:26] Harold_Foster(0): /vmods
+[20:50:33] Harold_Foster(0): /vstereo
+[20:50:42] Harold_Foster(0): /vstereo
+[20:51:09] Harold_Foster(0): /gotob sher
+[20:51:11] Harold_Foster(0): /stats
+[20:51:15] Harold_Foster(0): /enter
+[20:51:20] Harold_Foster(0): /door open
+[20:51:23] Harold_Foster(0): /door open
+[20:51:26] Harold_Foster(0): /door open
+[20:51:28] Harold_Foster(0): /door open
+[20:51:30] Harold_Foster(0): /door open
+[20:51:31] Harold_Foster(0): /door open
+[20:51:32] Harold_Foster(0): /door open
+[20:51:38] Harold_Foster(0): /fhelp
+[20:51:44] Harold_Foster(0): /setp harold rank 8
+[20:51:46] Harold_Foster(0): /fhelp
+[20:51:53] Harold_Foster(0): /fine 0 10
+[20:51:55] Harold_Foster(0): /fine 0 10 Cunt
+[20:52:05] Harold_Foster(0): /editranks
+[20:52:18] Harold_Foster(0): /pnc
+[20:52:58] Harold_Foster(0): /pnc
+[20:53:15] Harold_Foster(0): /cuff 0
+[20:53:18] Harold_Foster(0): /jail 0 1
+[20:53:53] Harold_Foster(0): /v inf
+[20:54:56] Harold_Foster(0): /fmanager
+[20:55:08] Harold_Foster(0): /fmanager
+[20:55:42] Harold_Foster(0): /fmanager
+[20:56:42] Harold_Foster(0): /e
+[20:56:43] Harold_Foster(0): /refuel
+[20:56:45] Harold_Foster(0): /refuel 2
+[20:56:49] Harold_Foster(0): /refuel 2
+[20:56:52] Harold_Foster(0): /setp harold cash 0
+[20:56:54] Harold_Foster(0): /setp harold cash 4
+[20:56:55] Harold_Foster(0): /refuel 2
+[20:56:57] Harold_Foster(0): /e
+[20:57:27] Harold_Foster(0): /pnc
+[20:57:48] Harold_Foster(0): /delv
+[20:57:57] Harold_Foster(0): /vmods
+[20:58:02] Harold_Foster(0): /vmods
+[20:58:05] Harold_Foster(0): /vmods
+[20:58:09] Harold_Foster(0): /vmods
+[20:58:13] Harold_Foster(0): /vmods
+[20:58:21] Harold_Foster(0): /vmods
+[20:58:23] Harold_Foster(0): /pnc

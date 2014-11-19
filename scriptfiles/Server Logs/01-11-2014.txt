@@ -1,0 +1,63 @@
+[20:53:07] Harold_Foster(0): /v inf
+[20:54:08] Harold_Foster(0): /gotopos
+[20:55:34] Harold_Foster(0): /freeze ha
+[20:55:42] Harold_Foster(0): /gotopos -71.59620 1351.90552 599.70374
+[20:55:44] Harold_Foster(0): /gotopos -71.59620 1351.90552 599.70374 1
+[20:56:08] Harold_Foster(0): /gotopos -72.59620 1351.90552 599.70374 1
+[20:56:14] Harold_Foster(0): /gotopos -72.59620 1351.90552 600.70374 1
+[20:56:18] Harold_Foster(0): /gotopos -72.59620 1351.90552 602.70374 1
+[20:58:45] Harold_Foster(0): /v hyd
+[21:07:08] Harold_Foster(0): /v la
+[21:07:53] Harold_Foster(0): /afix
+[21:17:27] Harold_Foster(0): /radar
+[21:17:32] Harold_Foster(0): /radar
+[21:17:39] Harold_Foster(0): /help
+[21:17:41] Harold_Foster(0): /fhelp
+[21:17:46] Harold_Foster(0): /stats
+[21:17:50] Harold_Foster(0): /setp harold faction 1
+[21:18:45] Harold_Foster(0): /delv
+[21:18:51] Harold_Foster(0): /enter
+[21:18:55] Harold_Foster(0): /exit
+[21:19:05] Harold_Foster(0): /enter
+[21:19:10] Harold_Foster(0): /exit
+[21:19:25] Harold_Foster(0): /enter
+[21:19:30] Harold_Foster(0): /exit
+[21:19:57] Harold_Foster(0): /enter
+[21:20:53] Harold_Foster(0): /exit
+[21:20:59] Harold_Foster(0): /v ifn
+[21:21:01] Harold_Foster(0): /v inf
+[21:23:15] Harold_Foster(0): /afix
+[21:23:17] Harold_Foster(0): /afix
+[21:23:49] Harold_Foster(0): /afix
+[21:23:54] Harold_Foster(0): /afix
+[21:28:43] Harold_Foster(0): /afix
+[21:28:45] Harold_Foster(0): /afix
+[22:11:26] Harold_Foster(0): /v inf
+[22:13:51] Harold_Foster(0): /gotob li
+[22:14:12] Harold_Foster(0): /gotopos -81.20066 1365.63599 613.07318
+[22:14:14] Harold_Foster(0): /gotopos -81.20066 1365.63599 613.07318 1
+[22:14:29] Harold_Foster(0): /v spa
+[22:14:37] Harold_Foster(0): /afix
+[22:14:38] Harold_Foster(0): /afix
+[22:14:40] Harold_Foster(0): /afix
+[22:14:42] Harold_Foster(0): /afix
+[22:14:44] Harold_Foster(0): /afix
+[22:15:26] Harold_Foster(0): /gotopos -81.20066 1365.63599 613.07318 0
+[22:15:41] Harold_Foster(0): /gotopos -81.20066 1365.63599 613.07318 0
+[22:15:47] Harold_Foster(0): /gotopos -81.20066 1365.63599 613.07318 0
+[22:15:49] Harold_Foster(0): /freeze ha
+[22:16:02] Harold_Foster(0): /unfreeze ha
+[22:16:04] Harold_Foster(0): /v rus
+[22:17:43] Harold_Foster(0): /gotopos -81.20066 1365.63599 613.07318 0
+[22:17:47] Harold_Foster(0): /gotopos -81.20066 1365.63599 613.07318 0
+[22:18:04] Harold_Foster(0): /gotopos -85.77743 1370.02356 1260.79163 0
+[22:18:19] Harold_Foster(0): /gotopos -84.77743 1370.02356 1260.79163 0
+[22:18:27] Harold_Foster(0): /gotopos -86.77743 1370.02356 1260.79163 0
+[22:20:50] Harold_Foster(0): /gotopos -86.77743 1370.02356 1260.79163 3
+[22:21:17] Harold_Foster(0): /setp harold interior 1
+[22:21:19] Harold_Foster(0): /setp harold interior 3
+[22:21:24] Harold_Foster(0): /setp harold interior 5
+[22:21:26] Harold_Foster(0): /setp harold interior 3
+[22:21:31] Harold_Foster(0): /gotopos -86.77743 1370.02356 1260.79163 3
+[22:21:33] Harold_Foster(0): /gotopos -86.77743 1370.02356 1260.79163 2
+[22:21:36] Harold_Foster(0): /gotopos -86.77743 1370.02356 1260.79163 3

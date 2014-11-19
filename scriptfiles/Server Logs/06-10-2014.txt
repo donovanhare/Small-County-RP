@@ -1,0 +1,177 @@
+[13:36:10] Harold_Foster(0): /v inf
+[13:37:53] Harold_Foster(0): /e
+[13:37:54] Harold_Foster(0): /e
+[13:37:54] Harold_Foster(0): /e
+[13:38:00] Harold_Foster(0): /e
+[13:38:01] Harold_Foster(0): /e
+[13:38:01] Harold_Foster(0): /e
+[13:38:03] Harold_Foster(0): /e
+[13:38:08] Harold_Foster(0): /refuel
+[13:38:36] Harold_Foster(0): /refuel 100
+[13:38:48] Harold_Foster(0): /e
+[13:39:14] Harold_Foster(0): /delv
+[13:39:20] Harold_Foster(0): /e
+[13:39:38] Harold_Foster(0): /setfuel
+[13:40:46] Harold_Foster(0): /e
+[13:42:34] Harold_Foster(0): /e
+[13:42:52] Harold_Foster(0): /refuel
+[13:44:26] Harold_Foster(0): /refuel
+[13:46:41] Harold_Foster(0): /refuel 100
+[13:46:43] Harold_Foster(0): /refuel 
+[13:46:47] Harold_Foster(0): /refuel 52
+[13:47:01] Harold_Foster(0): /delv
+[13:47:03] Harold_Foster(0): /afix
+[13:49:55] Harold_Foster(0): /delv
+[13:50:02] Harold_Foster(0): /respawnvehicle
+[13:50:05] Harold_Foster(0): /afix
+[13:50:11] Harold_Foster(0): /v inf
+[13:50:33] Harold_Foster(0): /setfuel 100
+[13:50:34] Harold_Foster(0): /e
+[13:51:19] Harold_Foster(0): /delv
+[13:51:20] Harold_Foster(0): /v taz
+[13:51:21] Harold_Foster(0): /v tax
+[13:51:28] Harold_Foster(0): /e
+[13:51:32] Harold_Foster(0): /e
+[13:51:33] Harold_Foster(0): /e
+[13:51:51] Harold_Foster(0): /lights
+[13:51:53] Harold_Foster(0): /e
+[13:52:01] Harold_Foster(0): /v inf
+[13:52:04] Harold_Foster(0): /delv
+[13:52:18] Harold_Foster(0): /e
+[13:52:27] Harold_Foster(0): /stats
+[13:54:04] Harold_Foster(0): /e
+[13:54:35] Harold_Foster(0): /delv
+[13:54:37] Harold_Foster(0): /v hot
+[13:55:27] Harold_Foster(0): /setfuel 1
+[13:55:28] Harold_Foster(0): /e
+[13:56:03] Harold_Foster(0): /delv
+[13:56:06] Harold_Foster(0): /v sab
+[13:56:43] Harold_Foster(0): /scrapcar
+[13:56:48] Harold_Foster(0): /delv
+[13:57:01] Harold_Foster(0): /gotoh 2
+[13:57:15] Harold_Foster(0): /gotov 38
+[13:57:31] Harold_Foster(0): /scrapcar
+[14:03:47] Harold_Foster(0): /v inf
+[14:03:52] Harold_Foster(0): /refuel 1
+[14:04:09] Harold_Foster(0): /refuel 99
+[14:04:30] Harold_Foster(0): /e
+[14:04:31] Harold_Foster(0): /e
+[14:14:45] Harold_Foster(0): /refuel
+[14:14:48] Harold_Foster(0): /refuel 10
+[14:15:29] Harold_Foster(0): /delv
+[16:09:09] Harold_Foster(0): /v inf
+[16:09:14] Harold_Foster(0): /refuel 20
+[16:09:38] Harold_Foster(0): /refuel 80
+[16:10:26] Harold_Foster(0): /refuel 80
+[16:10:28] Harold_Foster(0): /refuel
+[16:10:30] Harold_Foster(0): /refuel 1
+[16:14:49] Harold_Foster(0): /refuel
+[16:18:36] Harold_Foster(0): /delv
+[16:24:49] Harold_Foster(0): /refuel
+[16:24:52] Harold_Foster(0): /refuel
+[16:24:54] Harold_Foster(0): /refuel
+[16:24:55] Harold_Foster(0): /refuel
+[16:24:56] Harold_Foster(0): /refuel
+[16:24:57] Harold_Foster(0): /refuel
+[16:24:59] Harold_Foster(0): /refuel
+[16:25:00] Harold_Foster(0): /refuel
+[16:25:07] Harold_Foster(0): /v mon
+[16:25:11] Harold_Foster(0): /v mon
+[16:25:13] Harold_Foster(0): /delvall
+[16:25:18] Harold_Foster(0): /refuel
+[16:25:20] Harold_Foster(0): /refuel
+[16:25:22] Harold_Foster(0): /refuel
+[16:25:24] Harold_Foster(0): /refuel
+[16:25:25] Harold_Foster(0): /refuel
+[16:25:27] Harold_Foster(0): /refuel
+[16:25:30] Harold_Foster(0): /refuel
+[16:25:36] Harold_Foster(0): /refuel 100
+[16:25:38] Harold_Foster(0): /refuel 100
+[16:28:07] Harold_Foster(0): /refuel
+[16:28:09] Harold_Foster(0): /refuel
+[16:28:11] Harold_Foster(0): /refuel
+[16:28:12] Harold_Foster(0): /refuel
+[16:28:15] Harold_Foster(0): /refuel
+[16:28:17] Harold_Foster(0): /refuel
+[16:28:20] Harold_Foster(0): /refuel
+[16:40:50] Harold_Foster(0): /logout
+[16:40:58] Harold_Foster(0): /kill
+[16:41:33] Harold_Foster(0): /kill
+[16:41:34] Harold_Foster(0): .a
+[16:42:40] Harold_Foster(0): /v inf
+[16:42:52] Harold_Foster(0): /refuel 25
+[16:42:54] Harold_Foster(0): /refuel 25
+[16:43:07] Harold_Foster(0): /refuel 25
+[16:43:10] Harold_Foster(0): /refuel
+[16:43:33] Harold_Foster(0): /setfuel 19
+[16:43:36] Harold_Foster(0): /setfuel 19
+[16:43:39] Harold_Foster(0): /setfuel 30
+[16:43:43] Harold_Foster(0): /setfuel 30
+[16:43:48] Harold_Foster(0): /setfuel 50
+[16:43:58] Harold_Foster(0): /setfuel 90
+[16:44:06] Harold_Foster(0): /setfuel 1
+[16:44:28] Harold_Foster(0): /setfuel 11
+[16:45:16] Harold_Foster(0): /afix
+[16:45:20] Harold_Foster(0): /lights
+[16:46:23] Harold_Foster(0): /delv
+[16:46:26] Harold_Foster(0): /v tax
+[16:46:42] Harold_Foster(0): /refuel
+[16:46:44] Harold_Foster(0): /refuel 100
+[16:46:46] Harold_Foster(0): /refuel 100
+[16:46:47] Harold_Foster(0): /refuel 100
+[16:47:38] Harold_Foster(0): Urr-..
+[16:47:45] Harold_Foster(0): /me sighs as he taps his fingers
+[16:47:46] Harold_Foster(0): /e
+[16:47:54] Harold_Foster(0): /refuel 1
+[17:09:13] Harold_Foster(0): /v inf
+[17:09:20] Harold_Foster(0): /setfuel
+[17:09:22] Harold_Foster(0): /setfuel 10
+[17:10:00] Harold_Foster(0): .delv
+[17:10:02] Harold_Foster(0): .delv
+[17:10:03] Harold_Foster(0): /delv
+[17:10:08] Harold_Foster(0): /e
+[17:10:16] Harold_Foster(0): /afix
+[17:11:15] Harold_Foster(0): /refuel
+[17:13:47] Harold_Foster(0): /e
+[17:13:51] Harold_Foster(0): /v inf
+[17:13:58] Harold_Foster(0): /delv
+[17:14:05] Harold_Foster(0): /setfuel 100
+[17:14:06] Harold_Foster(0): /e
+[17:14:08] Harold_Foster(0): /aengine
+[17:15:38] Harold_Foster(0): /e
+[17:15:49] Harold_Foster(0): /aengine
+[17:15:51] Harold_Foster(0): /aengine
+[17:15:52] Harold_Foster(0): /aengine
+[17:15:57] Harold_Foster(0): /setfuel 100
+[17:40:21] Harold_Foster(0): /v inf
+[17:40:36] Harold_Foster(0): /delv
+[17:40:43] Harold_Foster(0): /starttrucking
+[17:40:46] Harold_Foster(0): /endmission
+[17:40:49] Harold_Foster(0): /endmission confirm
+[17:41:18] Harold_Foster(0): /logout
+[17:42:01] Harold_Foster(0): /starttrucking
+[17:42:08] Harold_Foster(0): /v inf
+[17:42:27] Harold_Foster(0): /delv
+[17:42:29] Harold_Foster(0): /getv 17
+[17:42:34] Harold_Foster(0): /e
+[17:42:42] Harold_Foster(0): /unfreeze ha
+[17:42:57] Harold_Foster(0): /v dod
+[17:43:54] Harold_Foster(0): /delv
+[17:43:58] Harold_Foster(0): /getv 17
+[17:44:10] Harold_Foster(0): /gotob fost
+[17:44:15] Harold_Foster(0): /getv 17
+[17:44:27] Harold_Foster(0): /gotov 18
+[17:44:30] Harold_Foster(0): /gotov 17
+[17:44:32] Harold_Foster(0): /gotov 16
+[17:44:37] Harold_Foster(0): /getv 17
+[17:46:53] Harold_Foster(0): /v taxi
+[17:47:40] Harold_Foster(0): /delv
+[17:49:09] Harold_Foster(0): /v inf
+[17:53:53] Harold_Foster(0): /settime 0
+[17:54:27] Harold_Foster(0): /delv
+[17:54:30] Harold_Foster(0): v
+[17:54:34] Harold_Foster(0): /v inf
+[17:55:18] Harold_Foster(0): /settime 6
+[17:55:20] Harold_Foster(0): /settime 5
+[17:57:17] Harold_Foster(0): /afix
+[17:58:11] Harold_Foster(0): a

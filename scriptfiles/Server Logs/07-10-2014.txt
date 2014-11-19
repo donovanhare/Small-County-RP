@@ -1,0 +1,26 @@
+[17:52:32] Harold_Foster(0): /v inf
+[17:52:33] Harold_Foster(0): /e
+[17:52:35] Harold_Foster(0): /e
+[17:52:36] Harold_Foster(0): q
+[17:54:17] Harold_Foster(0): /v inf
+[17:54:18] Harold_Foster(0): /e
+[17:54:27] Harold_Foster(0): /e
+[17:56:29] Harold_Foster(0): /v inf
+[17:56:42] Harold_Foster(0): /v info
+[17:56:46] Harold_Foster(0): /vinfo
+[17:59:07] Harold_Foster(0): /v inf
+[18:05:22] Harold_Foster(0): /v inf
+[18:05:24] Harold_Foster(0): /e
+[18:05:27] Harold_Foster(0): /e
+[18:05:28] Harold_Foster(0): /e
+[18:05:29] Harold_Foster(0): /e
+[18:05:29] Harold_Foster(0): /e
+[18:05:30] Harold_Foster(0): /e
+[18:05:31] Harold_Foster(0): /e
+[18:05:32] Harold_Foster(0): /e
+[18:20:49] Harold_Foster(0): /v inf
+[18:20:57] Harold_Foster(0): /e
+[18:20:58] Harold_Foster(0): /e
+[18:21:16] Harold_Foster(0): /delv
+[18:21:23] Harold_Foster(0): /e
+[18:21:24] Harold_Foster(0): /e

@@ -1,0 +1,52 @@
+[14:56:04] Harold_Foster(0): /gotoi
+[14:56:05] Harold_Foster(0): /gotoi 1
+[14:56:12] Harold_Foster(0): /seticon
+[14:56:14] Harold_Foster(0): /seticon 1
+[14:56:16] Harold_Foster(0): /seticon 1pos
+[14:56:18] Harold_Foster(0): /seticon 1 pos
+[15:03:57] Harold_Foster(0): /exit
+[15:03:58] Harold_Foster(0): /enter
+[15:03:59] Harold_Foster(0): /exit
+[15:04:01] Harold_Foster(0): /enter
+[15:04:09] Harold_Foster(0): /seticon pos
+[15:04:11] Harold_Foster(0): /seticon 1 pos
+[15:04:21] Harold_Foster(0): /gotoi 1
+[15:04:41] Harold_Foster(0): /iconmanager
+[15:04:49] Harold_Foster(0): /iconmanager
+[15:04:53] Harold_Foster(0): /iconmanager
+[15:04:59] Harold_Foster(0): /iconmanager
+[15:05:22] Harold_Foster(0): /iconmanager
+[15:05:28] Harold_Foster(0): /gotoi 2
+[15:05:34] Harold_Foster(0): /iconmanager
+[15:07:17] Harold_Foster(0): /gotoi 0
+[15:07:46] Harold_Foster(0): /iconmanager
+[15:30:58] Harold_Foster(0): /iconmanager
+[15:31:08] Harold_Foster(0): /iconmanager
+[20:38:56] Harold_Foster(0): /buyvehicle
+[20:39:08] Harold_Foster(0): /setp harold cash 1000000
+[20:39:09] Harold_Foster(0): /buyvehicle
+[20:39:21] Harold_Foster(0): /exit
+[20:39:22] Harold_Foster(0): /enter
+[20:39:24] Harold_Foster(0): /exit
+[20:39:38] Harold_Foster(0): /gotoh half
+[20:39:47] Harold_Foster(0): /enter
+[20:39:56] Harold_Foster(0): /exit
+[20:40:20] Harold_Foster(0): /e
+[20:40:46] Harold_Foster(0): /call 911
+[20:40:55] Harold_Foster(0): /handsup
+[20:41:16] Harold_Foster(0): /hangup
+[20:41:18] Harold_Foster(0): /call 911
+[20:41:26] Harold_Foster(0): Police
+[20:41:34] Harold_Foster(0): I've been shot
+[20:41:39] Harold_Foster(0): Bone County
+[20:42:00] Harold_Foster(0): /selectobject mouse
+[20:42:16] Harold_Foster(0): /createobject 700 a
+[20:42:24] Harold_Foster(0): /deleteobject
+[20:42:53] Harold_Foster(0): /enter
+[20:43:13] Harold_Foster(0): /door open
+[20:43:17] Harold_Foster(0): /door open
+[20:43:19] Harold_Foster(0): /door open
+[20:43:31] Harold_Foster(0): /exit
+[20:43:49] Harold_Foster(0): /enter
+[20:43:53] Harold_Foster(0): /buy
+[20:44:09] Harold_Foster(0): /exit

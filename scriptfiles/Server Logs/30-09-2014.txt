@@ -1,0 +1,84 @@
+[11:22:56] Harold_Foster(0): /v inf
+[11:23:12] Harold_Foster(0): /phoneinfo
+[11:23:21] Harold_Foster(0): /call 7907424
+[11:23:26] Harold_Foster(0): /answer
+[11:23:29] Harold_Foster(0): Hi hi
+[11:24:01] Harold_Foster(0): /hangup
+[11:25:27] Harold_Foster(0): /gotov 15
+[11:25:35] Harold_Foster(0): /starttrucking
+[11:25:36] Harold_Foster(0): /e
+[11:27:16] Harold_Foster(0): /endmission
+[11:27:21] Harold_Foster(0): /endmission confirm
+[11:27:35] Harold_Foster(0): /call 7907424
+[11:27:38] Harold_Foster(0): /hangup
+[11:27:47] Harold_Foster(0): /v inf
+[11:27:48] Harold_Foster(0): /call 7907424
+[11:27:56] Harold_Foster(0): /hangup
+[11:28:25] Harold_Foster(0): /delv
+[11:54:21] Harold_Foster(0): /asay
+[11:54:22] Harold_Foster(0): /asay a
+[11:54:34] Harold_Foster(0): /asay That is not what I was wanting but FUCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCK it
+[11:54:38] Harold_Foster(0): /asay That is not what I was wanting but FUCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCK it UPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+[11:54:51] Harold_Foster(0): /asay That is not what I was wanting but FUCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCK it UPPPPPPPPPPPPPPPPPPPPPPPPPPPd
+[11:55:06] Harold_Foster(0): /asay
+[11:55:12] Harold_Foster(0): /asay Good evening.
+[14:18:47] Harold_Foster(0): /gotov 15
+[14:19:13] Harold_Foster(0): /starttrucking
+[14:19:14] Harold_Foster(0): /e
+[14:24:38] Harold_Foster(0): /logout
+[14:24:58] Harold_Foster(0): /starttrucking
+[14:24:58] Harold_Foster(0): /e
+[14:25:02] Harold_Foster(0): /slap ha
+[14:25:27] Harold_Foster(0): /afix
+[14:25:41] Harold_Foster(0): /unfreeze ha
+[14:26:28] Harold_Foster(0): /flip
+[14:28:01] Harold_Foster(0): /slap
+[14:28:17] Harold_Foster(0): /gotob fort carson new
+[14:28:21] Harold_Foster(0): /gotob fort carson new
+[14:28:23] Harold_Foster(0): /gotob fort carson
+[14:28:25] Harold_Foster(0): /gotob fort carson new
+[14:28:26] Harold_Foster(0): /gotob fort carson n
+[14:28:27] Harold_Foster(0): /gotob fort carson
+[14:28:31] Harold_Foster(0): /gotob new
+[14:28:33] Harold_Foster(0): 
+[14:28:37] Harold_Foster(0): /getv 15
+[14:28:47] Harold_Foster(0): /getv 15
+[14:29:09] Harold_Foster(0): /gotov 16
+[14:29:14] Harold_Foster(0): /getv 15
+[14:30:23] Harold_Foster(0): /giveweapon harold m4 100
+[14:41:11] Harold_Foster(0): /logout
+[14:42:26] Harold_Foster(0): /starttrucking
+[14:42:31] Harold_Foster(0): /starttrucking
+[14:42:38] Harold_Foster(0): /logout
+[14:42:56] Harold_Foster(0): /starttrucking
+[14:43:03] Harold_Foster(0): /endmission
+[14:43:06] Harold_Foster(0): /endmission confirm
+[14:46:31] Harold_Foster(0): /v pon
+[14:47:05] Harold_Foster(0): /delv
+[14:47:07] Harold_Foster(0): /v bur
+[14:47:36] Harold_Foster(0): /phoneinfo
+[14:47:41] Harold_Foster(0): /call 7907424
+[14:47:46] Harold_Foster(0): /hangup
+[14:47:51] Harold_Foster(0): /e
+[14:47:52] Harold_Foster(0): /e
+[14:47:53] Harold_Foster(0): /e
+[14:48:04] Harold_Foster(0): /call 7907424
+[14:48:09] Harold_Foster(0): Hello there
+[14:48:13] Harold_Foster(0): /answer
+[14:48:14] Harold_Foster(0): Hello there
+[14:48:23] Harold_Foster(0): /hangup
+[15:00:47] Harold_Foster(0): /logout
+[15:01:19] Harold_Foster(0): /e
+[15:01:50] Harold_Foster(0): /e
+[15:01:52] Harold_Foster(0): /aengine
+[15:03:11] Harold_Foster(0): q
+[16:16:13] Harold_Foster(0): /v stunt
+[16:16:21] Harold_Foster(0): /delv
+[16:16:25] Harold_Foster(0): /v mav
+[16:16:56] Harold_Foster(0): /delv
+[16:17:01] Harold_Foster(0): /v pon
+[16:17:04] Harold_Foster(0): /delv
+[16:17:05] Harold_Foster(0): /v line
+[16:18:57] Harold_Foster(0): /lights
+[16:19:42] Harold_Foster(0): /e
+[16:21:07] Harold_Foster(0): /v bob

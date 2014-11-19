@@ -1,0 +1,45 @@
+[14:05:11] Harold_Foster(0): /gotoh 1 out
+[14:05:58] Harold_Foster(0): /v inf
+[14:06:15] Harold_Foster(0): /frespawn
+[14:06:16] Harold_Foster(0): /frespawn all
+[14:06:19] Harold_Foster(0): /frespawn all
+[14:06:30] Harold_Foster(0): /e
+[14:06:41] Harold_Foster(0): /frespawn all
+[14:07:41] Harold_Foster(0): /afix
+[14:08:17] Harold_Foster(0): /lights
+[14:08:20] Harold_Foster(0): /lights
+[14:08:24] Harold_Foster(0): /e
+[14:08:26] Harold_Foster(0): /e
+[14:08:54] Harold_Foster(0): /frespawn all
+[14:08:56] Harold_Foster(0): /v inf
+[14:10:07] Harold_Foster(0): /gotob zip
+[14:10:08] Harold_Foster(0): /delvall
+[14:10:10] Harold_Foster(0): /v inf
+[14:17:03] Harold_Foster(0): /aengine
+[14:17:05] Harold_Foster(0): /aengine
+[14:17:28] Harold_Foster(0): /reload biz
+[14:18:27] Harold_Foster(0): /frespawn all
+[14:18:42] Harold_Foster(0): /afix
+[14:18:44] Harold_Foster(0): /e
+[14:18:50] Harold_Foster(0): /frespawn all
+[14:19:03] Harold_Foster(0): /e
+[14:19:06] Harold_Foster(0): /e
+[14:19:07] Harold_Foster(0): /e
+[14:19:40] Harold_Foster(0): /frespawn all
+[14:19:41] Harold_Foster(0): /v inf
+[14:19:59] Harold_Foster(0): /delvall
+[14:20:08] Harold_Foster(0): /e
+[14:20:09] Harold_Foster(0): /e
+[14:21:28] Harold_Foster(0): /delv
+[14:21:30] Harold_Foster(0): /v inf
+[14:21:51] Harold_Foster(0): /delv
+[17:04:16] Harold_Foster(0): /gotob zip
+[17:04:19] Harold_Foster(0): /v inf
+[17:04:24] Harold_Foster(0): /superspeed
+[17:04:29] Harold_Foster(0): /superspeed
+[17:04:31] Harold_Foster(0): /superspeed
+[17:04:43] Harold_Foster(0): /superspeed
+[17:04:47] Harold_Foster(0): /superspeed
+[17:04:49] Harold_Foster(0): /superspeed
+[17:04:50] Harold_Foster(0): /superspeed
+[17:04:54] Harold_Foster(0): /delv

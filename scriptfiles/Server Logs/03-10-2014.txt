@@ -1,0 +1,24 @@
+[18:40:07] Harold_Foster(0): /v inf
+[18:40:45] Harold_Foster(0): /delv
+[18:40:46] Harold_Foster(0): /v tax
+[18:40:57] Harold_Foster(0): /taxi
+[18:41:01] Harold_Foster(0): /offertaxi ha
+[18:41:05] Harold_Foster(0): /taxi accept
+[18:41:17] Harold_Foster(0): /setfare 5
+[18:41:22] Harold_Foster(0): /setfare 50
+[18:41:22] Harold_Foster(0): /setfare 5
+[18:41:25] Harold_Foster(0): /offertaxi ha
+[18:41:27] Harold_Foster(0): /taxi accept
+[18:46:04] Harold_Foster(0): /v ta
+[18:46:29] Harold_Foster(0): /offertaxi ha
+[18:46:37] Harold_Foster(0): /taxi accept
+[18:46:57] Harold_Foster(0): /setfare 5
+[18:47:04] Harold_Foster(0): /offertaxi ha
+[18:47:06] Harold_Foster(0): /setfare 5
+[18:47:22] Harold_Foster(0): /taxi accept
+[18:47:54] Harold_Foster(0): /v inf
+[18:48:02] Harold_Foster(0): /endfare
+[18:48:04] Harold_Foster(0): /endfare
+[18:49:31] Harold_Foster(0): /afix
+[18:50:04] Harold_Foster(0): /housemanager
+[18:50:34] Harold_Foster(0): /ban harold bunny-hop

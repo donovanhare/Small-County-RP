@@ -1,0 +1,45 @@
+[12:23:32] Harold_Foster(0): /v inf
+[12:23:35] Harold_Foster(0): /dmv
+[12:23:41] Harold_Foster(0): /dmv
+[12:23:42] Harold_Foster(0): /dmv
+[12:23:52] Harold_Foster(0): /delv
+[12:48:20] Harold_Foster(0): /v la
+[12:48:22] Harold_Foster(0): /dmv
+[12:49:21] Harold_Foster(0): /delv
+[12:49:27] Harold_Foster(0): /v rus
+[12:49:39] Harold_Foster(0): /delv
+[12:49:58] Harold_Foster(0): /delvall
+[12:50:01] Harold_Foster(0): /v hyd
+[12:50:51] Harold_Foster(0): /dmv
+[12:59:17] Harold_Foster(0): /e
+[12:59:40] Harold_Foster(0): /afix
+[13:00:08] Harold_Foster(0): /dmv
+[13:00:15] Harold_Foster(0): /dmv
+[13:00:22] Harold_Foster(0): /delv
+[13:00:36] Harold_Foster(0): /giveweapon 0 rpg 10
+[13:02:40] Harold_Foster(0): /dmv
+[13:03:44] Harold_Foster(0): /restart
+[13:04:32] Harold_Foster(0): /dmv
+[13:07:26] Harold_Foster(0): /restart
+[13:08:18] Harold_Foster(0): /dmv
+[13:08:39] Harold_Foster(0): /restart
+[13:12:03] Harold_Foster(0): /dmv
+[13:16:43] Harold_Foster(0): /restart
+[13:17:36] Harold_Foster(0): /dmv
+[13:34:33] Harold_Foster(0): /v inf
+[13:34:41] Harold_Foster(0): /dmv
+[13:34:51] Harold_Foster(0): /dmv
+[13:35:33] Harold_Foster(0): /delv
+[13:39:59] Harold_Foster(0): /v inf
+[13:40:00] Harold_Foster(0): /dmv
+[13:40:03] Harold_Foster(0): /dmv
+[13:40:20] Harold_Foster(0): /dmv
+[13:45:05] Harold_Foster(0): /dmv
+[13:45:09] Harold_Foster(0): /v inf
+[13:45:10] Harold_Foster(0): /dmv
+[13:45:12] Harold_Foster(0): /dmv
+[13:48:30] Harold_Foster(0): /v inf
+[13:48:32] Harold_Foster(0): /dmv
+[13:48:35] Harold_Foster(0): /dmv
+[13:48:36] Harold_Foster(0): /dmv
+[13:48:37] Harold_Foster(0): /dmv

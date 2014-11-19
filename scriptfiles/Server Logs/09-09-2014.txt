@@ -1,0 +1,45 @@
+[16:48:45] Harold_Foster(0): /v inf
+[16:48:51] Harold_Foster(0): /dmv
+[16:48:58] Harold_Foster(0): /dmv
+[16:49:00] Harold_Foster(0): /dmv
+[16:54:21] Harold_Foster(0): /dmv
+[16:56:24] Harold_Foster(0): /dmv
+[16:57:10] Harold_Foster(0): /restart
+[16:57:38] Harold_Foster(0): /dmv
+[17:38:50] Harold_Foster(0): /dmv
+[17:40:58] Harold_Foster(0): /dmv
+[17:41:07] Harold_Foster(0): /v inf
+[17:41:10] Harold_Foster(0): /dmv
+[18:29:02] Harold_Foster(0): /dmv
+[18:29:06] Harold_Foster(0): /v inf
+[18:29:14] Harold_Foster(0): /v inf
+[18:29:19] Harold_Foster(0): /dmv
+[18:29:53] Harold_Foster(0): /dmv
+[18:35:15] Harold_Foster(0): /dmv
+[18:35:19] Harold_Foster(0): /dmv
+[20:37:42] Harold_Foster(0): /v inf
+[20:37:45] Harold_Foster(0): /dmv
+[20:38:13] Harold_Foster(0): /restart
+[20:38:41] Harold_Foster(0): /v inf
+[20:38:43] Harold_Foster(0): /dmv
+[20:51:17] Harold_Foster(0): /v inf
+[20:51:19] Harold_Foster(0): /dmv
+[20:56:20] Harold_Foster(0): /v ubf
+[20:56:23] Harold_Foster(0): /v inf
+[20:56:27] Harold_Foster(0): /dmv
+[21:02:09] Harold_Foster(0): /v inf
+[21:02:11] Harold_Foster(0): /dmv
+[21:12:13] Harold_Foster(0): /v inf
+[21:12:16] Harold_Foster(0): /dmv
+[21:17:56] Harold_Foster(0): /v bull
+[21:18:02] Harold_Foster(0): /dmv
+[21:20:22] Harold_Foster(0): /restart
+[21:20:48] Harold_Foster(0): /v bull
+[21:20:52] Harold_Foster(0): /dmv
+[21:21:39] Harold_Foster(0): /l
+[21:21:41] Harold_Foster(0): /lights
+[21:21:44] Harold_Foster(0): /lights
+[21:24:01] Harold_Foster(0): /v bull
+[21:24:04] Harold_Foster(0): /dmv
+[21:26:28] Harold_Foster(0): /v bull
+[21:26:29] Harold_Foster(0): /dmv

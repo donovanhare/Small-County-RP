@@ -1,0 +1,7 @@
+[14:11:39] Harold_Foster(0): /v inf
+[14:12:07] Harold_Foster(0): /flip
+[14:13:11] Harold_Foster(0): /gotob z
+[14:13:21] Harold_Foster(0): /gotob dine
+[14:13:29] Harold_Foster(0): /e
+[14:13:31] Harold_Foster(0): /e
+[14:13:48] Harold_Foster(0): /me flicks his middle finger up at the people as he drives at excessive speed.

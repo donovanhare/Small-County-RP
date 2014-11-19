@@ -1,0 +1,232 @@
+[08:59:12] Harold_Foster(0): /gotob bank
+[08:59:13] Harold_Foster(0): /enter
+[08:59:18] Harold_Foster(0): /balance
+[08:59:22] Harold_Foster(0): /balance
+[09:10:25] Harold_Foster(0): /balance
+[09:11:07] Harold_Foster(0): /balance
+[09:11:09] Harold_Foster(0): /balance
+[09:11:10] Harold_Foster(0): /balance
+[09:11:12] Harold_Foster(0): /balance
+[09:13:34] Harold_Foster(0): /balance
+[09:13:40] Harold_Foster(0): /exit
+[09:14:09] Harold_Foster(0): /gotob king
+[09:20:59] Harold_Foster(0): /v mo
+[09:21:01] Harold_Foster(0): /delv
+[09:21:04] Harold_Foster(0): /v ra
+[09:21:08] Harold_Foster(0): /v ara
+[09:21:09] Harold_Foster(0): /v aro
+[09:21:11] Harold_Foster(0): /v arm
+[09:22:14] Harold_Foster(0): /delv
+[09:22:16] Harold_Foster(0): /v nev
+[09:22:25] Harold_Foster(0): /slap ha
+[09:22:27] Harold_Foster(0): /slap ha
+[09:22:28] Harold_Foster(0): /slap ha
+[09:22:28] Harold_Foster(0): /slap ha
+[09:22:29] Harold_Foster(0): /slap ha
+[09:22:29] Harold_Foster(0): /slap hat
+[09:22:34] Harold_Foster(0): /delv
+[09:22:36] Harold_Foster(0): /v inf
+[09:22:42] Harold_Foster(0): /delv
+[09:22:43] Harold_Foster(0): /v an
+[09:22:56] Harold_Foster(0): /afix
+[09:24:15] Harold_Foster(0): /delv
+[14:58:33] Harold_Foster(0): /gotob ha
+[14:58:34] Harold_Foster(0): /gotob h
+[14:58:37] Harold_Foster(0): /gotob 1
+[14:58:39] Harold_Foster(0): /gotob l
+[14:58:47] Harold_Foster(0): /gotob bar
+[15:00:49] Harold_Foster(0): 35k
+[15:00:55] Harold_Foster(0): /gotob new
+[15:00:59] Harold_Foster(0): /setbiz
+[15:01:07] Harold_Foster(0): /setbiz 6 price 350000
+[15:01:10] Harold_Foster(0): /setbiz 6 price 3500000
+[15:01:16] Harold_Foster(0): /setbiz 6 price 35000000
+[15:02:12] Harold_Foster(0): /setbiz 6 price 3500
+[15:02:14] Harold_Foster(0): /setbiz 6 price 35000
+[15:02:59] Harold_Foster(0): /gotob ne
+[15:03:01] Harold_Foster(0): /gotob new
+[15:03:03] Harold_Foster(0): /setbiz
+[15:03:05] Harold_Foster(0): /setbiz 6
+[15:03:13] Harold_Foster(0): /setbiz 6 price 3
+[15:03:19] Harold_Foster(0): /setbiz 6 price 35
+[15:03:22] Harold_Foster(0): /setbiz 6 price 350
+[15:03:24] Harold_Foster(0): /setbiz 6 price 3500
+[15:03:27] Harold_Foster(0): /setbiz 6 price 35000
+[15:03:30] Harold_Foster(0): /setbiz 6 price 350000
+[15:03:32] Harold_Foster(0): /setbiz 6 price 3500000
+[15:03:34] Harold_Foster(0): /setbiz 6 price 35000000
+[15:03:37] Harold_Foster(0): /setbiz 6 price 350000000
+[15:03:40] Harold_Foster(0): /setbiz 6 price 3500000000
+[15:03:44] Harold_Foster(0): /setbiz 6 price 350000000
+[15:03:49] Harold_Foster(0): /setbiz 6 price -35
+[15:03:54] Harold_Foster(0): /setbiz 6 price -3500
+[15:03:57] Harold_Foster(0): /setbiz 6 price -35000
+[15:04:00] Harold_Foster(0): /setbiz 6 price -35000000
+[15:04:03] Harold_Foster(0): /setbiz 6 price -3500000
+[15:04:07] Harold_Foster(0): /setbiz 6 price 35000
+[15:09:44] Harold_Foster(0): /v inf
+[15:09:56] Harold_Foster(0): /delv
+[15:09:59] Harold_Foster(0): /enter
+[15:10:01] Harold_Foster(0): /stats
+[15:10:06] Harold_Foster(0): /myvehicles
+[15:10:09] Harold_Foster(0): /balance
+[15:10:17] Harold_Foster(0): /deposit 10000
+[15:10:51] Harold_Foster(0): /withdraw 10000
+[15:10:57] Harold_Foster(0): /exit
+[15:10:59] Harold_Foster(0): /pnc
+[15:11:01] Harold_Foster(0): /stats
+[15:11:14] Harold_Foster(0): /gotob she
+[15:11:15] Harold_Foster(0): /enter
+[15:11:16] Harold_Foster(0): /pnc
+[15:11:18] Harold_Foster(0): /pnc
+[15:11:21] Harold_Foster(0): /exit
+[15:11:31] Harold_Foster(0): /pnc
+[15:17:10] Harold_Foster(0): /pnc
+[19:47:10] Harold_Foster(0): /giveweapon harold ak 100
+[19:47:16] Harold_Foster(0): /giveweapon harold silen 10
+[19:47:18] Harold_Foster(0): /giveweapon harold silen flower 1
+[19:47:20] Harold_Foster(0): /giveweapon harold silen flowers 1
+[19:47:25] Harold_Foster(0): /giveweapon harold flowers 1
+[20:33:17] Harold_Foster(0): /giveweapon harold eagle 100
+[20:34:30] Harold_Foster(0): /logout
+[20:39:21] Harold_Foster(0): /logout
+[20:40:36] Harold_Foster(0): /logout
+[20:40:57] Harold_Foster(0): /logout
+[20:44:40] Harold_Foster(0): /logout
+[21:05:06] Harold_Foster(0): /v inf
+[21:19:26] Harold_Foster(0): /giveweapon harold eagle 100
+[21:19:33] Harold_Foster(0): /logout
+[21:20:51] Harold_Foster(0): /giveweapon harold rpg 10
+[21:21:01] Harold_Foster(0): /logout
+[21:23:34] Harold_Foster(0): /giveweapon harold silen 100
+[21:23:37] Harold_Foster(0): /giveweapon harold silen 102
+[21:26:49] Harold_Foster(0): /GIVEWEAPON harold ak 425
+[21:26:54] Harold_Foster(0): /GIVEWEAPON harold MP5 23
+[21:26:58] Harold_Foster(0): /GIVEWEAPON harold MP5 230
+[21:27:07] Harold_Foster(0): /LOGOUT
+[21:43:20] Harold_Foster(0): /giveweapon harold ak 199
+[21:43:26] Harold_Foster(0): /giveweapon harold eagle 100
+[21:46:51] Harold_Foster(0): /v dum
+[21:55:20] Harold_Foster(0): /logout
+[22:14:50] Harold_Foster(0): /logout
+[22:16:14] Harold_Foster(0): /l
+[22:16:16] Harold_Foster(0): /l me
+[22:17:34] Harold_Foster(0): /logout
+[22:19:42] Julia_Latina(0): /enter
+[22:19:53] Julia_Latina(0): /exit
+[22:20:06] Julia_Latina(0): /enter
+[22:20:17] Julia_Latina(0): /exit
+[22:20:22] Julia_Latina(0): /exit
+[22:20:34] Julia_Latina(0): /enter
+[22:20:44] Julia_Latina(0): /exit
+[22:20:55] Julia_Latina(0): /enter
+[22:21:13] Julia_Latina(0): /exit
+[22:21:25] Julia_Latina(0): /v an
+[22:21:27] Julia_Latina(0): /slap ha
+[22:21:28] Julia_Latina(0): /slap ha
+[22:21:28] Julia_Latina(0): /slap ha
+[22:21:28] Julia_Latina(0): /slap ha
+[22:21:29] Julia_Latina(0): /slap ha
+[22:21:29] Julia_Latina(0): /slap ha
+[22:21:30] Julia_Latina(0): /slap ha
+[22:21:30] Julia_Latina(0): /slap ha
+[22:21:30] Julia_Latina(0): /slap ha
+[22:21:31] Julia_Latina(0): /slap ha
+[22:21:33] Julia_Latina(0): /slap ju
+[22:21:33] Julia_Latina(0): /slap ju
+[22:21:34] Julia_Latina(0): /slap ju
+[22:21:34] Julia_Latina(0): /slap ju
+[22:21:34] Julia_Latina(0): /slap ju
+[22:21:35] Julia_Latina(0): /slap ju
+[22:21:35] Julia_Latina(0): /slap ju
+[22:21:36] Julia_Latina(0): /slap ju
+[22:21:36] Julia_Latina(0): /slap ju
+[22:21:36] Julia_Latina(0): /slap ju
+[22:21:37] Julia_Latina(0): /slap ju
+[22:21:37] Julia_Latina(0): /slap ju
+[22:21:37] Julia_Latina(0): /slap ju
+[22:21:38] Julia_Latina(0): /slap ju
+[22:21:40] Julia_Latina(0): /slap ju
+[22:22:15] Julia_Latina(0): /v at
+[22:22:20] Julia_Latina(0): /slap ha
+[22:22:20] Julia_Latina(0): /slap ha
+[22:22:20] Julia_Latina(0): /slap ha
+[22:22:21] Julia_Latina(0): /slap ha
+[22:22:21] Julia_Latina(0): /slap ha
+[22:22:23] Julia_Latina(0): /slap ju
+[22:22:24] Julia_Latina(0): /slap ju
+[22:22:24] Julia_Latina(0): /slap ju
+[22:22:25] Julia_Latina(0): /slap ju
+[22:22:25] Julia_Latina(0): /slap ju
+[22:22:26] Julia_Latina(0): /slap ju
+[22:22:26] Julia_Latina(0): /slap ju
+[22:22:26] Julia_Latina(0): /slap ju
+[22:22:27] Julia_Latina(0): /slap ju
+[22:22:27] Julia_Latina(0): /slap ju
+[22:22:27] Julia_Latina(0): /slap ju
+[22:22:28] Julia_Latina(0): /slap ju
+[22:22:28] Julia_Latina(0): /slap ju
+[22:22:29] Julia_Latina(0): /slap ju
+[22:22:29] Julia_Latina(0): /slap ju
+[22:22:29] Julia_Latina(0): /slap ju
+[22:22:30] Julia_Latina(0): /slap ju
+[22:22:30] Julia_Latina(0): /slap ju
+[22:27:37] Julia_Latina(0): /e
+[22:28:05] Julia_Latina(0): /kill
+[22:28:18] Julia_Latina(0): /delvall
+[22:28:24] Julia_Latina(0): /v  mon
+[22:29:15] Julia_Latina(0): /myvehicles
+[22:29:16] Julia_Latina(0): /myvehicles
+[22:29:30] Julia_Latina(0): /stats
+[22:29:35] Julia_Latina(0): /delv
+[22:29:39] Julia_Latina(0): /enter
+[22:29:47] Julia_Latina(0): /payday
+[22:29:51] Julia_Latina(0): /balance
+[22:30:09] Julia_Latina(0): exit
+[22:30:11] Julia_Latina(0): 
+[22:30:16] Julia_Latina(0): /balance
+[22:30:25] Julia_Latina(0): /withdraw 300
+[22:30:30] Julia_Latina(0): /exit
+[22:31:25] Julia_Latina(0): /dmv
+[22:31:41] Julia_Latina(0): /enter
+[22:31:47] Julia_Latina(0): /withdraw 1000
+[22:31:51] Julia_Latina(0): /exit
+[22:32:07] Julia_Latina(0): /dmv
+[22:32:12] Julia_Latina(0): /e
+[22:32:16] Julia_Latina(0): /l
+[22:32:18] Julia_Latina(0): /lights
+[22:34:29] Julia_Latina(0): /lights
+[22:35:01] Julia_Latina(0): /enter
+[22:35:11] Julia_Latina(0): /buyvehicle
+[22:35:31] Julia_Latina(0): /exit
+[22:35:41] Julia_Latina(0): /v hyd
+[22:35:57] Julia_Latina(0): /delv
+[22:36:12] Julia_Latina(0): /e
+[22:36:17] Julia_Latina(0): /starttrucking
+[22:36:19] Julia_Latina(0): /e
+[22:36:27] Julia_Latina(0): /lights
+[22:42:39] Julia_Latina(0): /lights
+[22:42:46] Julia_Latina(0): /gotob bank
+[22:42:48] Julia_Latina(0): /enter
+[22:42:57] Julia_Latina(0): /payday
+[22:43:03] Julia_Latina(0): I'm rich!
+[22:43:05] Julia_Latina(0): /exit
+[22:43:18] Julia_Latina(0): I'm rich !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! INIT !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+[22:43:38] Julia_Latina(0): /v police
+[22:44:04] Julia_Latina(0): /delv
+[22:44:06] Julia_Latina(0): /v inf
+[22:44:11] Julia_Latina(0): /delv
+[22:44:21] Julia_Latina(0): /selectobject
+[22:44:23] Julia_Latina(0): /selectobject mouse
+[22:48:04] Julia_Latina(0): /selectobject mouse
+[22:48:37] Julia_Latina(0): /v j
+[22:48:41] Julia_Latina(0): /delv
+[22:48:45] Julia_Latina(0): /v a
+[22:50:45] Julia_Latina(0): /delv
+[22:50:51] Julia_Latina(0): /pnc
+[22:50:52] Julia_Latina(0): /pnc
+[22:50:53] Julia_Latina(0): /pnc
+[22:51:01] Julia_Latina(0): /logout
+[22:51:06] Harold_Foster(0): /v inf
+[22:51:14] Harold_Foster(0): /delv
+[22:51:21] Harold_Foster(0): /pnc

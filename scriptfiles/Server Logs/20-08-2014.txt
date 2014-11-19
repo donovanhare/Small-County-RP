@@ -1,0 +1,75 @@
+[09:39:21] Harold_Foster(0): /v ma
+[09:39:38] Harold_Foster(0): /vinfo
+[09:39:56] Harold_Foster(0): /v inf
+[09:40:00] Harold_Foster(0): /v inf
+[09:40:05] Harold_Foster(0): /delv
+[09:40:46] Harold_Foster(0): /enter
+[09:40:48] Harold_Foster(0): /buy
+[09:41:06] Harold_Foster(0): /exit
+[10:03:59] Harold_Foster(0): /v ma
+[10:04:04] Harold_Foster(0): /vinfo
+[10:04:56] Harold_Foster(0): /delv
+[10:05:00] Harold_Foster(0): /binfo
+[10:45:53] Harold_Foster(0): /phoneon
+[10:45:56] Harold_Foster(0): /phoneoff
+[10:45:59] Harold_Foster(0): /enter
+[10:46:01] Harold_Foster(0): /buy
+[10:46:06] Harold_Foster(0): /exit
+[10:46:09] Harold_Foster(0): /phoneon
+[10:46:16] Harold_Foster(0): /phoneon
+[10:46:17] Harold_Foster(0): /phoneon
+[10:46:19] Harold_Foster(0): /phoneoff
+[10:46:25] Harold_Foster(0): /phoneon
+[10:46:30] Harold_Foster(0): /phoneoff
+[11:19:18] Harold_Foster(0): /phoneon
+[11:19:22] Harold_Foster(0): /enter
+[11:19:25] Harold_Foster(0): /binfo
+[11:19:25] Harold_Foster(0): /exit
+[11:19:27] Harold_Foster(0): /binfo
+[11:19:30] Harold_Foster(0): /enter
+[11:19:32] Harold_Foster(0): /buy
+[11:19:39] Harold_Foster(0): /exit
+[11:19:43] Harold_Foster(0): /phoneon
+[11:25:32] Harold_Foster(0): /enter
+[11:25:34] Harold_Foster(0): /buy
+[11:25:36] Harold_Foster(0): /buy
+[11:25:38] Harold_Foster(0): /exit
+[11:25:47] Harold_Foster(0): /phoneon
+[11:31:45] Harold_Foster(0): /enter
+[11:31:46] Harold_Foster(0): /buy
+[11:31:54] Harold_Foster(0): /phoneon
+[11:33:58] Harold_Foster(0): /phoneon
+[11:34:01] Harold_Foster(0): /buy
+[12:00:53] Harold_Foster(0): /buy
+[12:13:56] Harold_Foster(0): /phoneon
+[12:13:59] Harold_Foster(0): /buy
+[12:14:14] Harold_Foster(0): /phoneon
+[12:17:12] Harold_Foster(0): /buy
+[12:20:33] Harold_Foster(0): /buy
+[17:50:07] Harold_Foster(0): /exit
+[17:50:16] Harold_Foster(0): /phoneon
+[17:50:19] Harold_Foster(0): /phoneoff
+[17:53:21] Harold_Foster(0): /enter
+[17:53:23] Harold_Foster(0): /buy
+[18:25:36] Harold_Foster(0): /call
+[18:25:42] Harold_Foster(0): /phoneon
+[18:25:46] Harold_Foster(0): /call
+[18:25:53] Harold_Foster(0): /call a
+[18:25:54] Harold_Foster(0): /call 2
+[18:25:56] Harold_Foster(0): /call
+[18:26:10] Harold_Foster(0): /call 7907424
+[18:26:17] Harold_Foster(0): /call 7907422
+[18:26:23] Harold_Foster(0): /exit
+[18:26:32] Harold_Foster(0): /v dum
+[18:27:13] Harold_Foster(0): /delv
+[18:27:14] Harold_Foster(0): /v dum
+[18:28:44] Harold_Foster(0): /delv
+[18:29:03] Harold_Foster(0): /phoneon
+[18:29:05] Harold_Foster(0): /phoneoff
+[18:29:07] Harold_Foster(0): /call
+[18:29:26] Harold_Foster(0): /v j
+[18:29:27] Harold_Foster(0): /delv
+[18:29:31] Harold_Foster(0): /v y
+[18:30:03] Harold_Foster(0): /repair
+[18:30:06] Harold_Foster(0): /repair
+[18:30:11] Harold_Foster(0): /delv

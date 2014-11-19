@@ -1,0 +1,105 @@
+[14:22:45] Harold_Foster(0): /v tax
+[14:22:47] Harold_Foster(0): /setfare
+[14:23:21] Harold_Foster(0): /setfare 1
+[14:23:32] Harold_Foster(0): /offertaxi 0
+[14:23:36] Harold_Foster(0): /taxi accept
+[14:30:58] Harold_Foster(0): /v tax
+[14:31:04] Harold_Foster(0): /offertaxi ha
+[14:31:07] Harold_Foster(0): /taxi accept
+[14:31:24] Harold_Foster(0): /setfare 5
+[14:33:25] Harold_Foster(0): /taxi accept
+[14:33:27] Harold_Foster(0): /offertaxi ha
+[14:33:28] Harold_Foster(0): /taxi accept
+[16:02:34] Harold_Foster(0): /v tax
+[16:02:38] Harold_Foster(0): /offertaxi ha
+[16:02:41] Harold_Foster(0): /taxi accept
+[16:02:51] Harold_Foster(0): /setfare
+[16:02:52] Harold_Foster(0): /setfare
+[16:02:55] Harold_Foster(0): /setfare
+[16:02:56] Harold_Foster(0): /setfare
+[16:02:58] Harold_Foster(0): /setfare
+[16:02:58] Harold_Foster(0): /setfare
+[16:03:00] Harold_Foster(0): /setfare 4
+[16:04:47] Harold_Foster(0): /setfare 4
+[16:07:37] Harold_Foster(0): /v inf
+[16:08:08] Harold_Foster(0): /setfare
+[16:08:11] Harold_Foster(0): /setfare 10
+[16:08:18] Harold_Foster(0): /offertaxi
+[16:08:20] Harold_Foster(0): /offertaxi ha
+[16:08:25] Harold_Foster(0): /taxi accept
+[16:08:50] Harold_Foster(0): /setfare
+[16:08:51] Harold_Foster(0): /setfare 1
+[16:08:52] Harold_Foster(0): /setfare 1
+[16:08:57] Harold_Foster(0): /offertaxi 1
+[16:08:59] Harold_Foster(0): /offertaxi 0
+[16:09:05] Harold_Foster(0): /offertaxi 1
+[16:09:14] Harold_Foster(0): /taxi accept
+[16:23:15] Harold_Foster(0): /setfare
+[16:23:19] Harold_Foster(0): /setfare
+[16:23:22] Harold_Foster(0): /taxi
+[16:23:26] Harold_Foster(0): /offertaxi
+[16:23:29] Harold_Foster(0): /v inf
+[16:23:32] Harold_Foster(0): /v inf
+[16:23:34] Harold_Foster(0): /offertaxi
+[16:23:38] Harold_Foster(0): /taxi
+[16:23:41] Harold_Foster(0): /v tax
+[16:23:43] Harold_Foster(0): /taxi
+[16:23:45] Harold_Foster(0): /offertaxi
+[16:23:49] Harold_Foster(0): /delvall
+[16:23:52] Harold_Foster(0): /delvall
+[16:23:53] Harold_Foster(0): /v inf
+[16:23:55] Harold_Foster(0): /delv
+[16:23:56] Harold_Foster(0): /v tax
+[16:24:00] Harold_Foster(0): /offertaxi
+[16:24:03] Harold_Foster(0): /offertaxi
+[16:24:04] Harold_Foster(0): /offertaxi
+[16:24:06] Harold_Foster(0): /offertaxi
+[16:24:09] Harold_Foster(0): /taxi
+[16:24:16] Harold_Foster(0): /offertaxi
+[17:21:19] Harold_Foster(0): /v inf
+[17:21:22] Harold_Foster(0): /setfare
+[17:21:24] Harold_Foster(0): /setfare 45
+[17:21:28] Harold_Foster(0): /setfare 45
+[17:21:30] Harold_Foster(0): /v tax
+[17:21:31] Harold_Foster(0): /setfare 45
+[17:21:35] Harold_Foster(0): /setfare 45
+[17:21:35] Harold_Foster(0): /setfare 45
+[17:21:36] Harold_Foster(0): /setfare 45
+[17:21:37] Harold_Foster(0): /setfare 45
+[17:23:28] Harold_Foster(0): /v inf
+[17:23:31] Harold_Foster(0): /setfare
+[17:23:32] Harold_Foster(0): /setfare 1
+[17:23:33] Harold_Foster(0): /delv
+[17:23:37] Harold_Foster(0): /v tax
+[17:23:38] Harold_Foster(0): /delv
+[17:23:39] Harold_Foster(0): /v tax
+[17:23:41] Harold_Foster(0): /setfare 1
+[17:23:43] Harold_Foster(0): /setfare 5
+[17:23:54] Harold_Foster(0): /offertaxi ha
+[17:24:06] Harold_Foster(0): /taxi decline
+[17:24:08] Harold_Foster(0): /taxi decline
+[17:24:09] Harold_Foster(0): /taxi decline
+[17:25:09] Harold_Foster(0): /taxi accept
+[17:25:50] Harold_Foster(0): /v ta
+[17:25:53] Harold_Foster(0): /setfare 222
+[17:25:54] Harold_Foster(0): /setfare 25
+[17:26:00] Harold_Foster(0): /taxi
+[17:26:01] Harold_Foster(0): /taxi
+[17:26:04] Harold_Foster(0): /offertaxi 0
+[17:26:09] Harold_Foster(0): /taxi accept
+[17:26:12] Harold_Foster(0): /taxi
+[17:26:13] Harold_Foster(0): /taxi
+[17:26:56] Harold_Foster(0): /v tax
+[17:27:02] Harold_Foster(0): /offertaxi 0
+[17:27:06] Harold_Foster(0): /taxi accept
+[17:27:16] Harold_Foster(0): /setfare
+[17:27:26] Harold_Foster(0): /setfare 44
+[17:27:27] Harold_Foster(0): /setfare 4
+[17:27:29] Harold_Foster(0): /setfare 25t
+[17:27:29] Harold_Foster(0): /setfare 25
+[17:27:33] Harold_Foster(0): /offertaxi 0
+[17:27:35] Harold_Foster(0): /taxi accept
+[17:30:23] Harold_Foster(0): /e
+[17:30:30] Harold_Foster(0): /v tax
+[17:30:41] Harold_Foster(0): /v cab
+[17:31:33] Harold_Foster(0): /delv

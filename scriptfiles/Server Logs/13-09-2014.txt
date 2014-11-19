@@ -1,0 +1,85 @@
+[13:11:20] Harold_Foster(0): /v inf
+[13:12:56] Harold_Foster(0): /delv
+[13:13:01] Harold_Foster(0): /dmv
+[13:13:06] Harold_Foster(0): /e
+[13:13:08] Harold_Foster(0): /e
+[13:13:09] Harold_Foster(0): /e
+[13:13:10] Harold_Foster(0): /vinfo
+[13:19:23] Harold_Foster(0): /kill
+[13:20:36] Harold_Foster(0): /gotoh 2 out
+[13:35:38] Harold_Foster(0): /v inf
+[13:35:49] Harold_Foster(0): /delv
+[13:35:55] Harold_Foster(0): /dmv
+[13:36:05] Harold_Foster(0): /setp harol cash 1000
+[13:36:09] Harold_Foster(0): /dmv
+[13:36:15] Harold_Foster(0): /e
+[13:36:29] Harold_Foster(0): /endtest
+[13:36:33] Harold_Foster(0): /endtest confirm
+[13:37:21] Harold_Foster(0): /v rum
+[13:38:29] Harold_Foster(0): /setp harold cash 100
+[13:38:31] Harold_Foster(0): /setp harold cash 1000
+[13:38:41] Harold_Foster(0): /repair
+[13:39:37] Harold_Foster(0): /gotov 13
+[13:39:42] Harold_Foster(0): /gotov 12
+[13:39:44] Harold_Foster(0): /gotov 14
+[13:39:49] Harold_Foster(0): /setp
+[13:40:11] Harold_Foster(0): /setp 
+[13:41:20] Harold_Foster(0): /setp har cash 1000
+[13:41:28] Harold_Foster(0): /e
+[13:41:33] Harold_Foster(0): /dmv
+[13:41:39] Harold_Foster(0): /e
+[14:04:54] Harold_Foster(0): inventory
+[14:05:38] Harold_Foster(0): /inventory
+[14:05:49] Harold_Foster(0): /phoneoff
+[14:05:51] Harold_Foster(0): /inventory
+[14:06:02] Harold_Foster(0): /inventory
+[14:06:08] Harold_Foster(0): /inventory
+[14:06:21] Harold_Foster(0): /phoneon
+[14:06:23] Harold_Foster(0): /inventory
+[14:06:33] Harold_Foster(0): /phoneinfo
+[14:06:40] Harold_Foster(0): /call 7907424
+[14:06:43] Harold_Foster(0): /phoneinfo
+[14:06:45] Harold_Foster(0): /inventory
+[14:06:53] Harold_Foster(0): /answer
+[14:06:55] Harold_Foster(0): /inventory
+[14:07:04] Harold_Foster(0): /hangup
+[14:07:30] Harold_Foster(0): /inventory
+[14:23:55] Harold_Foster(0): /v mon
+[14:24:07] Harold_Foster(0): /delv
+[14:24:13] Harold_Foster(0): /enter
+[14:24:19] Harold_Foster(0): /setp harold cash 1000
+[14:24:20] Harold_Foster(0): /enter
+[14:24:22] Harold_Foster(0): /buy
+[14:24:53] Harold_Foster(0): /exit
+[15:17:54] Harold_Foster(0): /enter
+[15:17:59] Harold_Foster(0): /buy
+[15:18:23] Harold_Foster(0): /buy
+[15:28:52] Harold_Foster(0): /buy
+[15:28:58] Harold_Foster(0): /buy
+[15:30:37] Harold_Foster(0): /buy
+[15:32:53] Harold_Foster(0): /exit
+[15:33:04] Harold_Foster(0): /enter
+[15:33:07] Harold_Foster(0): /exit
+[15:53:15] Harold_Foster(0): /levelup
+[15:53:28] Harold_Foster(0): /stats
+[15:53:37] Harold_Foster(0): /setp 0 level 0
+[15:53:39] Harold_Foster(0): /setp 0 level 1
+[15:53:44] Harold_Foster(0): /levelup
+[15:55:38] Harold_Foster(0): /levelup
+[15:55:44] Harold_Foster(0): /levelup confirm
+[15:55:53] Harold_Foster(0): /stats
+[15:56:42] Harold_Foster(0): /levelup confirm
+[15:56:43] Harold_Foster(0): /levelup confirm
+[15:56:43] Harold_Foster(0): /levelup confirm
+[15:56:52] Harold_Foster(0): /levelup
+[15:57:37] Harold_Foster(0): /gotoi 9
+[15:57:39] Harold_Foster(0): /dmv
+[15:57:45] Harold_Foster(0): /setp harold cash 100000
+[15:57:48] Harold_Foster(0): /dmv
+[15:57:50] Harold_Foster(0): /dmv
+[15:57:52] Harold_Foster(0): /dmv
+[15:58:03] Harold_Foster(0): /endtest
+[15:58:06] Harold_Foster(0): /endtest confirm
+[15:58:08] Harold_Foster(0): /dmv
+[15:58:37] Harold_Foster(0): /levelup
+[15:59:04] Harold_Foster(0): /stats

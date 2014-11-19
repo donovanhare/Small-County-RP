@@ -1,0 +1,132 @@
+[15:40:58] Harold_Foster(0): /iconmanager
+[15:41:58] Harold_Foster(0): /reload icons
+[15:42:09] Harold_Foster(0): /iconmanager
+[15:42:17] Harold_Foster(0): /iconmanager
+[15:48:43] Harold_Foster(0): /iconinfo
+[15:48:48] Harold_Foster(0): /iconmanager
+[15:48:53] Harold_Foster(0): /iconinfo
+[15:48:56] Harold_Foster(0): /iconinfo
+[15:49:00] Harold_Foster(0): /reload icons
+[15:49:01] Harold_Foster(0): /iconinfo
+[15:49:04] Harold_Foster(0): /iconinfo
+[15:49:25] Harold_Foster(0): /iconinfo
+[15:49:29] Harold_Foster(0): /iconmanager
+[15:50:27] Harold_Foster(0): /iconmanager
+[15:52:41] Harold_Foster(0): /gotoi 2
+[15:52:53] Harold_Foster(0): /gotoi 3
+[15:52:57] Harold_Foster(0): /iconmanager
+[15:53:02] Harold_Foster(0): /gotoi 3
+[15:53:04] Harold_Foster(0): /gotoi 2
+[15:53:08] Harold_Foster(0): /reload icons
+[15:55:01] Harold_Foster(0): /exit
+[15:55:04] Harold_Foster(0): /gotob bank
+[15:55:08] Harold_Foster(0): /gotoi 2
+[15:55:09] Harold_Foster(0): /gotoi 1
+[15:55:10] Harold_Foster(0): /gotoi 4
+[15:55:15] Harold_Foster(0): /gotoi 4
+[15:55:17] Harold_Foster(0): /gotoi 3
+[15:55:23] Harold_Foster(0): /ICONMANAGER
+[15:55:32] Harold_Foster(0): /ICONMANAGER
+[15:55:58] Harold_Foster(0): /ICONMANAGER
+[16:01:12] Harold_Foster(0): /iconmanager
+[16:03:44] Harold_Foster(0): /iconmanager
+[16:03:53] Harold_Foster(0): /iconmanager
+[16:04:00] Harold_Foster(0): /iconmanager
+[16:24:35] Harold_Foster(0): /v stun
+[16:24:41] Harold_Foster(0): /afix
+[16:24:55] Harold_Foster(0): /delv
+[16:25:04] Harold_Foster(0): /iconmanager
+[16:26:51] Harold_Foster(0): /iconmanager
+[16:28:19] Harold_Foster(0): /iconmanager
+[16:28:25] Harold_Foster(0): /iconmanager
+[16:28:35] Harold_Foster(0): /iconmanager
+[16:28:40] Harold_Foster(0): /iconmanager
+[16:28:47] Harold_Foster(0): /iconmanager
+[17:00:59] Harold_Foster(0): /iconmanager
+[17:01:05] Harold_Foster(0): /iconmanager
+[17:01:11] Harold_Foster(0): /iconinfo
+[17:01:19] Harold_Foster(0): /iconinfo
+[17:01:30] Harold_Foster(0): /gotoi 2
+[17:01:32] Harold_Foster(0): /iconinfo
+[17:04:03] Harold_Foster(0): /iconinfo
+[17:05:23] Harold_Foster(0): /iconinfo
+[17:05:26] Harold_Foster(0): /gotoi 2
+[17:05:27] Harold_Foster(0): /gotoi 1
+[17:05:30] Harold_Foster(0): /iconinfo
+[17:07:34] Harold_Foster(0): /iconinfo
+[17:07:36] Harold_Foster(0): /iconinfo
+[17:10:32] Harold_Foster(0): /gotoi 2
+[17:10:43] Harold_Foster(0): /iconinfo
+[17:10:46] Harold_Foster(0): /gotoi 2
+[17:10:47] Harold_Foster(0): /gotoi 1
+[17:10:49] Harold_Foster(0): /iconinfo
+[17:10:53] Harold_Foster(0): /gotoi 4
+[17:10:54] Harold_Foster(0): /iconinfo
+[17:11:37] Harold_Foster(0): /gotoi 7
+[17:11:39] Harold_Foster(0): /iconinfo
+[17:11:42] Harold_Foster(0): /gotoi 8
+[17:11:44] Harold_Foster(0): /iconinfo
+[17:19:50] Harold_Foster(0): /gotoi 2
+[17:19:53] Harold_Foster(0): /gotoi 0
+[17:19:55] Harold_Foster(0): /gotoi 1
+[17:20:24] Harold_Foster(0): /reload icons
+[17:20:28] Harold_Foster(0): /gotoi 1
+[17:20:33] Harold_Foster(0): /iconinfo
+[17:20:37] Harold_Foster(0): /gotoi 6
+[17:20:39] Harold_Foster(0): /iconinfo
+[17:20:41] Harold_Foster(0): /iconinfo
+[17:23:48] Harold_Foster(0): /reload icons
+[17:23:57] Harold_Foster(0): /iconinfo
+[17:24:57] Harold_Foster(0): /gotoi 5
+[17:25:01] Harold_Foster(0): /gotoi 6
+[17:28:21] Harold_Foster(0): /v mo
+[17:28:23] Harold_Foster(0): /delv
+[17:28:25] Harold_Foster(0): /v mon
+[17:31:07] Harold_Foster(0): /repair
+[17:31:08] Harold_Foster(0): /repair
+[17:31:12] Harold_Foster(0): /repair
+[17:37:53] Harold_Foster(0): /v j
+[17:37:55] Harold_Foster(0): /delv
+[17:37:59] Harold_Foster(0): /v y
+[17:40:10] Harold_Foster(0): /enter
+[17:40:21] Harold_Foster(0): /exit
+[17:41:51] Harold_Foster(0): /gotoi 2
+[17:42:09] Harold_Foster(0): /iconinfo
+[17:42:13] Harold_Foster(0): /gotoi 4
+[17:42:14] Harold_Foster(0): /iconinfo
+[17:42:18] Harold_Foster(0): /gotoi 9
+[17:42:20] Harold_Foster(0): /iconinfo
+[17:42:24] Harold_Foster(0): /gotoi 4
+[17:42:25] Harold_Foster(0): /iconinfo
+[17:42:28] Harold_Foster(0): /gotoi 9
+[17:42:30] Harold_Foster(0): /iconinfo
+[17:42:36] Harold_Foster(0): /gotoi 10
+[17:42:38] Harold_Foster(0): /iconinfo
+[17:42:42] Harold_Foster(0): /gotoi 12
+[17:42:43] Harold_Foster(0): /gotoi 13
+[17:42:45] Harold_Foster(0): /gotoi 12
+[17:42:46] Harold_Foster(0): /gotoi 11
+[17:42:48] Harold_Foster(0): /gotoi 10
+[17:43:12] Harold_Foster(0): /v aro
+[17:43:18] Harold_Foster(0): /v arom
+[17:43:20] Harold_Foster(0): /v mad
+[17:43:22] Harold_Foster(0): /v mar
+[17:43:51] Harold_Foster(0): /slap ha
+[17:43:51] Harold_Foster(0): /slap ha
+[17:43:52] Harold_Foster(0): /slap ha
+[17:43:52] Harold_Foster(0): /slap ha
+[17:43:52] Harold_Foster(0): /slap ha
+[17:43:53] Harold_Foster(0): /slap ha
+[17:43:53] Harold_Foster(0): /slap ha
+[17:43:53] Harold_Foster(0): /slap ha
+[17:43:54] Harold_Foster(0): /slap ha
+[17:43:54] Harold_Foster(0): /slap ha
+[17:43:55] Harold_Foster(0): /slap ha
+[17:43:55] Harold_Foster(0): /slap ha
+[17:43:55] Harold_Foster(0): /slap ha
+[17:43:56] Harold_Foster(0): /slap ha
+[17:43:56] Harold_Foster(0): /slap ha
+[17:43:56] Harold_Foster(0): /slap ha
+[17:43:57] Harold_Foster(0): /slap ha
+[17:43:57] Harold_Foster(0): /slap ha
+[17:43:58] Harold_Foster(0): /slap hat

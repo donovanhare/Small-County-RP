@@ -1,0 +1,128 @@
+[13:59:38] Harold_Foster(0): /v inf
+[14:00:13] Harold_Foster(0): /e
+[14:00:13] Harold_Foster(0): /e
+[14:00:13] Harold_Foster(0): /e
+[14:00:18] Harold_Foster(0): /afix
+[14:00:19] Harold_Foster(0): /e
+[14:00:25] Harold_Foster(0): /slap ha
+[14:00:27] Harold_Foster(0): /slap ha
+[14:00:27] Harold_Foster(0): /slap ha
+[14:00:28] Harold_Foster(0): /slap ha
+[14:00:29] Harold_Foster(0): /slap ha
+[14:00:29] Harold_Foster(0): /slap ha
+[14:00:29] Harold_Foster(0): /slap ha
+[14:00:30] Harold_Foster(0): /slap ha
+[14:00:30] Harold_Foster(0): /slap ha
+[14:00:30] Harold_Foster(0): /slap ha
+[14:00:31] Harold_Foster(0): d
+[14:01:20] Harold_Foster(0): /v inf
+[14:02:08] Harold_Foster(0): /slap ha
+[14:02:08] Harold_Foster(0): /slap ha
+[14:02:09] Harold_Foster(0): /slap ha
+[14:02:09] Harold_Foster(0): /slap ha
+[14:02:24] Harold_Foster(0): /flip
+[14:02:25] Harold_Foster(0): /afix
+[14:02:27] Harold_Foster(0): /e
+[14:03:23] Harold_Foster(0): /setp harold faction 3
+[14:03:26] Harold_Foster(0): /gate open
+[14:03:30] Harold_Foster(0): /e
+[14:03:34] Harold_Foster(0): /locker
+[14:03:36] Harold_Foster(0): /locker
+[14:03:41] Harold_Foster(0): /locker
+[14:03:44] Harold_Foster(0): /locker
+[14:03:53] Harold_Foster(0): /e
+[14:04:36] Harold_Foster(0): /e
+[14:04:37] Harold_Foster(0): f
+[14:05:05] Harold_Foster(0): /enter
+[14:05:15] Harold_Foster(0): /setp harold faction 1
+[14:05:21] Harold_Foster(0): /locker
+[14:05:39] Harold_Foster(0): /logout
+[14:05:54] Harold_Foster(0): /changeuniform
+[14:06:05] Harold_Foster(0): /locker
+[14:06:07] Harold_Foster(0): /locker
+[14:06:10] Harold_Foster(0): /locker
+[14:06:20] Harold_Foster(0): /logout
+[14:06:28] Harold_Foster(0): /changeuniform
+[14:06:31] Harold_Foster(0): /exit
+[14:06:41] Harold_Foster(0): /afix
+[14:06:41] Harold_Foster(0): /e
+[14:07:05] Harold_Foster(0): /afix
+[14:09:31] Harold_Foster(0): /selectobject mouse
+[14:09:49] Harold_Foster(0): /selectobject mouse
+[14:09:58] Harold_Foster(0): /selectobject mouse
+[14:10:23] Harold_Foster(0): /selectobject mouse
+[14:10:50] Harold_Foster(0): /unloadsv
+[14:10:54] Harold_Foster(0): /delvall
+[14:11:35] Harold_Foster(0): /reload objects
+[14:11:39] Harold_Foster(0): /reloadobjects
+[14:11:46] Harold_Foster(0): /loadsv
+[20:54:13] Harold_Foster(0): /door open
+[20:54:16] Harold_Foster(0): /door close
+[20:54:57] Harold_Foster(0): /gotoh 1
+[20:55:00] Harold_Foster(0): /key
+[20:55:03] Harold_Foster(0): /gotoh 3 hak
+[20:55:04] Harold_Foster(0): /gotoh 3 half
+[20:55:06] Harold_Foster(0): /gotoh 3 hal2
+[20:55:09] Harold_Foster(0): /gotoh 2 hal
+[20:55:11] Harold_Foster(0): /key
+[20:56:12] Harold_Foster(0): /enter
+[20:56:15] Harold_Foster(0): /reload houses
+[20:56:18] Harold_Foster(0): /enter
+[20:56:22] Harold_Foster(0): /key
+[20:56:24] Harold_Foster(0): /enter
+[20:56:25] Harold_Foster(0): /exit
+[20:56:29] Harold_Foster(0): /key
+[21:24:57] Harold_Foster(0): /vmods
+[21:25:09] Harold_Foster(0): /e
+[21:25:14] Harold_Foster(0): /setfuel 100
+[21:25:14] Harold_Foster(0): /e
+[21:25:57] Harold_Foster(0): /iconmanager
+[21:26:22] Harold_Foster(0): /vmods
+[21:26:27] Harold_Foster(0): /setp harold job 2
+[21:26:30] Harold_Foster(0): /vmods
+[21:26:31] Harold_Foster(0): /vmods
+[21:26:35] Harold_Foster(0): /vmods
+[21:27:20] Harold_Foster(0): /vmods
+[21:27:44] Harold_Foster(0): /vmods
+[21:27:53] Harold_Foster(0): /vmods
+[21:36:37] Harold_Foster(0): /myvehicles
+[21:36:41] Harold_Foster(0): /getv 54
+[21:36:45] Harold_Foster(0): /getv 56
+[21:36:58] Harold_Foster(0): /setp harold faction 5
+[21:37:04] Harold_Foster(0): /setp harold rank 7t
+[21:37:05] Harold_Foster(0): /setp harold rank 7
+[21:37:09] Harold_Foster(0): /frespawn all
+[21:37:14] Harold_Foster(0): /myvehicles
+[21:37:17] Harold_Foster(0): /getv 57
+[21:37:24] Harold_Foster(0): /vmods
+[21:37:32] Harold_Foster(0): /setfuel 100
+[21:37:33] Harold_Foster(0): /e
+[21:38:09] Harold_Foster(0): /logout
+[21:38:16] Harold_Foster(0): /myvehicles
+[21:38:20] Harold_Foster(0): /getv 57
+[21:38:27] Harold_Foster(0): /e
+[21:38:29] Harold_Foster(0): /vmods
+[21:38:33] Harold_Foster(0): /vmods
+[21:38:40] Harold_Foster(0): /setp harold cash 10000
+[21:38:45] Harold_Foster(0): /vmods
+[21:38:50] Harold_Foster(0): /vmods
+[21:38:56] Harold_Foster(0): /vmods
+[21:38:59] Harold_Foster(0): /vmods
+[21:39:04] Harold_Foster(0): /vmods
+[21:39:52] Harold_Foster(0): 
+[23:12:08] Harold_Foster(0): /v inf
+[23:12:15] Harold_Foster(0): /givepayday
+[23:12:46] Harold_Foster(0): /setp harold rank 8
+[23:12:49] Harold_Foster(0): /setp harold rank 110
+[23:12:51] Harold_Foster(0): /givepayday
+[23:13:23] Harold_Foster(0): /setp faction 1
+[23:13:27] Harold_Foster(0): /setp harold faction 1
+[23:13:31] Harold_Foster(0): /setp harold rank 10
+[23:13:33] Harold_Foster(0): /setp harold rank 10
+[23:13:35] Harold_Foster(0): /fmanager
+[23:13:44] Harold_Foster(0): /setp harold rank 10
+[23:13:49] Harold_Foster(0): /givepayday
+[23:15:17] Harold_Foster(0): /afix
+[23:15:18] Harold_Foster(0): /e
+[23:16:40] Harold_Foster(0): /afix
+[23:16:42] Harold_Foster(0): /e

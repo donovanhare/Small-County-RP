@@ -1,0 +1,58 @@
+[15:23:15] Harold_Foster(0): /cuff 0
+[15:23:22] Harold_Foster(0): /jail 0 5
+[15:36:55] Harold_Foster(0): /logout
+[15:37:21] Harold_Foster(0): /policenationalcomputer
+[15:44:30] Harold_Foster(0): /policenationalcomputer
+[15:59:52] Harold_Foster(0): /policenationalcomputer
+[16:02:00] Harold_Foster(0): /v mon
+[16:02:04] Harold_Foster(0): /policenationalcomputer
+[16:14:28] Harold_Foster(0): /policenationalcomputer
+[16:16:34] Harold_Foster(0): /policenationalcomputer
+[16:21:14] Harold_Foster(0): /policenationalcomputer
+[16:21:21] Harold_Foster(0): /policenationalcomputer
+[16:27:27] Harold_Foster(0): /e
+[16:27:34] Harold_Foster(0): /aengine
+[16:28:50] Harold_Foster(0): /afix
+[16:31:02] Harold_Foster(0): /afix
+[16:31:54] Harold_Foster(0): /afix
+[16:32:03] Harold_Foster(0): /afix
+[16:32:04] Harold_Foster(0): /afix
+[16:32:05] Harold_Foster(0): /afix
+[16:32:06] Harold_Foster(0): /afix
+[16:32:07] Harold_Foster(0): /afix
+[16:32:14] Harold_Foster(0): /afix
+[16:32:45] Harold_Foster(0): /e
+[16:32:56] Harold_Foster(0): /aengine
+[18:01:38] Harold_Foster(0): /policenationalcomputer
+[18:01:48] Harold_Foster(0): /policenationalcomputer
+[18:02:00] Harold_Foster(0): /policenationalcomputer
+[18:02:08] Harold_Foster(0): /policenationalcomputer
+[18:05:07] Harold_Foster(0): /policenationalcomputer
+[18:05:13] Harold_Foster(0): /policenationalcomputer
+[18:06:46] Harold_Foster(0): /policenationalcomputer
+[18:06:53] Harold_Foster(0): /policenationalcomputer
+[18:07:04] Harold_Foster(0): /policenationalcomputer
+[18:07:16] Harold_Foster(0): /policenationalcomputer
+[18:10:13] Harold_Foster(0): /policenationalcomputer
+[18:25:10] Harold_Foster(0): /policenationalcomputer
+[18:25:41] Harold_Foster(0): /cuff 0
+[18:25:45] Harold_Foster(0): /jail 0 1
+[18:26:21] Harold_Foster(0): a
+[18:26:26] Harold_Foster(0): I am not happy.
+[18:26:30] Harold_Foster(0): This is racism.
+[18:26:34] Harold_Foster(0): And I'm NOT having it.
+[18:26:54] Harold_Foster(0): /policenationalcomputer
+[18:28:36] Harold_Foster(0): /policenationalcomputer
+[18:29:50] Harold_Foster(0): /policenationalcomputer
+[18:31:16] Harold_Foster(0): /policenationalcomputer
+[18:32:56] Harold_Foster(0): /policenationalcomputer
+[18:35:01] Harold_Foster(0): /policenationalcomputer
+[18:49:23] Harold_Foster(0): /policenationalcomputer
+[19:06:19] Harold_Foster(0): /taxi
+[19:06:20] Harold_Foster(0): /taxi
+[19:06:21] Harold_Foster(0): /e
+[19:06:25] Harold_Foster(0): /setp harold job 1
+[19:06:26] Harold_Foster(0): /e
+[19:06:29] Harold_Foster(0): /engine
+[19:06:32] Harold_Foster(0): /aengine
+[19:06:37] Harold_Foster(0): /offertaxi

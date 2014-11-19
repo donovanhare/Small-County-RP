@@ -1,0 +1,50 @@
+[15:20:15] Harold_Foster(0): /fmanager
+[15:20:33] Harold_Foster(0): /fmanager
+[15:21:40] Harold_Foster(0): /fmanager
+[15:30:08] Harold_Foster(0): /fmanager
+[15:32:55] Harold_Foster(0): /fmanager
+[15:33:21] Harold_Foster(0): /fmanager
+[17:24:54] Harold_Foster(0): /fmanager
+[17:29:27] Harold_Foster(0): /fmanager
+[17:29:33] Harold_Foster(0): /fmanager
+[17:29:57] Harold_Foster(0): /fmanager
+[17:30:22] Harold_Foster(0): /fmanager
+[17:35:12] Harold_Foster(0): /fmanager
+[17:35:23] Harold_Foster(0): /fmanager
+[17:35:32] Harold_Foster(0): /fmanager
+[17:36:59] Harold_Foster(0): /setp harold hp 100
+[19:14:01] Harold_Foster(0): /fmanager
+[19:14:07] Harold_Foster(0): /editranks
+[19:14:09] Harold_Foster(0): /editranks
+[19:14:10] Harold_Foster(0): /editranks
+[19:14:15] Harold_Foster(0): /setp harold faction 5
+[19:14:17] Harold_Foster(0): /setp harold faction 4
+[19:22:47] Harold_Foster(0): /setp harold faction 1
+[19:22:49] Harold_Foster(0): /setp harold faction 2
+[19:22:50] Harold_Foster(0): /setp harold faction 3
+[19:22:50] Harold_Foster(0): /setp harold faction 4
+[19:22:51] Harold_Foster(0): /setp harold faction 5
+[19:22:56] Harold_Foster(0): /editranks
+[19:22:57] Harold_Foster(0): /editranks
+[19:23:07] Harold_Foster(0): /setp harold rank 8
+[19:23:11] Harold_Foster(0): /editranks
+[19:24:58] Harold_Foster(0): /fmanager
+[19:26:09] Harold_Foster(0): /fmanager
+[19:26:14] Harold_Foster(0): /fmanager
+[19:27:24] Harold_Foster(0): /v ionf
+[19:27:27] Harold_Foster(0): /v inf
+[19:28:42] Harold_Foster(0): /afix
+[19:32:01] Harold_Foster(0): /bhelp
+[19:34:29] Harold_Foster(0): /delv
+[19:38:40] Harold_Foster(0): /editranks
+[19:38:51] Harold_Foster(0): /editranks
+[21:00:12] Harold_Foster(0): /editranks
+[21:34:51] Harold_Foster(0): /restart
+[21:35:39] Harold_Foster(0): /stats
+[21:35:48] Harold_Foster(0): /fhelp
+[21:36:10] Harold_Foster(0): /setrank
+[21:36:12] Harold_Foster(0): /setrank
+[21:36:13] Harold_Foster(0): /setrank
+[21:36:13] Harold_Foster(0): /setrank
+[21:36:14] Harold_Foster(0): /setrank
+[21:36:15] Harold_Foster(0): /setrank

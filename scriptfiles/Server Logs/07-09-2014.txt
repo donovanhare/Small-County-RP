@@ -1,0 +1,42 @@
+[13:50:19] Gogo_Yourmum(0): /setp
+[13:50:40] Gogo_Yourmum(0): /enter
+[13:50:42] Gogo_Yourmum(0): /buy
+[13:50:46] Gogo_Yourmum(0): /exit
+[13:58:02] Test_Character(0): /enter
+[14:51:52] Harry_Foster(0): /enter
+[14:51:54] Harry_Foster(0): /buy
+[14:51:58] Harry_Foster(0): /exit
+[14:52:21] Harry_Foster(0): /enter
+[14:52:24] Harry_Foster(0): /buy
+[14:52:29] Harry_Foster(0): /phoneinfo
+[14:52:31] Harry_Foster(0): /exit
+[14:57:28] John_Leroy(0): /enter
+[14:57:29] John_Leroy(0): /buy
+[14:57:35] John_Leroy(0): /exit
+[15:31:11] Harold_Foster(0): /v la
+[15:32:09] Harold_Foster(0): /delv
+[15:32:16] Harold_Foster(0): /v hyd
+[15:32:57] Harold_Foster(0): ee
+[15:33:19] Harold_Foster(0): /v stunt
+[15:33:22] Harold_Foster(0): /e
+[15:33:35] Harold_Foster(0): /delvall
+[15:33:47] Harold_Foster(0): /v hyd
+[15:34:10] Harold_Foster(0): /v stu
+[15:34:18] Harold_Foster(0): /delvall
+[15:34:33] Harold_Foster(0): /v rus
+[15:34:41] Harold_Foster(0): /delvall
+[15:35:42] Harold_Foster(0): /delvall
+[15:35:56] Harold_Foster(0): /v inf
+[15:36:25] Harold_Foster(0): /afix
+[15:36:42] Harold_Foster(0): /flip
+[15:36:49] Harold_Foster(0): /a yes
+[15:37:02] Harold_Foster(0): /flip
+[15:37:36] Harold_Foster(0): /afix
+[15:37:43] Harold_Foster(0): /delv
+[15:37:44] Harold_Foster(0): /v mav
+[15:38:17] Harold_Foster(0): /v mavdelv
+[15:38:18] Harold_Foster(0): /delv
+[15:38:21] Harold_Foster(0): /v inf
+[15:40:27] Harold_Foster(0): /reloadobjects
+[15:40:46] Harold_Foster(0): /delv
+[15:40:50] Harold_Foster(0): /gotob zi

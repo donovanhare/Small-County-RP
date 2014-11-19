@@ -1,0 +1,56 @@
+[17:20:20] Harold_Foster(0): /viewaccounts
+[17:20:22] Harold_Foster(0): /viewaccounts Foster
+[21:18:56] Harold_Foster(0): /enter
+[21:18:57] Harold_Foster(0): /buy
+[21:19:14] Harold_Foster(0): /exit
+[21:19:27] Harold_Foster(0): /gotoh 2
+[21:19:34] Harold_Foster(0): /e
+[21:20:07] Harold_Foster(0): /e
+[21:20:17] Harold_Foster(0): /buyvehicle
+[21:20:55] Harold_Foster(0): /e
+[21:21:03] Harold_Foster(0): /e
+[21:21:04] Harold_Foster(0): /e
+[21:21:09] Harold_Foster(0):  /aengine
+[21:21:12] Harold_Foster(0): /aengine
+[21:21:16] Harold_Foster(0): /aengine
+[21:21:24] Harold_Foster(0): /e
+[21:22:03] Harold_Foster(0): /spray
+[21:22:05] Harold_Foster(0): /spray 1
+[21:22:07] Harold_Foster(0): /spray 1 3
+[21:22:12] Harold_Foster(0): /spray 5 3
+[21:22:21] Harold_Foster(0): /spray 1 5
+[21:22:23] Harold_Foster(0): /spray 1 4
+[21:22:30] Harold_Foster(0): /spray 1 5
+[21:22:32] Harold_Foster(0): /spray 1 4
+[21:23:41] Harold_Foster(0): /repair
+[21:30:07] Harold_Foster(0): /setp 0 skin 17
+[21:34:19] Harold_Foster(0): /gotob zip
+[21:34:21] Harold_Foster(0): /enter
+[21:34:23] Harold_Foster(0): /buy
+[21:34:26] Harold_Foster(0): /exit
+[21:34:37] Harold_Foster(0): /kill
+[21:35:14] Harold_Foster(0): /gotob zu
+[21:35:15] Harold_Foster(0): /gotob z
+[21:35:16] Harold_Foster(0): /enter
+[21:35:17] Harold_Foster(0): /buy
+[21:35:21] Harold_Foster(0): /exit
+[21:36:25] Harold_Foster(0): /viewaccounts Testing
+[21:38:53] John_Leroy(0): /restart
+[21:42:05] Harold_Foster(0): /viewaccounts Testing
+[21:48:54] Harold_Foster(0): /viewaccounts
+[21:48:56] Harold_Foster(0): /viewaccounts Testing
+[21:49:16] John_Leroy(0): /enter
+[21:49:19] John_Leroy(0): /exit
+[21:49:39] John_Leroy(0): /enter
+[21:49:40] John_Leroy(0): /buy
+[21:49:47] John_Leroy(0): /exit
+[21:49:54] John_Leroy(0): /admins
+[21:50:14] John_Leroy(0): /enter
+[21:50:18] John_Leroy(0): /buy
+[21:50:28] John_Leroy(0): /exit
+[21:51:06] John_Leroy(0): /enter
+[21:51:07] John_Leroy(0): /exit
+[21:55:50] John_Leroy(0): /restart
+[22:14:15] Julia_Martins(0): /enter
+[22:14:19] Julia_Martins(0): /buy
+[22:14:43] Julia_Martins(0): /exit

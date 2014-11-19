@@ -1,0 +1,9 @@
+[11:27:10] Harold_Foster(0): /v l
+[11:30:32] Harold_Foster(0): /delv
+[11:38:35] Harold_Foster(0): /call 911
+[11:38:37] Harold_Foster(0): police
+[11:38:51] Harold_Foster(0): A man has stolen my car, he was black... very black.
+[11:38:59] Harold_Foster(0): Low Street!
+[11:39:05] Harold_Foster(0): /gotov 27
+[11:39:13] Harold_Foster(0): t/pnc
+[11:39:15] Harold_Foster(0): /pnc

@@ -1,0 +1,96 @@
+[08:41:35] Harold_Foster(0): /v inf
+[08:41:37] Harold_Foster(0): /dmv
+[11:06:45] Harold_Foster(0): /v inf
+[11:06:48] Harold_Foster(0): /dmv
+[11:06:59] Harold_Foster(0): d/elv
+[11:07:01] Harold_Foster(0): /delv
+[11:07:04] Harold_Foster(0): /v sand
+[11:11:22] Harold_Foster(0): /dmv
+[11:15:11] Harold_Foster(0): /repair
+[21:48:35] Harold_Foster(0): /v inf
+[21:48:38] Harold_Foster(0): /delv
+[21:48:50] Harold_Foster(0): /housemanager
+[21:59:21] Harold_Foster(0): /housemanager
+[22:04:29] Harold_Foster(0): /housemanager
+[22:07:32] Harold_Foster(0): /housemanager
+[22:07:55] Harold_Foster(0): /enter
+[22:08:00] Harold_Foster(0): /exit
+[22:08:09] Harold_Foster(0): /enter
+[22:08:14] Harold_Foster(0): /exit
+[22:08:23] Harold_Foster(0): /gotoh 8
+[22:08:29] Harold_Foster(0): /deletehouse 8
+[22:14:04] Harold_Foster(0): /gotoh 2 outer
+[22:14:09] Harold_Foster(0): /sethouse
+[22:14:15] Harold_Foster(0): /sethouse 4 exterior
+[22:14:18] Harold_Foster(0): /sethouse 4 exterior 0
+[22:14:21] Harold_Foster(0): /sethouse 4 exterior 0
+[22:14:57] Harold_Foster(0): /sethouse 4 owner 0
+[22:14:59] Harold_Foster(0): /sethouse 4 owner 1
+[22:15:02] Harold_Foster(0): /sethouse 4 owner 0
+[22:15:10] Harold_Foster(0): /sethouse 4 price 0
+[22:15:13] Harold_Foster(0): /sethouse 4 price 5
+[22:15:19] Harold_Foster(0): /enter
+[22:15:21] Harold_Foster(0): /exit
+[22:15:50] Harold_Foster(0): /gotoh bar
+[22:15:53] Harold_Foster(0): /gotob bar
+[22:15:59] Harold_Foster(0): /setbiz
+[22:16:02] Harold_Foster(0): /setbiz 
+[22:16:03] Harold_Foster(0): /binfo
+[22:16:10] Harold_Foster(0): /setbiz 4 exterior
+[22:16:12] Harold_Foster(0): /setbiz 4 exterior 1
+[22:23:35] Harold_Foster(0): /gotoh 1
+[22:23:40] Harold_Foster(0): /housemanager
+[22:24:04] Harold_Foster(0): /housemanager
+[22:24:08] Harold_Foster(0): /housemanager
+[22:24:14] Harold_Foster(0): /enter
+[22:24:15] Harold_Foster(0): /exit
+[22:24:17] Harold_Foster(0): /housemanager
+[22:24:23] Harold_Foster(0): /enter
+[22:24:25] Harold_Foster(0): /exit
+[22:24:28] Harold_Foster(0): /gotoh 2
+[22:24:30] Harold_Foster(0): /enter
+[22:24:33] Harold_Foster(0): /gotoh 3
+[22:24:35] Harold_Foster(0): /enter
+[22:24:36] Harold_Foster(0): /exit
+[22:31:49] Harold_Foster(0): /housemanager
+[22:32:00] Harold_Foster(0): /enter
+[22:32:02] Harold_Foster(0): /exit
+[22:32:13] Harold_Foster(0): /housemanager
+[22:32:27] Harold_Foster(0): /enter
+[22:32:28] Harold_Foster(0): /exit
+[22:32:36] Harold_Foster(0): /gotoh chi
+[22:32:40] Harold_Foster(0): /deletehouse 8
+[22:33:17] Harold_Foster(0): /housemanager
+[22:33:20] Harold_Foster(0): /housemanager
+[22:33:32] Harold_Foster(0): /housemanager
+[22:34:12] Harold_Foster(0): /v inf
+[22:34:39] Harold_Foster(0): /delv
+[22:34:42] Harold_Foster(0): /bmanager
+[22:35:10] Harold_Foster(0): /gotob cow
+[22:36:38] Harold_Foster(0): /v ha
+[22:36:41] Harold_Foster(0): /v i
+[22:37:02] Harold_Foster(0): /selecto
+[22:37:04] Harold_Foster(0): /selecto near
+[22:37:06] Harold_Foster(0): /selecto near
+[22:37:13] Harold_Foster(0): /reloadobjects
+[22:37:16] Harold_Foster(0): /selecto near
+[22:37:21] Harold_Foster(0): /selecto near
+[22:37:26] Harold_Foster(0): /reloadobjects
+[22:38:22] Harold_Foster(0): /selecto near
+[22:38:28] Harold_Foster(0): /reloadobjects
+[22:40:17] Harold_Foster(0): /selecto near
+[22:40:18] Harold_Foster(0): /selecto near
+[22:40:19] Harold_Foster(0): /selecto near
+[22:52:47] Harold_Foster(0): /selectobject mouse
+[22:53:04] Harold_Foster(0): /deleteobject
+[22:53:18] Harold_Foster(0): /selectobject
+[22:53:20] Harold_Foster(0): /selectobject near
+[22:53:23] Harold_Foster(0): /selectobject near
+[22:53:26] Harold_Foster(0): /selectobject mouse
+[22:53:39] Harold_Foster(0): /createobject 700
+[22:53:41] Harold_Foster(0): /createobject 700 tree
+[22:53:46] Harold_Foster(0): /selectobject mouse
+[22:53:55] Harold_Foster(0): /reloadobjects
+[22:54:00] Harold_Foster(0): /deleteobject
+[22:54:15] Harold_Foster(0): /ah
+[22:54:28] Harold_Foster(0): /editobject

@@ -1,0 +1,111 @@
+[14:35:06] Harold_Foster(0): /pnc
+[14:35:20] Harold_Foster(0): /pnc
+[14:35:32] Harold_Foster(0): /pnc
+[14:38:31] Harold_Foster(0): /pnc
+[14:38:41] Harold_Foster(0): /pnc
+[14:38:48] Harold_Foster(0): /pnc
+[14:41:18] Harold_Foster(0): /pnc
+[14:43:58] Harold_Foster(0): /pnc
+[14:47:40] Harold_Foster(0): /pnc
+[14:49:20] Harold_Foster(0): /pnc
+[14:52:32] Harold_Foster(0): /v j
+[14:52:34] Harold_Foster(0): /delv
+[14:52:38] Harold_Foster(0): /v q
+[16:20:10] Harold_Foster(0): /cuff 0
+[16:20:14] Harold_Foster(0): /jail 0 1
+[16:20:16] Harold_Foster(0): /me ja
+[16:20:25] Harold_Foster(0): /low
+[16:20:27] Harold_Foster(0): /low a
+[16:20:32] Harold_Foster(0): /pnc
+[16:21:06] Harold_Foster(0): /jail 0 1
+[16:21:09] Harold_Foster(0): /cuff 0
+[16:21:11] Harold_Foster(0): /jail 0 1
+[16:21:18] Harold_Foster(0): /handsup
+[16:25:13] Harold_Foster(0): /cuff 0
+[16:25:18] Harold_Foster(0): /jail 0 3
+[16:25:50] Harold_Foster(0): /me has
+[18:10:34] Harold_Foster(0): /pnc
+[18:11:39] Harold_Foster(0): /fine
+[18:11:57] Harold_Foster(0): /fine ha 1000 Speeding
+[18:12:29] Harold_Foster(0): /pnc
+[18:13:00] Harold_Foster(0): /fine ha 1000 Speeding
+[18:13:00] Harold_Foster(0): /fine ha 1000 Speeding
+[18:13:01] Harold_Foster(0): /fine ha 1000 Speeding
+[18:13:01] Harold_Foster(0): /fine ha 1000 Speeding
+[18:13:02] Harold_Foster(0): /fine ha 1000 Speeding
+[18:13:02] Harold_Foster(0): /fine ha 1000 Speeding
+[18:13:02] Harold_Foster(0): /fine ha 1000 Speeding
+[18:13:03] Harold_Foster(0): /fine ha 1000 Speeding
+[18:13:03] Harold_Foster(0): /fine ha 1000 Speeding
+[18:13:04] Harold_Foster(0): /fine ha 1000 Speeding
+[18:13:04] Harold_Foster(0): /fine ha 1000 Speeding
+[18:13:04] Harold_Foster(0): /fine ha 1000 Speeding
+[18:13:05] Harold_Foster(0): /fine ha 1000 Speeding
+[18:13:05] Harold_Foster(0): /fine ha 1000 Speeding
+[18:13:06] Harold_Foster(0): /fine ha 1000 Speeding
+[18:13:06] Harold_Foster(0): /fine ha 1000 Speeding
+[18:13:06] Harold_Foster(0): /fine ha 1000 Speeding
+[18:13:07] Harold_Foster(0): /fine ha 1000 Speeding
+[18:13:08] Harold_Foster(0): /fine ha 1000 Speeding
+[18:13:16] Harold_Foster(0): /pnc
+[18:14:02] Harold_Foster(0): /pnc
+[18:16:24] Harold_Foster(0): /pnc
+[19:37:37] Harold_Foster(0): /pnc
+[20:53:51] Harold_Foster(0): /pnc
+[20:55:26] Harold_Foster(0): /pnc
+[20:57:00] Harold_Foster(0): /pnc
+[20:59:42] Harold_Foster(0): /pnc
+[21:01:19] Harold_Foster(0): /pnc
+[21:02:17] Harold_Foster(0): /pnc
+[21:03:48] Harold_Foster(0): /pnc
+[21:04:51] Harold_Foster(0): /pnc
+[21:06:24] Harold_Foster(0): /pnc
+[21:07:34] Harold_Foster(0): /pnc
+[21:26:04] Harold_Foster(0): /pnc
+[21:31:37] Harold_Foster(0): /pnc
+[21:32:03] Harold_Foster(0): /pnc
+[21:32:53] Harold_Foster(0): /pnc
+[22:02:12] Harold_Foster(0): /pnc
+[23:01:47] Harold_Foster(0): /gotob bar
+[23:01:53] Harold_Foster(0): /setbiz
+[23:01:58] Harold_Foster(0): /setbiz 3 exterior
+[23:02:00] Harold_Foster(0): /setbiz 3 exterior 1
+[23:02:05] Harold_Foster(0): /a fuck
+[23:02:17] Harold_Foster(0): /setbiz 4 exterior 1
+[23:02:22] Harold_Foster(0): /v inf
+[23:02:44] Harold_Foster(0): /setbiz 3 exterior 1
+[23:03:02] Harold_Foster(0): /flip
+[23:03:03] Harold_Foster(0): /afix
+[23:04:00] Harold_Foster(0): /slap ha
+[23:04:00] Harold_Foster(0): /slap hat
+[23:04:02] Harold_Foster(0): /afix
+[23:04:04] Harold_Foster(0): /slap hat
+[23:04:05] Harold_Foster(0): /slap ha
+[23:04:05] Harold_Foster(0): /slap ha
+[23:04:05] Harold_Foster(0): /slap ha
+[23:04:06] Harold_Foster(0): /slap ha
+[23:04:10] Harold_Foster(0): /slap ha
+[23:04:11] Harold_Foster(0): /slap hat
+[23:04:12] Harold_Foster(0): /slap ha
+[23:04:13] Harold_Foster(0): /slap ha
+[23:04:13] Harold_Foster(0): /slap ha
+[23:04:13] Harold_Foster(0): /slap ha
+[23:04:14] Harold_Foster(0): /slap ha
+[23:04:15] Harold_Foster(0): /slap ha
+[23:04:15] Harold_Foster(0): /slap hat
+[23:04:16] Harold_Foster(0): /slap hat
+[23:04:18] Harold_Foster(0): /slap ha
+[23:04:18] Harold_Foster(0): /slap ha
+[23:04:19] Harold_Foster(0): /slap ha
+[23:04:19] Harold_Foster(0): /slap ha
+[23:04:20] Harold_Foster(0): /slap ha
+[23:04:21] Harold_Foster(0): /slap ha
+[23:04:21] Harold_Foster(0): /slap ha
+[23:04:22] Harold_Foster(0): /slap ha
+[23:04:22] Harold_Foster(0): /slap ha
+[23:04:24] Harold_Foster(0): /slap ha
+[23:04:24] Harold_Foster(0): /slap ha
+[23:04:25] Harold_Foster(0): /slap ha
+[23:04:25] Harold_Foster(0): /slap ha
+[23:04:26] Harold_Foster(0): /slap hat
+[23:04:29] Harold_Foster(0): /delv

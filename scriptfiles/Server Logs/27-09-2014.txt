@@ -1,0 +1,420 @@
+[14:41:06] Harold_Foster(0): /v inf
+[14:41:34] Harold_Foster(0): /delv
+[14:41:40] Harold_Foster(0): /dmv
+[14:41:46] Harold_Foster(0): /e
+[14:42:19] Harold_Foster(0): /v inf
+[14:42:59] Harold_Foster(0): /delv
+[14:47:15] Harold_Foster(0): /v inf
+[14:48:39] Harold_Foster(0): /afix
+[14:49:24] Harold_Foster(0): /delv
+[14:49:27] Harold_Foster(0): /dmv
+[14:49:34] Harold_Foster(0): /e
+[14:50:19] Harold_Foster(0): /v inf
+[14:51:07] Harold_Foster(0): /delv
+[14:51:12] Harold_Foster(0): /v inf
+[14:51:44] Harold_Foster(0): /delv
+[14:53:04] Harold_Foster(0): /gotoh 3
+[14:53:06] Harold_Foster(0): /slap ha
+[19:43:37] Harold_Foster(0): /help
+[19:43:42] Harold_Foster(0): /changemapassword
+[19:43:45] Harold_Foster(0): /changemapassword donovan
+[19:43:58] Harold_Foster(0): /v mav
+[19:44:33] Harold_Foster(0): /delv
+[19:44:39] Harold_Foster(0): /setp harold cash 1000
+[19:44:47] Harold_Foster(0): /starttrucking
+[19:44:48] Harold_Foster(0): /e
+[19:45:07] Harold_Foster(0): /slap h
+[19:45:07] Harold_Foster(0): /slap h
+[19:45:08] Harold_Foster(0): /slap h
+[19:45:08] Harold_Foster(0): /slap h
+[19:45:08] Harold_Foster(0): /slap h
+[19:45:09] Harold_Foster(0): /slap h
+[19:45:10] Harold_Foster(0): /slap h
+[19:45:10] Harold_Foster(0): /slap h
+[19:45:11] Harold_Foster(0): /slap h
+[19:45:12] Harold_Foster(0): /slap h
+[19:45:12] Harold_Foster(0): /slap h
+[19:45:12] Harold_Foster(0): /slap h
+[19:45:13] Harold_Foster(0): /slap h
+[19:45:13] Harold_Foster(0): /slap h
+[19:45:14] Harold_Foster(0): /slap h
+[19:45:14] Harold_Foster(0): /slap h
+[19:45:15] Harold_Foster(0): /slap h
+[19:45:16] Harold_Foster(0): /slap h
+[19:45:16] Harold_Foster(0): /slap h
+[19:45:17] Harold_Foster(0): /slap h
+[19:45:17] Harold_Foster(0): /slap h
+[19:45:18] Harold_Foster(0): /slap h
+[19:45:20] Harold_Foster(0): /slap h
+[19:45:21] Harold_Foster(0): /slap h
+[19:45:21] Harold_Foster(0): /slap h
+[19:45:26] Harold_Foster(0): /flip
+[19:45:26] Harold_Foster(0): /slap h
+[19:45:27] Harold_Foster(0): /slap h
+[19:45:28] Harold_Foster(0): /slap h
+[19:45:32] Harold_Foster(0): /slap h
+[19:45:32] Harold_Foster(0): /slap h
+[19:45:33] Harold_Foster(0): /slap h
+[19:45:33] Harold_Foster(0): /slap h
+[19:45:34] Harold_Foster(0): /slap h
+[19:45:34] Harold_Foster(0): /slap h
+[19:45:35] Harold_Foster(0): /slap h
+[19:45:35] Harold_Foster(0): /slap h
+[19:45:36] Harold_Foster(0): /slap ht
+[19:45:37] Harold_Foster(0): /slap h
+[19:45:38] Harold_Foster(0): /slap h
+[19:45:41] Harold_Foster(0): /afix
+[19:47:05] Harold_Foster(0): /slap h
+[19:47:05] Harold_Foster(0): /slap h
+[19:47:06] Harold_Foster(0): /slap h
+[19:47:06] Harold_Foster(0): /slap h
+[19:47:06] Harold_Foster(0): /slap h
+[19:47:07] Harold_Foster(0): /slap h
+[19:47:28] Harold_Foster(0): /slap h
+[19:47:29] Harold_Foster(0): /slap h
+[19:47:29] Harold_Foster(0): /slap h
+[19:47:30] Harold_Foster(0): /slap h
+[19:47:30] Harold_Foster(0): /slap h
+[19:47:31] Harold_Foster(0): /slap h
+[19:47:31] Harold_Foster(0): /slap h
+[19:47:32] Harold_Foster(0): /slap h
+[19:47:32] Harold_Foster(0): /slap h
+[19:47:33] Harold_Foster(0): /slap h
+[19:47:33] Harold_Foster(0): /slap h
+[19:47:34] Harold_Foster(0): /slap h
+[19:47:34] Harold_Foster(0): /slap h
+[19:47:35] Harold_Foster(0): /slap h
+[19:47:35] Harold_Foster(0): /slap h
+[19:47:36] Harold_Foster(0): /slap h
+[19:47:37] Harold_Foster(0): /slap h
+[19:47:38] Harold_Foster(0): /slap h
+[19:47:38] Harold_Foster(0): /slap h
+[19:47:40] Harold_Foster(0): /slap h
+[19:47:40] Harold_Foster(0): /slap h
+[19:47:40] Harold_Foster(0): /slap h
+[19:47:41] Harold_Foster(0): /slap h
+[19:47:41] Harold_Foster(0): /slap h
+[19:47:47] Harold_Foster(0): /afix
+[19:48:41] Harold_Foster(0): /slap h
+[19:48:41] Harold_Foster(0): /slap h
+[19:48:42] Harold_Foster(0): /slap h
+[19:48:42] Harold_Foster(0): /slap h
+[19:48:43] Harold_Foster(0): /slap h
+[19:48:43] Harold_Foster(0): /slap h
+[19:48:44] Harold_Foster(0): /slap h
+[19:48:44] Harold_Foster(0): /slap h
+[19:48:45] Harold_Foster(0): /slap h
+[19:48:45] Harold_Foster(0): /slap h
+[19:48:46] Harold_Foster(0): /slap h
+[19:48:46] Harold_Foster(0): /slap h
+[19:48:47] Harold_Foster(0): /slap h
+[19:48:47] Harold_Foster(0): /slap h
+[19:48:48] Harold_Foster(0): /slap h
+[19:48:48] Harold_Foster(0): /slap h
+[19:48:49] Harold_Foster(0): /slap h
+[19:48:49] Harold_Foster(0): /slap h
+[19:48:50] Harold_Foster(0): /slap h
+[19:48:50] Harold_Foster(0): /slap h
+[19:48:51] Harold_Foster(0): /slap h
+[19:48:51] Harold_Foster(0): /slap h
+[19:48:52] Harold_Foster(0): /slap h
+[19:48:52] Harold_Foster(0): /slap h
+[19:48:53] Harold_Foster(0): /slap h
+[19:48:53] Harold_Foster(0): /slap h
+[19:48:54] Harold_Foster(0): /slap h
+[19:48:54] Harold_Foster(0): /slap h
+[19:48:55] Harold_Foster(0): /slap h
+[19:48:55] Harold_Foster(0): /slap h
+[19:48:56] Harold_Foster(0): /slap h
+[19:48:56] Harold_Foster(0): /slap h
+[19:48:57] Harold_Foster(0): /slap h
+[19:48:57] Harold_Foster(0): /slap h
+[19:48:58] Harold_Foster(0): /slap h
+[19:48:58] Harold_Foster(0): /slap h
+[19:48:59] Harold_Foster(0): /slap h
+[19:48:59] Harold_Foster(0): /slap h
+[19:49:00] Harold_Foster(0): /slap h
+[19:49:00] Harold_Foster(0): /slap h
+[19:49:01] Harold_Foster(0): /slap h
+[19:49:02] Harold_Foster(0): /slap h
+[19:49:02] Harold_Foster(0): /slap h
+[19:49:03] Harold_Foster(0): /slap h
+[19:49:12] Harold_Foster(0): /afix
+[19:49:13] Harold_Foster(0): /afix
+[19:49:15] Harold_Foster(0): /afix
+[19:50:09] Harold_Foster(0): /gotob zip
+[19:50:15] Harold_Foster(0): /getv 15
+[19:53:09] Harold_Foster(0): /gotoi 9
+[19:57:30] Harold_Foster(0): /gotov 15
+[19:57:39] Harold_Foster(0): /starttrucking
+[19:57:44] Harold_Foster(0): /setp harold cash 1000
+[19:57:45] Harold_Foster(0): /starttrucking
+[19:57:46] Harold_Foster(0): /e
+[19:57:57] Harold_Foster(0): /slap ha
+[19:58:00] Harold_Foster(0): /v hyd
+[19:58:04] Harold_Foster(0): /delv
+[19:58:07] Harold_Foster(0): /v hyd
+[19:58:20] Harold_Foster(0): /delv
+[19:58:27] Harold_Foster(0): /getv 15
+[20:00:52] Harold_Foster(0): /v hyd
+[20:01:28] Harold_Foster(0): /delv
+[20:01:34] Harold_Foster(0): /getv 15
+[20:01:46] Harold_Foster(0): /gotob al
+[20:01:48] Harold_Foster(0): /gotob ale
+[20:01:53] Harold_Foster(0): /getv 15
+[20:02:06] Harold_Foster(0): /afix
+[20:02:07] Harold_Foster(0): /afix
+[20:02:07] Harold_Foster(0): /afix
+[20:02:07] Harold_Foster(0): /afix
+[20:02:08] Harold_Foster(0): /afix
+[20:02:08] Harold_Foster(0): /afix
+[20:02:09] Harold_Foster(0): /afix
+[20:02:11] Harold_Foster(0): w
+[20:04:59] Harold_Foster(0): /setp harold cash 2000
+[20:05:02] Harold_Foster(0): /starttrucking
+[20:05:04] Harold_Foster(0): /starttrucking
+[20:05:04] Harold_Foster(0): /starttrucking
+[20:05:04] Harold_Foster(0): /starttrucking
+[20:05:05] Harold_Foster(0): /starttrucking
+[20:05:11] Harold_Foster(0): /logout
+[20:05:31] Harold_Foster(0): /starttrucking
+[20:05:31] Harold_Foster(0): /e
+[20:05:42] Harold_Foster(0): /v hyd
+[20:05:49] Harold_Foster(0): /afix
+[20:06:16] Harold_Foster(0): /delv
+[20:06:20] Harold_Foster(0): /getv 15
+[20:07:03] Harold_Foster(0): /v hyd
+[20:08:21] Harold_Foster(0): /delv
+[20:08:27] Harold_Foster(0): /getv 15
+[20:08:30] Harold_Foster(0): gf
+[20:08:33] Harold_Foster(0): /me na
+[20:08:42] Harold_Foster(0): /gotob fort carson ga
+[20:08:48] Harold_Foster(0): /getv 15
+[20:12:12] Harold_Foster(0): /starttrucking
+[20:12:17] Harold_Foster(0): /logout
+[20:12:36] Harold_Foster(0): /starttrucking
+[20:12:37] Harold_Foster(0): /e
+[20:12:47] Harold_Foster(0): /slap ha
+[20:12:47] Harold_Foster(0): /slap ha
+[20:12:48] Harold_Foster(0): /slap ha
+[20:12:48] Harold_Foster(0): /slap ha
+[20:12:48] Harold_Foster(0): /slap ha
+[20:12:49] Harold_Foster(0): /slap ha
+[20:12:58] Harold_Foster(0): /slap ha
+[20:13:02] Harold_Foster(0): /slap ha
+[20:13:02] Harold_Foster(0): /slap ha
+[20:13:03] Harold_Foster(0): /slap ha
+[20:13:03] Harold_Foster(0): /slap ha
+[20:13:04] Harold_Foster(0): /slap ha
+[20:13:04] Harold_Foster(0): /slap ha
+[20:13:05] Harold_Foster(0): /slap ha
+[20:13:06] Harold_Foster(0): /slap ha
+[20:13:06] Harold_Foster(0): /slap ha
+[20:13:07] Harold_Foster(0): /slap ha
+[20:13:07] Harold_Foster(0): /slap ha
+[20:13:09] Harold_Foster(0): /flip
+[20:13:14] Harold_Foster(0): /slap ha
+[20:13:14] Harold_Foster(0): /slap ha
+[20:13:15] Harold_Foster(0): /slap ha
+[20:13:15] Harold_Foster(0): /slap ha
+[20:13:17] Harold_Foster(0): /slap ha
+[20:13:17] Harold_Foster(0): /slap ha
+[20:13:49] Harold_Foster(0): /slap ha
+[20:13:49] Harold_Foster(0): /slap ha
+[20:13:49] Harold_Foster(0): /slap hat
+[20:13:51] Harold_Foster(0): /slap hat
+[20:13:51] Harold_Foster(0): /slap hat
+[20:13:53] Harold_Foster(0): /getv 15
+[20:14:01] Harold_Foster(0): /getv 15
+[20:14:09] Harold_Foster(0): /slap ha
+[20:14:13] Harold_Foster(0): /slap ha
+[20:14:14] Harold_Foster(0): /slap hat
+[20:14:15] Harold_Foster(0): /slap hat
+[20:14:58] Harold_Foster(0): /slap hat
+[20:14:59] Harold_Foster(0): /slap hat
+[20:15:01] Harold_Foster(0): /slap ha
+[20:15:02] Harold_Foster(0): /slap ha
+[20:15:09] Harold_Foster(0): /slap hat
+[20:15:10] Harold_Foster(0): /slap hat
+[20:15:11] Harold_Foster(0): /slap hat
+[20:15:26] Harold_Foster(0): /getv 15
+[20:15:32] Harold_Foster(0): /slap ha
+[20:15:36] Harold_Foster(0): /slap ha
+[20:15:36] Harold_Foster(0): /slap ha
+[20:15:36] Harold_Foster(0): /slap ha
+[20:15:37] Harold_Foster(0): /slap ha
+[20:15:37] Harold_Foster(0): /slap ha
+[20:15:38] Harold_Foster(0): /slap ha
+[20:15:39] Harold_Foster(0): /slap ha
+[20:15:40] Harold_Foster(0): /slap ha
+[20:15:40] Harold_Foster(0): /slap ha
+[20:15:40] Harold_Foster(0): /slap ha
+[20:15:41] Harold_Foster(0): /slap ha
+[20:15:41] Harold_Foster(0): /slap ha
+[20:15:42] Harold_Foster(0): /slap ha
+[20:15:43] Harold_Foster(0): /slap ha
+[20:15:44] Harold_Foster(0): /slap ha
+[20:15:44] Harold_Foster(0): /slap ha
+[20:15:45] Harold_Foster(0): /slap ha
+[20:15:50] Harold_Foster(0): /flip
+[20:16:16] Harold_Foster(0): /flip
+[20:16:25] Harold_Foster(0): /slap ha
+[20:16:43] Harold_Foster(0): /gotob fort
+[20:16:49] Harold_Foster(0): /getv 15
+[20:17:15] Harold_Foster(0): /gotov 14
+[20:17:23] Harold_Foster(0): /getv 16
+[20:17:30] Harold_Foster(0): /gotov 17
+[20:19:10] Harold_Foster(0): /logout
+[20:20:42] Harold_Foster(0): /v inf
+[20:21:28] Harold_Foster(0): /enter
+[20:21:39] Harold_Foster(0): /balance
+[20:21:47] Harold_Foster(0): /payday
+[20:21:55] Harold_Foster(0): /exit
+[20:21:59] Harold_Foster(0): /gotov 15
+[20:24:47] Harold_Foster(0): /starttrucking
+[20:24:48] Harold_Foster(0): /e
+[20:24:54] Harold_Foster(0): /v mon
+[20:25:17] Harold_Foster(0): /slap ha
+[20:25:18] Harold_Foster(0): /slap ha
+[20:25:19] Harold_Foster(0): /slap ha
+[20:25:22] Harold_Foster(0): /slap ha
+[20:25:28] Harold_Foster(0): /slap ha
+[20:25:29] Harold_Foster(0): /slap ha
+[20:25:29] Harold_Foster(0): /slap ha
+[20:25:30] Harold_Foster(0): /slap ha
+[20:25:31] Harold_Foster(0): /slap ha
+[20:25:31] Harold_Foster(0): /slap ha
+[20:25:32] Harold_Foster(0): /slap ha
+[20:25:32] Harold_Foster(0): /slap ha
+[20:25:36] Harold_Foster(0): /flip
+[20:25:38] Harold_Foster(0): /slap ha
+[20:25:40] Harold_Foster(0): /slap ha
+[20:25:42] Harold_Foster(0): /slap ha
+[20:25:47] Harold_Foster(0): /slap ha
+[20:25:47] Harold_Foster(0): /slap hat
+[20:25:51] Harold_Foster(0): /delvall
+[20:25:53] Harold_Foster(0): /v inf
+[20:25:58] Harold_Foster(0): /slap ha
+[20:26:06] Harold_Foster(0): /downslap ha
+[20:26:37] Harold_Foster(0): /slap ha
+[20:26:38] Harold_Foster(0): /slap ha
+[20:26:38] Harold_Foster(0): /slap ha
+[20:26:39] Harold_Foster(0): /slap ha
+[20:26:39] Harold_Foster(0): /slap ha
+[20:26:42] Harold_Foster(0): /slap ha
+[20:26:43] Harold_Foster(0): /slap ha
+[20:26:53] Harold_Foster(0): /delvall
+[20:26:54] Harold_Foster(0): /v inf
+[20:26:58] Harold_Foster(0): /slap ha
+[20:27:01] Harold_Foster(0): /slap ha
+[20:27:02] Harold_Foster(0): /slap ha
+[20:27:06] Harold_Foster(0): /slap ha
+[20:27:06] Harold_Foster(0): /slap ha
+[20:27:07] Harold_Foster(0): /slap ha
+[20:27:07] Harold_Foster(0): /slap ha
+[20:27:08] Harold_Foster(0): /slap ha
+[20:27:11] Harold_Foster(0): /delv
+[20:27:14] Harold_Foster(0): /getv 15
+[20:27:22] Harold_Foster(0): /e
+[20:27:29] Harold_Foster(0): /unfreeze ha
+[20:27:34] Harold_Foster(0): /v hyd
+[20:28:11] Harold_Foster(0): /delv
+[20:28:14] Harold_Foster(0): /getv 15
+[20:28:28] Harold_Foster(0): /gotob fit
+[20:28:30] Harold_Foster(0): /gotob fia
+[20:28:41] Harold_Foster(0): /getv 15
+[20:28:45] Harold_Foster(0): /getv 15
+[20:28:46] Harold_Foster(0): /getv 15
+[20:29:00] Harold_Foster(0): /afix
+[20:29:03] Harold_Foster(0): /slap ha
+[20:29:03] Harold_Foster(0): /slap ha
+[20:29:03] Harold_Foster(0): /slap hat
+[20:29:06] Harold_Foster(0): /slap hat
+[20:29:09] Harold_Foster(0): /gotov 15
+[20:29:10] Harold_Foster(0): /gotov 16
+[20:29:15] Harold_Foster(0): /getv 15
+[20:31:19] Harold_Foster(0): /help
+[20:32:14] Harold_Foster(0): /bhelp
+[20:38:59] Harold_Foster(0): /starttrucking
+[20:39:04] Harold_Foster(0): /e
+[20:40:35] Harold_Foster(0): /endtest
+[20:40:41] Harold_Foster(0): /endmission
+[20:40:43] Harold_Foster(0): /endmission confirm
+[20:40:50] Harold_Foster(0): /v inf
+[20:41:20] Harold_Foster(0): /delv
+[20:41:22] Harold_Foster(0): /v hyd
+[20:41:29] Harold_Foster(0): /afix
+[20:42:33] Harold_Foster(0): /delv
+[20:42:37] Harold_Foster(0): /v inf
+[20:43:27] Harold_Foster(0): /delv
+[20:43:30] Harold_Foster(0): /v road
+[20:43:38] Harold_Foster(0): /delv
+[20:43:41] Harold_Foster(0): /v road
+[20:46:35] Harold_Foster(0): /v inf
+[20:46:59] Harold_Foster(0): /delv
+[20:47:05] Harold_Foster(0): /starttrucking
+[20:47:07] Harold_Foster(0): /starttrucking
+[20:47:09] Harold_Foster(0): /logout
+[20:48:02] Harold_Foster(0): /starttrucking
+[20:48:10] Harold_Foster(0): /e
+[20:48:21] Harold_Foster(0): /lights
+[20:55:13] Harold_Foster(0): /lights
+[20:55:21] Harold_Foster(0): /v inf
+[20:56:10] Harold_Foster(0): /e
+[20:56:12] Harold_Foster(0): /e
+[20:56:12] Harold_Foster(0): /e
+[20:58:12] Harold_Foster(0): /e
+[20:58:14] Harold_Foster(0): /logout
+[20:59:03] Harold_Foster(0): /e
+[20:59:08] Harold_Foster(0): /starttrucking
+[20:59:15] Harold_Foster(0): /setp harold cash 1000
+[20:59:17] Harold_Foster(0): /starttrucking
+[20:59:18] Harold_Foster(0): /e
+[20:59:26] Harold_Foster(0): /lights
+[21:00:04] Harold_Foster(0): /afix
+[21:00:06] Harold_Foster(0): /flip
+[21:00:14] Harold_Foster(0): /unfreeze ha
+[21:00:27] Harold_Foster(0): /v hyd
+[21:00:31] Harold_Foster(0): /slap ha
+[21:00:32] Harold_Foster(0): /slap ha
+[21:00:32] Harold_Foster(0): /slap hat
+[21:00:35] Harold_Foster(0): /delv
+[21:00:37] Harold_Foster(0): /delvall
+[21:00:46] Harold_Foster(0): /v hyd
+[21:01:43] Harold_Foster(0): /delv
+[21:01:47] Harold_Foster(0): /getv 17
+[21:02:04] Harold_Foster(0): /slap ha
+[21:02:06] Harold_Foster(0): /getv 17
+[21:02:07] Harold_Foster(0): /getv 17
+[21:02:08] Harold_Foster(0): ff
+[21:02:16] Harold_Foster(0): /key
+[21:02:22] Harold_Foster(0): /key
+[21:02:34] Harold_Foster(0): /gotob sky
+[21:02:43] Harold_Foster(0): /getv 17
+[21:42:21] Harold_Foster(0): /starttrucking
+[21:43:25] Harold_Foster(0): /starttrucking
+[21:45:34] Harold_Foster(0): /setp harold cash 1000
+[21:46:22] Harold_Foster(0): /starttrucking
+[21:46:24] Harold_Foster(0): /e
+[21:47:07] Harold_Foster(0): /v inf
+[21:47:51] Harold_Foster(0): /afix
+[21:49:32] Harold_Foster(0): /afix
+[21:49:37] Harold_Foster(0): /delv
+[21:49:41] Harold_Foster(0): /v mon
+[21:52:56] Harold_Foster(0): /e
+[21:54:31] Harold_Foster(0): /createobject
+[21:54:37] Harold_Foster(0): /createobject 11497 Bait Shop
+[21:54:41] Harold_Foster(0): /slap ha
+[21:54:42] Harold_Foster(0): /slap ha
+[21:54:53] Harold_Foster(0): /selectobject mouse
+[21:57:15] Harold_Foster(0): /selectobject mouse
+[21:57:48] Harold_Foster(0): /selectobject mouse
+[21:58:17] Harold_Foster(0): /e
+[22:05:09] Harold_Foster(0): /kill
+[22:05:26] Harold_Foster(0): /kill
+[22:05:48] Harold_Foster(0): /setp level
+[22:05:57] Harold_Foster(0): /setp harold level 25
+[22:05:59] Harold_Foster(0): /kill
+[22:06:20] Harold_Foster(0): /kill
+[22:06:43] Harold_Foster(0): /setp harold level 4
+[22:06:48] Harold_Foster(0): /stats
