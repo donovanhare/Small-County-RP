@@ -12507,13 +12507,6 @@ new Float:HouseInteriorCoords[][] =
 	{ 2324.419921,-1145.568359,1050.710083},
 	{ 1298.597900, -796.083007, 1084.0},
 	{ 2332.923828, -1076.169433, 1049.023437},
-	{ 1198.1999, -1514.80004, 1001.0},
-	{ 2124.100097, -1524.6999, 1059.0},
-	{ 168.69999, -1483.0, 994.4},
-	{ -746.5, -1803.40002, 997.7},
-	{ -2062.503, -2534.738, 1126.313},
-	{ 2513.018310, -1729.234863, 778.637084},
-	{ 225.7570,1240.0000,1082.1406},
 	{ 385.8040,1471.7699,1080.1875},
 	{ 375.9720,1417.2699,1081.3281},
 	{ 328.0446,1478.8771,1084.4375},
@@ -12554,13 +12547,6 @@ new HouseInteriorInfo[][][32] =
 	{ "House 9", 12},
 	{ "House 10", 5},
 	{ "House 11", 6},
-	{ "House 12", 1},
-	{ "House 13", 15},
-	{ "House 14", 10},
-	{ "House 15", 6},
-	{ "House 16", 1},
-	{ "House 17", 1},
-	{ "House 18", 2},
 	{ "House 19", 15},
 	{ "House 20", 15},
 	{ "House 21", 15},
@@ -12577,10 +12563,10 @@ CMD:houseinteriors(playerid, params[])
 {
 	if(MasterAccount[playerid][Admin] > 0)
 	{
-		new str[128], dialog[400];
-		for (new iv = 0; iv < sizeof(HouseInteriorInfo); ++iv)
+		new str[128], dialog[600];
+		for (new i = 0; i < sizeof(HouseInteriorInfo); ++i)
 		{
-			format(str, sizeof(str), "%s\n", HouseInteriorInfo[iv][0]);
+			format(str, sizeof(str), "%s\n", HouseInteriorInfo[i][0]);
 	        strcat(dialog, str, sizeof(dialog));
 		}
 
@@ -13186,8 +13172,14 @@ Dialog:HOUSEMENU(playerid, response, listitem, inputtext[])
 				new id = InRangeOfHouse(playerid);
 			   	if(id)
 			   	{
-						PlayerInfo[playerid][NewID] = id;
-						Dialog_Show(playerid, CREATEHOUSE3, DIALOG_STYLE_LIST, "Interior Change", "Robada\nBayside Yellow\nSmall Outer\nMed Robada\n2 Floor Lade\nBayside Large Stairs\nShite Hole\nGranny Wallpaper\nSmall Flat Green\nDark Blue House\nvLarge 2 floor\nLarge Lade\nMed Stripe Wall","Create","Cancel");
+					PlayerInfo[playerid][NewID] = id;
+					new str[128], dialog[600];
+					for (new i = 0; i < sizeof(HouseInteriorInfo); ++i)
+					{
+						format(str, sizeof(str), "%s\n", HouseInteriorInfo[i][0]);
+				        strcat(dialog, str, sizeof(dialog));
+					}
+					Dialog_Show(playerid, CREATEHOUSE3, DIALOG_STYLE_LIST, "House Interiors", dialog, "Select","Exit");
 				}
 			}
 			case 3: //House List
@@ -13242,7 +13234,13 @@ Dialog:CREATEHOUSE2(playerid, response, listitem, inputtext[])
 	        new hID = PlayerInfo[playerid][NewID];
 			Houses[hID][Price] = strval(inputtext);
 
-			Dialog_Show(playerid, CREATEHOUSE3, DIALOG_STYLE_LIST, "Interior Change","Robada\nBayside Yellow\nSmall Outer\nMed Robada\n2 Floor Lade\nBayside Large Stairs\nShite Hole\nGranny Wallpaper\nSmall Flat Green\nDark Blue House\nvLarge 2 floor\nLarge Lade\nMed Stripe Wall","Create","Cancel");
+			new str[128], dialog[600];
+			for (new i = 0; i < sizeof(HouseInteriorInfo); ++i)
+			{
+				format(str, sizeof(str), "%s\n", HouseInteriorInfo[i][0]);
+		        strcat(dialog, str, sizeof(dialog));
+			}
+			Dialog_Show(playerid, CREATEHOUSE3, DIALOG_STYLE_LIST, "House Interiors", dialog, "Select","Exit");
 		}
 		else
 		{
@@ -13288,107 +13286,13 @@ Dialog:CREATEHOUSE3(playerid, response, listitem, inputtext[])
     {
     	new query[300], hID = PlayerInfo[playerid][NewID];
     	printf("%d", hID);
-        switch(listitem)
-        {
- 			case 0:
-            {
-                Houses[hID][IntX] = -33.6552;
-                Houses[hID][IntY] = 1564.2339;
-                Houses[hID][IntZ] = 1080.2109;
-                Houses[hID][Interior] = 3;
-            }
-            case 1:
-            {
-                Houses[hID][IntX] = 5.2788;
-                Houses[hID][IntY] = 1612.1793;
-                Houses[hID][IntZ] = 1084.3750;
-                Houses[hID][Interior] = 2;
-            }
-            case 2:
-            {
-                Houses[hID][IntX] = 18.3167;
-                Houses[hID][IntY] = 1566.3641;
-                Houses[hID][IntZ] = 1084.4297;
-                Houses[hID][Interior] = 1;
-            }
-            case 3:
-            {
-                Houses[hID][IntX] = -33.0208;
-                Houses[hID][IntY] = 1614.3723;
-                Houses[hID][IntZ] = 1084.4297;
-                Houses[hID][Interior] = 7;
-            }
-            case 4:
-            {
-                Houses[hID][IntX] = 62.3589;
-                Houses[hID][IntY] = 1557.1005;
-                Houses[hID][IntZ] = 1083.8662;
-                Houses[hID][Interior] = 15;
-            }
-            case 5:
-            {
-                Houses[hID][IntX] = 59.8227;
-                Houses[hID][IntY] = 1612.7520;
-                Houses[hID][IntZ] = 1083.8594;
-                Houses[hID][Interior] = 15;
-            }
-            case 6:
-            {
-                Houses[hID][IntX] = 106.9103;
-                Houses[hID][IntY] = 1561.0291;
-                Houses[hID][IntZ] = 1084.4375;
-                Houses[hID][Interior] = 15;
-            }
-            case 7:
-            {
-                Houses[hID][IntX] = 109.5615;
-                Houses[hID][IntY] = 1620.7977;
-                Houses[hID][IntZ] = 1084.3047;
-                Houses[hID][Interior] = 15;
-            }
-            case 8:
-            {
-                Houses[hID][IntX] = 146.0323;
-                Houses[hID][IntY] = 1562.4762;
-                Houses[hID][IntZ] = 1082.1406;
-                Houses[hID][Interior] = 15;
-            }
-            case 9:
-            {
-                Houses[hID][IntX] = 151.6272;
-                Houses[hID][IntY] = 1623.3051;
-                Houses[hID][IntZ] = 1081.8254;
-                Houses[hID][Interior] = 15;
-            }
-            case 10:
-            {
-                Houses[hID][IntX] = 198.2629;
-                Houses[hID][IntY] = 1624.6292;
-                Houses[hID][IntZ] = 1080.9965;
-                Houses[hID][Interior] = 15;
-            }
-			case 11:
-            {
-                Houses[hID][IntX] = 217.3181;
-                Houses[hID][IntY] = 1555.3815;
-                Houses[hID][IntZ] = 1084.0154;
-                Houses[hID][Interior] = 15;
-            }
-            case 12:
-            {
-                Houses[hID][IntX] = 264.7508;
-                Houses[hID][IntY] = 1625.2355;
-                Houses[hID][IntZ] = 1083.8828;
-                Houses[hID][Interior] = 15;
-            }
-            case 13:
-            {
-                Houses[hID][IntX] = 275.7429;
-                Houses[hID][IntY] = 1559.3079;
-                Houses[hID][IntZ] = 1080.2578;
-                Houses[hID][Interior] = 15;
-            }
-        }
+
+        Houses[hID][IntX] = HouseInteriorCoords[listitem][0];
+        Houses[hID][IntY] = HouseInteriorCoords[listitem][1];
+        Houses[hID][IntZ] = HouseInteriorCoords[listitem][2];
+        Houses[hID][Interior] = HouseInteriorInfo[listitem][1][0];
+   
+        
         Houses[hID][World] = PlayerInfo[playerid][NewID];
         WorldFreeIdCheck(hID, Houses[hID][World]);
 
