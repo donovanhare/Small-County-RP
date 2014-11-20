@@ -8,7 +8,7 @@
 			|-----------------------------------------------------------------------------------------------------------------------------|
 
 - Faction Skins
-- Faction Weaponss
+- Faction Weapons
 - Faction Pay
 - 911testing
 - batton hit instead of taser?
@@ -12542,7 +12542,6 @@ Dialog:HOUSEINTERIORS(playerid, response, listitem, inputtext[])
 }
 
 
-*/
 new Float:BusinessInteriorPos[][] =
 {
     { -25.7114, -187.821, 1003.5469 },
