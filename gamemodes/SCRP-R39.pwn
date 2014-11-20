@@ -1480,7 +1480,7 @@ CMD:logout(playerid,params[])
 	SendLocalMessage(playerid, str, 30.0, COLOR_GRAY, COLOR_GRAY);
 	SendAdminsMessage(1, COLOR_GRAY, str);
 	Save_Account(playerid);
-	Account_Unload_Vehicles(playerid);
+	Unload_Account_Vehicles(playerid);
 	Select_MasterAccount(playerid);
 	return 1;
 }			
@@ -1913,7 +1913,7 @@ public OnPlayerDisconnect(playerid, reason)
 	GetPlayerArmour(playerid, PlayerInfo[playerid][Armour]);
 	Save_Account(playerid);
 	PlayerInfo[playerid][LoggedIn] = 0;
-	Account_Unload_Vehicles(playerid);
+	Unload_Account_Vehicles(playerid);
     new pName[24], str[128];
     GetPlayerName(playerid, pName, 24);
 
@@ -4520,6 +4520,7 @@ public Load_Account_Vehicles(playerid)
 			if(PlayerInfo[playerid][TotalVehicles] < 4)
 			{
 				Total_Vehicles_Created++;
+				static Float:VehicleHP, VehicleDamage[4];
 			  	new vid = GetFreeVehicleSlot();
 			  	ResetVehicleVariables(vid);
 			    validvehicle[vid] = true;
@@ -4536,11 +4537,16 @@ public Load_Account_Vehicles(playerid)
 				cache_get_field_content(i, "Plate", Vehicles[vid][Plate], SQL_CONNECTION, 12);
 				Vehicles[vid][Owner] = cache_get_field_content_int(i, "Owner", SQL_CONNECTION);
 				Vehicles[vid][Fuel] = cache_get_field_content_int(i, "Fuel", SQL_CONNECTION);
-				Vehicles[vid][Damage] = cache_get_field_content_float(i, "Damage", SQL_CONNECTION);
+				VehicleHP = cache_get_field_content_float(i, "Damage", SQL_CONNECTION);
 				Vehicles[vid][Radio] = cache_get_field_content_int(i, "Radio", SQL_CONNECTION);
 				Vehicles[vid][Nitrous] = cache_get_field_content_int(i, "Nitrous", SQL_CONNECTION);
 				Vehicles[vid][Hydraulics] = cache_get_field_content_int(i, "Hydraulics", SQL_CONNECTION);
 				Vehicles[vid][Wheels] = cache_get_field_content_int(i, "Wheels", SQL_CONNECTION);
+				VehicleDamage[0] = cache_get_field_content_int(i, "Panels", SQL_CONNECTION);
+				VehicleDamage[1] = cache_get_field_content_int(i, "Doors", SQL_CONNECTION);
+				VehicleDamage[2] = cache_get_field_content_int(i, "Lights", SQL_CONNECTION);
+				VehicleDamage[3] = cache_get_field_content_int(i, "Tires", SQL_CONNECTION);
+
 				if(Vehicles[vid][Model] > 399 && Vehicles[vid][Model] < 612)
 				{	
 				    new Vehicle = CreateVehicle(Vehicles[vid][Model], Vehicles[vid][PosX], Vehicles[vid][PosY], Vehicles[vid][PosZ], Vehicles[vid][PosA], Vehicles[vid][Color1], Vehicles[vid][Color2], -1);
@@ -4567,7 +4573,8 @@ public Load_Account_Vehicles(playerid)
 
 					SetVehicleToRespawn(Vehicle);
 					SetVehicleNumberPlate(Vehicle, Vehicles[vid][Plate]);
-				    SetVehicleHealth(Vehicle, floatround(Vehicles[vid][Damage]));
+				    SetVehicleHealth(Vehicle, VehicleHP);
+				    UpdateVehicleDamageStatus(Vehicle, VehicleDamage[0], VehicleDamage[1], VehicleDamage[2], VehicleDamage[3]);
 				    SetVehicleParamsEx(Vehicle, 0, 0,  alarm[vid], doors[vid], bonnet[vid], boot[vid], objective[vid]);
 
 				    if(Vehicles[Vehicle][Nitrous] > 1007 && Vehicles[Vehicle][Nitrous] < 1011)
@@ -4589,6 +4596,35 @@ public Load_Account_Vehicles(playerid)
 		}
 	}
 
+	return 1;
+}
+
+stock Unload_Account_Vehicles(playerid)
+{
+	for(new id; id < MAX_VEH; id++)
+    {
+		if (IsVehicleSpawned(id))
+	    {
+	        if(Vehicles[id][Type] == 1)
+	        {
+				if (PlayerInfo[playerid][SQLID] == Vehicles[id][Owner])
+				{
+					static Float:VehicleHP[1], VehicleDamage[4];
+					GetVehicleHealth(id, VehicleHP[0]);
+					GetVehicleDamageStatus(id, VehicleDamage[0], VehicleDamage[1], VehicleDamage[2], VehicleDamage[3]);
+					MYSQL_Update_Float(Vehicles[id][SQLID], "playervehicles", "Damage", VehicleHP[0]);
+					MYSQL_Update_Interger(Vehicles[id][SQLID], "playervehicles", "Panels", VehicleDamage[0]);
+					MYSQL_Update_Interger(Vehicles[id][SQLID], "playervehicles", "Doors",  VehicleDamage[1]);
+					MYSQL_Update_Interger(Vehicles[id][SQLID], "playervehicles", "Lights", VehicleDamage[2]);
+					MYSQL_Update_Interger(Vehicles[id][SQLID], "playervehicles", "Tires",  VehicleDamage[3]);
+					DestroyVehicle(id);
+					Total_Vehicles_Created --;
+					validvehicle[id] = false;
+					ResetVehicleVariables(id);
+				}
+			}
+		}
+	}
 	return 1;
 }
 
@@ -4626,26 +4662,7 @@ public LoadFactions()
 	return 1;
 }
 
-stock Account_Unload_Vehicles(playerid)
-{
-	for(new id; id < MAX_VEH; id++)
-    {
-		if (IsVehicleSpawned(id))
-	    {
-	        if(Vehicles[id][Type] == 1)
-	        {
-				if (PlayerInfo[playerid][SQLID] == Vehicles[id][Owner])
-				{
-				 DestroyVehicle(id);
-				 Total_Vehicles_Created --;
-				 validvehicle[id] = false;
-				 ResetVehicleVariables(id);
-				}
-			}
-		}
-	}
-	return 1;
-}
+
 
 stock UnloadServerVehicles()
 {
@@ -4716,7 +4733,7 @@ stock RespawnFactionVehicles(factionid)
 /*ReloadPlayerVehicles(playerid)
 {
 
-		Account_Unload_Vehicles(playerid);
+		Unload_Account_Vehicles(playerid);
 		LoadPlayerVehicles(playerid);
 		return 1;
 }*/
@@ -4774,7 +4791,7 @@ ALTCMD:loadpv->loadplayervehicles;
 
 CMD:unloadplayerehicles(playerid,params[])
 {
-	Account_Unload_Vehicles(playerid);
+	Unload_Account_Vehicles(playerid);
 	return 1;
 }
 ALTCMD:unloadpv->unloadplayerehicles;
@@ -9537,7 +9554,7 @@ stock MYSQL_Update_Interger(sqlid, table[], column[], interger)
 stock MYSQL_Update_Float(sqlid, table[], column[], Float:interger)
 {
 	new query[280];
-    mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `%e` SET `%e` = %d WHERE SQLID = %d LIMIT 1", table, column, interger, sqlid);
+    mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `%e` SET `%e` = %f WHERE SQLID = %d LIMIT 1", table, column, interger, sqlid);
 	mysql_tquery(SQL_CONNECTION, query);
 	return 1;
 }
