@@ -6,8 +6,7 @@
        		|  				   ------------------------------------------------------------------------------------------                 |
 			|                                       	  | Small County Roleplay |     	         	                                  |
 			|-----------------------------------------------------------------------------------------------------------------------------|
-No
-Yes
+
 - Faction Skins
 - Faction Weapons
 - Faction Pay
@@ -8090,6 +8089,46 @@ CMD:installstereo(playerid, params[])
 	{
 		SendErrorMessage(playerid, ERROR_JOB);
 	}
+	return 1;
+}
+
+CMD:tow(playerid, params[])
+{
+	if(PlayerInfo[playerid][Job] != MECHANIC_JOB) return SendErrorMessage(playerid, "You must be a mechanic to tow vehicles.");
+
+	new vehicleid = GetPlayerVehicleID(playerid), modelid = GetVehicleModel(vehicleid);
+	if(modelid != 525 && modelid != 531) return SendErrorMessage(playerid, "You must be in a tow truck or tractor.");
+	if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER) return SendErrorMessage(playerid,"You must be the driver.");
+	if(IsTrailerAttachedToVehicle(vehicleid)) return SendErrorMessage(playerid,"You are already towing a vehicle, use /detach if you want to tow another.");
+
+	new Float:pX, Float:pY, Float:pZ, Float:vX, Float:vY, Float:vZ, found = 0, vid = 0;
+	GetPlayerPos(playerid, pX, pY, pZ);
+
+	while(vid < MAX_VEHICLES && found == 0)
+	{
+		vid ++;
+		GetVehiclePos(vid, vX, vY, vZ);
+		if(floatabs(pX-vX) < 7.0 && floatabs(pY-vY) < 7.0 && floatabs(pZ-vZ) < 7.0 && vid != vehicleid)
+		{
+	    	found = 1;
+			AttachTrailerToVehicle(vid, vehicleid);
+			break;
+		}
+	}
+	
+	if(!found) return SendClientMessage(playerid, COLOR_SKYBLUE, "There are no vehicles near to tow.");
+		
+	return 1;
+}
+CMD:detach(playerid, params[])
+{
+    new vehicleid = GetPlayerVehicleID(playerid);
+
+	if(vehicleid == 0 || (vehicleid > 0 && GetVehicleTrailer(vehicleid) == 0)) return SendErrorMessage(playerid, "You are not in a vehicle or you are not towing anything that can be detached.");
+	if(GetPlayerState(playerid) != PLAYER_STATE_DRIVER) return SendErrorMessage(playerid, "You must be the driver to operate the tow controls.");
+
+	DetachTrailerFromVehicle(vehicleid);
+	SendClientMessage(playerid, COLOR_SKYBLUE, "You have unhooked the vehicle.");
 	return 1;
 }
 
