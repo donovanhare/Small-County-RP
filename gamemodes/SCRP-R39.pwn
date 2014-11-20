@@ -10620,18 +10620,9 @@ CMD:housemanager(playerid, params[])
 	return 1;
 }
 
-CMD:houseinteriors(playerid, params[])
-{
-	if(MasterAccount[playerid][Admin] >= 5)
-	{
-	    Dialog_Show(playerid, HOUSEINTERIORS, DIALOG_STYLE_LIST, "Admin House Interior Teleports", "Robada\nBayside Yellow\nSmall Outer\nMed Robada\n2 Floor Lade\nBayside Large Stairs\nShite Hole\nGranny Wallpaper\nSmall Flat Green\nDark Blue House\nvLarge 2 floor\nLarge Lade\nMed Stripe Wall", "Teleport To", "Cancel");
-	}
-	else
-	{
-	    InfoBoxForPlayer(playerid, "You don't have access to this command.");
-	}
-	return 1;
-}
+
+
+
 
 CMD:clearanimation(playerid, params[])
 {
@@ -12422,46 +12413,17 @@ Dialog:RANK_SET(playerid, response, listitem, inputtext[])
 		//format(Faction[facid[playerid]][Rank1], 32, "%s", inputtext);
 		switch(PlayerInfo[playerid][NewID])
 		{
-			case 1:
-			{
-				format(Factions[facid[playerid]][Rank1], 32, "%s", inputtext);
-			}
-			case 2:
-			{
-				format(Factions[facid[playerid]][Rank2], 32, "%s", inputtext);
-			}
-			case 3:
-			{
-				format(Factions[facid[playerid]][Rank3], 32, "%s", inputtext);
-			}
-			case 4:
-			{
-				format(Factions[facid[playerid]][Rank4], 32, "%s", inputtext);
-			}
-			case 5:
-			{
-				format(Factions[facid[playerid]][Rank5], 32, "%s", inputtext);
-			}
-			case 6:
-			{
-				format(Factions[facid[playerid]][Rank6], 32, "%s", inputtext);
-			}
-			case 7:
-			{
-				format(Factions[facid[playerid]][Rank7], 32, "%s", inputtext);
-			}
-			case 8:
-			{
-				format(Factions[facid[playerid]][Rank8], 32, "%s", inputtext);
-			}
-			case 9:
-			{
-				format(Factions[facid[playerid]][Rank9], 32, "%s", inputtext);
-			}
-			case 10:
-			{
-				format(Factions[facid[playerid]][Rank10], 32, "%s", inputtext);
-			}
+			case 1: format(Factions[facid[playerid]][Rank1], 32, "%s", inputtext);
+			case 2: format(Factions[facid[playerid]][Rank2], 32, "%s", inputtext);
+			case 3: format(Factions[facid[playerid]][Rank3], 32, "%s", inputtext);
+			case 4: format(Factions[facid[playerid]][Rank4], 32, "%s", inputtext);
+			case 5: format(Factions[facid[playerid]][Rank5], 32, "%s", inputtext);
+			case 6: format(Factions[facid[playerid]][Rank6], 32, "%s", inputtext);
+			case 7: format(Factions[facid[playerid]][Rank7], 32, "%s", inputtext);
+			case 8: format(Factions[facid[playerid]][Rank8], 32, "%s", inputtext);
+			case 9: format(Factions[facid[playerid]][Rank9], 32, "%s", inputtext);
+			case 10: format(Factions[facid[playerid]][Rank10], 32, "%s", inputtext);
+			
 
 		}
 
@@ -12475,95 +12437,79 @@ Dialog:RANK_SET(playerid, response, listitem, inputtext[])
     return 1;
 }
 
-Dialog:HOUSEINTERIORS(playerid, response, listitem, inputtext[])
+
+
+
+new Float:HouseInteriorCoords[][] =
 {
-    if(response)
-    {
-        switch(listitem)
-        {
-            case 0:
-            {
-                SetPlayerPos(playerid, -33.6552,1564.2339,1080.2109);
-                SetPlayerInterior(playerid, 3);
-            }
-            case 1:
-            {
-                SetPlayerPos(playerid, 5.2788,1612.1793,1084.3750);
-                SetPlayerInterior(playerid, 2);
-            }
-            case 2:
-            {
-                SetPlayerPos(playerid, 18.3167,1566.3641,1084.4297);
-                SetPlayerInterior(playerid, 1);
-            }
-            case 3:
-            {
-                SetPlayerPos(playerid, -33.0208,1614.3723,1084.4297);
-                SetPlayerInterior(playerid, 7);
-            }
-            case 4:
-            {
-                SetPlayerPos(playerid, 62.3589,1557.1005,1083.8662);
-                SetPlayerInterior(playerid, 15);
-            }
-            case 5:
-            {
-                SetPlayerPos(playerid, 59.8227,1612.7520,1083.8594);
-                SetPlayerInterior(playerid, 15);
-            }
-            case 6:
-            {
-                SetPlayerPos(playerid, 106.9103,1561.0291,1084.4375);
-                SetPlayerInterior(playerid, 15);
-            }
-            case 7:
-            {
-                SetPlayerPos(playerid, 109.5615,1620.7977,1084.3047);
-                SetPlayerInterior(playerid, 8);
-            }
-            case 8:
-            {
-                SetPlayerPos(playerid, 146.0323,1562.4762,1082.1406);
-                SetPlayerInterior(playerid, 9);
-            }
-            case 9:
-            {
-                SetPlayerPos(playerid, 151.6272,1623.3051,1081.8254);
-                SetPlayerInterior(playerid, 10);
-            }
-            case 10:
-            {
-                SetPlayerPos(playerid, 198.2629,1624.6292,1080.9965);
-                SetPlayerInterior(playerid, 3);
-            }
-            case 11:
-            {
-                SetPlayerPos(playerid, 217.3181,1555.3815,1084.0154);
-                SetPlayerInterior(playerid, 8);
-            }
-            case 12:
-            {
-                SetPlayerPos(playerid, 264.7508,1625.2355,1083.8828);
-                SetPlayerInterior(playerid, 1);
-            }
-            case 13:
-            {
-                SetPlayerPos(playerid, 275.7429,1559.3079,1080.2578);
-                SetPlayerInterior(playerid, 1);
-            }
-        }
+	{ -33.6552, 1564.2339, 1080.2109 },
+	{ 5.2788, 1612.1793,   1084.3750 },
+	{ 18.3167, 1566.3641,  1084.4297 },
+	{ -33.0208, 1614.3723, 1084.4297 },
+	{ 62.3589, 1557.1005,  1083.8662 },
+	{ 59.8227, 1612.7520,  1083.8594 },
+	{ 106.9103, 1561.0291, 1084.4375 },
+	{ 109.5615, 1620.7977, 1084.3047 },
+	{ 146.0323, 1562.4762, 1082.1406 },
+	{ 151.6272, 1623.3051, 1081.8254 },
+	{ 198.2629, 1624.6292, 1080.9965 },
+	{ 217.3181, 1555.3815, 1084.0154 },
+	{ 264.7508, 1625.2355, 1083.8828 },
+	{ 275.7429, 1559.3079, 1080.2578 }
+};
+
+new HouseInteriorInfo[][][32] =
+{
+	{ "Robada", 			3 },
+	{ "Bayside Yellow", 	2 },
+	{ "Small Outer",		1 },
+	{ "Med Robada", 		7 },
+	{ "2 Floor Lade", 	   15 },
+	{ "Bayside Large Stairs", 15 },
+	{ "Shite Hole", 	   15 },
+	{ "Granny Wallpaper",   8 },
+	{ "Small Flat Green",   9 },
+	{ "Dark Blue House",   10 },
+	{ "vLarge 2 floor",     3 },
+	{ "Large Lade",         8 },
+	{ "Med Stripe Wall",    1 },
+	{ "Unknown",            1 }   
+};
+
+CMD:houseinteriors(playerid, params[])
+{
+	if(MasterAccount[playerid][Admin] > 0)
+	{
+		new str[128], dialog[400];
+		for (new iv = 0; iv < sizeof(HouseInteriorInfo); ++iv)
+		{
+			format(str, sizeof(str), "%s\n", HouseInteriorInfo[iv][0]);
+	        strcat(dialog, str, sizeof(dialog));
+		}
+
+		Dialog_Show(playerid, HOUSEINTERIORS, DIALOG_STYLE_LIST, "House Interiors", dialog, "Teleport","Exit");
 	}
 	return 1;
 }
 
 
+Dialog:HOUSEINTERIORS(playerid, response, listitem, inputtext[])
+{
+    if(response)
+    {
+        SetPlayerPosEx(playerid, HouseInteriorCoords[listitem][0], HouseInteriorCoords[listitem][1], HouseInteriorCoords[listitem][2], HouseInteriorInfo[listitem][1][0], 0);
+    }
+    return 1;
+}
+
+
 /*
 -33.6552, 1564.2339, 1080.2109 // HOUSE 01
-5.2788, 1612.1793, 1084.3750 // HOUSE 02
-18.3167, 1566.3641, 1084.4297 // HOUSE 03
+5.2788, 1612.1793,   1084.3750 // HOUSE 02
+18.3167, 1566.3641,  1084.4297 // HOUSE 03
 -33.0208, 1614.3723, 1084.4297 // HOUSE04
-62.3589, 1557.1005, 1083.8662 // HOUSE05
-59.8227, 1612.7520, 1083.8594 // HOUSE06
+62.3589, 1557.1005,  1083.8662 // HOUSE05
+59.8227, 1612.7520,  1083.8594 // HOUSE06
 106.9103, 1561.0291, 1084.4375 // HOUSE07
 109.5615, 1620.7977, 1084.3047 // HOUSE08 
 146.0323, 1562.4762, 1082.1406 // HOUSE09
