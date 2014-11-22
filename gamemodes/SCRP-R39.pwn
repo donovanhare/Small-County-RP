@@ -6,7 +6,8 @@
        		|  				   ------------------------------------------------------------------------------------------                 |
 			|                                       	  | Small County Roleplay |     	         	                                  |
 			|-----------------------------------------------------------------------------------------------------------------------------|
-
+still broken car
+/n system
 - Faction Skins
 - Faction Weapons
 - Faction Pay
@@ -315,6 +316,7 @@ driving theory
 #define PNC_CHARGE																 2
 #define PNC_FINES																 3
 #define PNC_WARRANT																 4
+#define PNC_WLOG																 5
 //==============================================================================
 //          -- > Enums
 //==============================================================================
@@ -3090,7 +3092,7 @@ CMD:giveweapon(playerid, params[])
 	    
 		GivePlayerGun(Player, WeaponID, gWeaponAmmo);
 
-        format(str, sizeof(str), "Admin %s has given %s weapon: %d (Ammo:%d)", GetRoleplayName(playerid), GetRoleplayName(Player), WeaponID, gWeaponAmmo);
+        format(str, sizeof(str), "Admin %s has given %s weapon: %s (Ammo:%d)", GetRoleplayName(playerid), GetRoleplayName(Player), WeaponNameList[WeaponID], gWeaponAmmo);
 		SendAdminsMessage(1, COLOR_YELLOW, str);
 		SendClientMessage(Player, COLOR_YELLOW, str);
     }
@@ -4334,6 +4336,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 				else if(Icons[i][Type] == 12) return InformationBox(playerid, "~g~DMV~n~~w~ The driving test cost $1000 to take. To proceed use the command ~y~/dmv~w~.");				
 				else if(Icons[i][Type] == 13) return InformationBox(playerid, "~y~Lockers~n~~w~ To access the locker please use ~y~/locker~w~.");
 				else if(Icons[i][Type] == 14) return InformationBox(playerid, "~p~Vehicle Modification Center~n~~w~ Mechanics can perform vehicle modifications to personal vehicles here using the command ~y~/vmods~w~.");
+				else if(Icons[i][Type] == 15) return InformationBox(playerid, "~b~Faction Weapon Cache~n~~w~ Faction weapons can be bought and equiped here using the command ~y~/weaponcache~w~. \n~r~WARNING:~w~It is against the rules to distribute faction weapons.");
 			}
 		}
 	}
@@ -9607,6 +9610,7 @@ stock SendSetMessages(player, playerid, option1[], option2)
 	return 1;
 }
 
+
 CMD:setbiz(playerid, params[])
 {
 	new str[128], query[128], id, option2[24], option3;
@@ -11239,7 +11243,7 @@ stock SendToJail(playerid)
 
 stock Add_PoliceNationalComputer(player, playerid, Charge, ChargeReason[], Value)
 {
-	new query[300];
+	new query[400];
     mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO PoliceNationalComputer (Time, Player, Officer, OfficerName, OfficerRank, Type, Reason, Value) VALUES( %d, %d, %d, '%e', '%e', %d, '%e', %d)", gettime(), player, PlayerInfo[playerid][SQLID], GetRoleplayName(playerid), GetPlayerRank(playerid), Charge, ChargeReason, Value);
 	mysql_tquery(SQL_CONNECTION, query);
 	return 1;
@@ -11268,7 +11272,7 @@ ALTCMD:pnc->policenationalcomputer;
 
 stock PoliceNationalComputer(playerid)
 {
-	Dialog_Show(playerid, PNC_Main, DIALOG_STYLE_LIST, "Police National Computer (PNC)", "Person Search\nVehicle Search\n \nOutstanding Warrants\nRecent 911 Calls ", "Enter","Shutdown");
+	Dialog_Show(playerid, PNC_Main, DIALOG_STYLE_LIST, "Police National Computer (PNC)", "Person Search\nVehicle Search\n \nOutstanding Warrants\nRecent 911 Calls\nWeapon Log ", "Enter","Shutdown");
 	return 1;
 }
 
@@ -11316,6 +11320,10 @@ Dialog:PNC_Main(playerid, response, listitem, inputtext[])
 	else if(listitem == 4)
 	{
 		mysql_tquery(SQL_CONNECTION, "SELECT ID, Incident, Location, Number, IGTime FROM `911 Calls` WHERE Service = 1 ORDER BY ID ASC LIMIT 10", "ViewRecent911", "d", playerid);	
+	}
+	else if(listitem == 5)
+	{
+		mysql_tquery(SQL_CONNECTION, "SELECT OfficerName, OfficerRank, Reason FROM `PoliceNationalComputer` WHERE Type = 5 ORDER BY Time ASC LIMIT 20", "ViewWeaponLog", "d", playerid);	
 	}
 	else
 	{
@@ -11596,6 +11604,32 @@ public ViewActiveWarrants(playerid)
 	else
 	{
 		Dialog_Show(playerid, PNC_ViewAW, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", "None", "Back", "");
+	}
+	return 1;
+}
+
+
+forward ViewWeaponLog(playerid);
+public ViewWeaponLog(playerid)
+{
+	if(cache_num_rows())
+    {
+    	new str[128], Dialog[2000], oname[24], orank[32], winfo[128];
+        for(new id = 0; id < cache_num_rows(); id++)
+        {
+        	cache_get_field_content(id, "OfficerName", oname, SQL_CONNECTION, MAX_PLAYER_NAME);
+        	cache_get_field_content(id, "OfficerRank", orank, SQL_CONNECTION, 32); 
+			cache_get_field_content(id, "Reason", winfo, SQL_CONNECTION, 64); 
+
+        	format(str, sizeof(str), "Weapon Issued to: %s - %s | Information: %s |\n", orank, oname, winfo);
+        	strcat(Dialog, str, sizeof(Dialog));
+
+        }
+        Dialog_Show(playerid, PNC_ViewAW, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", Dialog, "Return", "");
+	}
+	else
+	{
+		Dialog_Show(playerid, PNC_ViewAW, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", "None", "Return", "");
 	}
 	return 1;
 }
@@ -13797,7 +13831,7 @@ stock Icon_List_Creation(playerid)
 
 stock Icon_List_Type(playerid)
 {
-  	Dialog_Show(playerid, IconType, DIALOG_STYLE_LIST, "Icon System","Please select the icon type:\nRegular Vehicle Dealership\nFast Vehicle Dealership\nCommercial Dealership\nPayDay\nBank\nATM\nPay Phone\nNothing\nScrap Dealer\nSpray Garage\nRepair Garage\nDMV\nFaction Locker\nVehicle Mod Garage","Select","Cancel");
+  	Dialog_Show(playerid, IconType, DIALOG_STYLE_LIST, "Icon System","Please select the icon type:\nRegular Vehicle Dealership\nFast Vehicle Dealership\nCommercial Dealership\nPayDay\nBank\nATM\nPay Phone\nNothing\nScrap Dealer\nSpray Garage\nRepair Garage\nDMV\nFaction Locker\nVehicle Mod Garage\nWeapon Cache","Select","Cancel");
     return 1;
 }
 
@@ -14005,7 +14039,7 @@ CMD:locker(playerid,params[])
 	if(PlayerInfo[playerid][Faction] > 0)
 	{
 		new id = InRangeOfIconID(playerid);
-		if(id > 0 && Icons[id][Faction] == PlayerInfo[playerid][Faction])
+		if(id > 0 && Icons[id][Faction] == PlayerInfo[playerid][Faction] && Icons[id][Type] == 13)
 		{
 		    Locker_Main(playerid);
 		}
@@ -14147,6 +14181,127 @@ Dialog:LockerEquipment(playerid, response, listitem, inputtext[])
 			GivePlayerGun(playerid, 42, 100);
 		}
 	}
+    return 1;
+}
+
+
+
+CMD:weaponcache(playerid,params[])
+{
+	if(PlayerInfo[playerid][Faction] > 0)
+	{
+		new id = InRangeOfIconID(playerid);
+		if(id > 0 && Icons[id][Faction] == PlayerInfo[playerid][Faction] && Icons[id][Type] == 15 && Icons[id][Faction] == PlayerInfo[playerid][Faction])
+		{
+	    	FWeapons_Main(playerid);
+		}
+		else SendErrorMessage(playerid, ERROR_LOCATION);
+	}
+	return 1;
+}
+
+stock FWeapons_Main(playerid)
+{
+	new str[600], query[200];
+	strcat(str, "Purchase Weapons\n");
+
+	mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT SQLID, Weapon, Ammo FROM `FactionWeapons` WHERE Faction = %d AND Status = 1", PlayerInfo[playerid][Faction]);
+	new Cache:result = mysql_query(SQL_CONNECTION, query);
+
+	for(new i=0; i<cache_num_rows(); i++)
+	{
+		format(str, sizeof(str), "%sWeapon(#%d) %s(Ammo:%d)  \n", str, cache_get_field_content_int(i, "SQLID", SQL_CONNECTION), WeaponNameList[cache_get_field_content_int(i, "Weapon", SQL_CONNECTION)], cache_get_field_content_int(i, "Ammo", SQL_CONNECTION));
+	}
+
+ 	cache_delete(result);
+
+	Dialog_Show(playerid, FWeaponsMain, DIALOG_STYLE_LIST, "Faction Manager", str, "Select", "Close");
+	return 1;
+}
+
+
+stock FWeapons_Buy(playerid)
+{
+    Dialog_Show(playerid, FWeaponsBuy, DIALOG_STYLE_LIST, "Locker - Main Menu","Shotgun($1500)\nMP5($2200)\nCombat Shotgun($4000)\nM4($7000)\nSniper($12000)","Select","Cancel");
+	return 1;
+}
+
+
+Dialog:FWeaponsMain(playerid, response, listitem, inputtext[])
+{
+	if(!response) return 1;
+	if(listitem == 0)
+	{
+		FWeapons_Buy(playerid);
+	}
+	else
+	{
+		new WeapSQLID[4], query[150], str[64];
+	    strmid(WeapSQLID, inputtext, strfind(inputtext, "#") + 1,  strfind(inputtext, ")"));
+
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT Weapon, Ammo FROM `FactionWeapons` WHERE SQLID = %d AND Status = 1", strval(WeapSQLID));
+		new Cache:result = mysql_query(SQL_CONNECTION, query);
+
+		if(cache_num_rows())
+		{
+			new Weap = cache_get_field_content_int(0, "Weapon", SQL_CONNECTION);
+			new Ammo = cache_get_field_content_int(0, "Ammo", SQL_CONNECTION);
+			GivePlayerGun(playerid, Weap, Ammo);
+			MYSQL_Update_Interger(strval(WeapSQLID), "FactionWeapons", "Status", 0);
+
+			format(str, sizeof(str), "Weapon OUT at %d:%d - %s with %d rounds.", ClockHours, ClockMinutes, WeaponNameList[Weap], Ammo);
+			Add_PoliceNationalComputer(0, playerid, PNC_WLOG, str, 0);
+
+		}
+		else SendErrorMessage(playerid, "Weapon not found.");
+		cache_delete(result);
+	}
+    return 1;
+}
+
+stock BuyFactionWeapon(playerid, weap, ammo)
+{
+	new query[300];
+    mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO FactionWeapons (Weapon, Ammo, Faction, Status) VALUES(%d, %d, %d, 1)", weap, ammo, PlayerInfo[playerid][Faction]);
+	mysql_tquery(SQL_CONNECTION, query);
+
+	SendClientMessage(playerid, COLOR_SKYBLUE, "Weapon successfully purchased.");
+	return 1;
+}
+
+
+Dialog:FWeaponsBuy(playerid, response, listitem, inputtext[])
+{
+	if(!response) return FWeapons_Main(playerid);
+	new extractprice[6], weapprice;
+    strmid(extractprice, inputtext, strfind(inputtext, "$") + 1,  strfind(inputtext, ")"));
+    weapprice = strval(extractprice);
+
+    if(PlayerInfo[playerid][Cash] < weapprice) return SendErrorMessage(playerid, ERROR_MONEY);
+    GivePlayerMoneyEx(playerid, -weapprice);
+
+
+ 	if(listitem == 0)
+	{
+		BuyFactionWeapon(playerid, 25, 30);
+	}
+	else if(listitem == 1)
+	{
+		BuyFactionWeapon(playerid, 29, 120);
+	}
+	else if(listitem == 2)
+	{
+		BuyFactionWeapon(playerid, 27, 35);
+	}
+	else if(listitem == 3)
+	{
+		BuyFactionWeapon(playerid, 31, 150);
+	}
+	else if(listitem == 4)
+	{
+		BuyFactionWeapon(playerid, 34, 20);
+	}
+	SendClientMessage(playerid, COLOR_SKYBLUE, "Weapon equiped.");
     return 1;
 }
 
