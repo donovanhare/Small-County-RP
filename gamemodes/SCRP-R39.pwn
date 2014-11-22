@@ -4336,7 +4336,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 				else if(Icons[i][Type] == 12) return InformationBox(playerid, "~g~DMV~n~~w~ The driving test cost $1000 to take. To proceed use the command ~y~/dmv~w~.");				
 				else if(Icons[i][Type] == 13) return InformationBox(playerid, "~y~Lockers~n~~w~ To access the locker please use ~y~/locker~w~.");
 				else if(Icons[i][Type] == 14) return InformationBox(playerid, "~p~Vehicle Modification Center~n~~w~ Mechanics can perform vehicle modifications to personal vehicles here using the command ~y~/vmods~w~.");
-				else if(Icons[i][Type] == 15) return InformationBox(playerid, "~b~Faction Weapon Cache~n~~w~ Faction weapons can be bought and equiped here using the command ~y~/weaponcache~w~. \n~r~WARNING:~w~It is against the rules to distribute faction weapons.");
+				else if(Icons[i][Type] == 15) return InformationBox(playerid, "~b~Faction Weapon Cache~n~~w~ Faction weapons can be bought and equiped here using the command ~y~/weaponcache~w~.~n~~r~WARNING~w~:It is against the rules to distribute faction weapons.");
 			}
 		}
 	}
@@ -11249,7 +11249,13 @@ stock Add_PoliceNationalComputer(player, playerid, Charge, ChargeReason[], Value
 	return 1;
 }
 
-
+stock Add_PoliceNationalComputer2(player, playerid, Charge, ChargeReason[], Value, pName[])
+{
+	new query[400];
+    mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO PoliceNationalComputer (Time, Player, Officer, OfficerName, OfficerRank, Type, Reason, Value, PlayerName) VALUES( %d, %d, %d, '%e', '%e', %d, '%e', %d, '%e')", gettime(), player, PlayerInfo[playerid][SQLID], GetRoleplayName(playerid), GetPlayerRank(playerid), Charge, ChargeReason, Value, pName);
+	mysql_tquery(SQL_CONNECTION, query);
+	return 1;
+}
 
 
 CMD:policenationalcomputer(playerid, params[])
@@ -11315,7 +11321,7 @@ Dialog:PNC_Main(playerid, response, listitem, inputtext[])
 	else if(listitem == 1) return PoliceNC_VehicleSearch(playerid);
 	else if(listitem == 3)
 	{
-		mysql_tquery(SQL_CONNECTION, "SELECT ID, Player, Time, OfficerName, OfficerRank, Reason, Value FROM `PoliceNationalComputer` WHERE Type = 4 AND Value = 1 ORDER BY ID ASC", "ViewActiveWarrants", "d", playerid);	
+		mysql_tquery(SQL_CONNECTION, "SELECT ID, Time, OfficerName, OfficerRank, Reason, Value, PlayerName FROM `PoliceNationalComputer` WHERE Type = 4 AND Value = 1 ORDER BY ID ASC", "ViewActiveWarrants", "d", playerid);	
 	}
 	else if(listitem == 4)
 	{
@@ -11520,7 +11526,7 @@ Dialog:PNC_IssueWarrant(playerid, response, listitem, inputtext[])
 	if(!response) return PoliceNC_Records(playerid);
 	if(strlen(inputtext) > 4 && strlen(inputtext) < 128)
     {
-    	Add_PoliceNationalComputer(PlayerInfo[playerid][PNC], playerid, PNC_WARRANT, inputtext, 1);
+    	Add_PoliceNationalComputer2(PlayerInfo[playerid][PNC], playerid, PNC_WARRANT, inputtext, 1, GetNameFromSQLID(PlayerInfo[playerid][PNC]));
     	new str[128];
     	format(str, sizeof(str), "[WARRANT] %s has issued a warrant for %s's arrest.", GetRoleplayName(playerid), GetNameFromSQLID(PlayerInfo[playerid][PNC]));
     	SendFactionMessage(1, COLOR_INDIANRED, str);
@@ -11586,24 +11592,24 @@ public ViewActiveWarrants(playerid)
 {
 	if(cache_num_rows())
     {
-    	new str[128], Dialog[2000], oname[24], orank[32], creason[128], wid, player;
+    	new str[128], Dialog[2000], oname[24], orank[32], creason[128], wid, player[MAX_PLAYER_NAME];
         for(new id = 0; id < cache_num_rows(); id++)
         {
         	wid = cache_get_field_content_int(id, "ID", SQL_CONNECTION);
-        	player = cache_get_field_content_int(id, "Player", SQL_CONNECTION);
         	cache_get_field_content(id, "OfficerName", oname, SQL_CONNECTION, MAX_PLAYER_NAME);
         	cache_get_field_content(id, "OfficerRank", orank, SQL_CONNECTION, 32); 
 			cache_get_field_content(id, "Reason", creason, SQL_CONNECTION, 64); 
+			cache_get_field_content(id, "PlayerName", player, SQL_CONNECTION, MAX_PLAYER_NAME); 
 
-        	format(str, sizeof(str), "Active WARRANT (#%d) issued by: %s %s | %s(wanted) for %s |\n", wid, orank, oname, GetNameFromSQLID(player), creason);
+        	format(str, sizeof(str), "Active WARRANT (#%d) issued by: %s %s | %s(wanted) for %s |\n", wid, orank, oname, player, creason);
         	strcat(Dialog, str, sizeof(Dialog));
 
         }
-        Dialog_Show(playerid, PNC_ViewAW, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", Dialog, "View Profile", "Back");
+        Dialog_Show(playerid, PNC_ViewAW, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", Dialog, "Return", "");
 	}
 	else
 	{
-		Dialog_Show(playerid, PNC_ViewAW, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", "None", "Back", "");
+		Dialog_Show(playerid, PNC_ViewAW, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", "None", "Return", "");
 	}
 	return 1;
 }
@@ -11652,11 +11658,11 @@ public ViewRecent911(playerid)
         	strcat(Dialog, str, sizeof(Dialog));
 
         }
-        Dialog_Show(playerid, PNC_ViewAW, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", Dialog, "Back", "");
+        Dialog_Show(playerid, PNC_ViewAW, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", Dialog, "Return", "");
 	}
 	else
 	{
-		Dialog_Show(playerid, PNC_ViewAW, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", "None", "Back", "");
+		Dialog_Show(playerid, PNC_ViewAW, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", "None", "Return", "");
 	}
 	return 1;
 }
@@ -11682,11 +11688,11 @@ public ViewCharges(playerid)
         	strcat(Dialog, str, sizeof(Dialog));
 
         }
-        Dialog_Show(playerid, PNC_PRecord, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", Dialog, "Back", "");
+        Dialog_Show(playerid, PNC_PRecord, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", Dialog, "Return", "");
 	}
 	else
 	{
-		Dialog_Show(playerid, PNC_PRecord, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", "None", "Back", "");
+		Dialog_Show(playerid, PNC_PRecord, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", "None", "Return", "");
 	}
 	return 1;
 }
@@ -11708,11 +11714,11 @@ public ViewFines(playerid)
         	strcat(Dialog, str, sizeof(Dialog));
 
         }
-        Dialog_Show(playerid, PNC_PRecord, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", Dialog, "Back", "");
+        Dialog_Show(playerid, PNC_PRecord, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", Dialog, "Return", "");
 	}
 	else
 	{
-		Dialog_Show(playerid, PNC_PRecord, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", "None", "Back", "");
+		Dialog_Show(playerid, PNC_PRecord, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", "None", "Return", "");
 	}
 	return 1;
 }
@@ -11735,11 +11741,11 @@ public ViewJailRecord(playerid)
         	strcat(Dialog, str, sizeof(Dialog));
 
         }
-        Dialog_Show(playerid, PNC_PRecord, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", Dialog, "Back", "");
+        Dialog_Show(playerid, PNC_PRecord, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", Dialog, "Return", "");
 	}
 	else
 	{
-		Dialog_Show(playerid, PNC_PRecord, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", "None", "Back", "");
+		Dialog_Show(playerid, PNC_PRecord, DIALOG_STYLE_MSGBOX, "Police National Computer (PNC)", "None", "Return", "");
 	}
 	return 1;
 }
@@ -14203,8 +14209,11 @@ CMD:weaponcache(playerid,params[])
 stock FWeapons_Main(playerid)
 {
 	new str[600], query[200];
-	strcat(str, "Purchase Weapons\n");
-
+	
+	if(PlayerInfo[playerid][Faction] == 1)
+	{
+		strcat(str, "Purchase Weapons\n");
+	}
 	mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT SQLID, Weapon, Ammo FROM `FactionWeapons` WHERE Faction = %d AND Status = 1", PlayerInfo[playerid][Faction]);
 	new Cache:result = mysql_query(SQL_CONNECTION, query);
 
@@ -14230,9 +14239,12 @@ stock FWeapons_Buy(playerid)
 Dialog:FWeaponsMain(playerid, response, listitem, inputtext[])
 {
 	if(!response) return 1;
-	if(listitem == 0)
+	if(PlayerInfo[playerid][Faction] == 1)
 	{
-		FWeapons_Buy(playerid);
+		if(listitem == 0)
+		{
+			FWeapons_Buy(playerid);
+		}
 	}
 	else
 	{
@@ -14249,8 +14261,11 @@ Dialog:FWeaponsMain(playerid, response, listitem, inputtext[])
 			GivePlayerGun(playerid, Weap, Ammo);
 			MYSQL_Update_Interger(strval(WeapSQLID), "FactionWeapons", "Status", 0);
 
-			format(str, sizeof(str), "Weapon OUT at %d:%d - %s with %d rounds.", ClockHours, ClockMinutes, WeaponNameList[Weap], Ammo);
-			Add_PoliceNationalComputer(0, playerid, PNC_WLOG, str, 0);
+			if(PlayerInfo[playerid][Faction] == 1)
+			{
+				format(str, sizeof(str), "Weapon OUT at %d:%d - %s with %d rounds.", ClockHours, ClockMinutes, WeaponNameList[Weap], Ammo);
+				Add_PoliceNationalComputer(0, playerid, PNC_WLOG, str, 0);
+			}
 
 		}
 		else SendErrorMessage(playerid, "Weapon not found.");
