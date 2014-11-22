@@ -5405,6 +5405,7 @@ public SetPlayerPosEx(playerid, Float:X, Float:Y, Float:Z, Int, vWorld)
 	SetPlayerPos(playerid, X, Y, Z);
     SetPlayerInterior(playerid, Int);
 	SetPlayerVirtualWorld(playerid, vWorld);
+	PickedUpPickup[playerid] = false;
 	return 1;
 }
 
@@ -14246,31 +14247,30 @@ Dialog:FWeaponsMain(playerid, response, listitem, inputtext[])
 			FWeapons_Buy(playerid);
 		}
 	}
-	else
+
+	new WeapSQLID[4], query[150], str[64];
+    strmid(WeapSQLID, inputtext, strfind(inputtext, "#") + 1,  strfind(inputtext, ")"));
+
+	mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT Weapon, Ammo FROM `FactionWeapons` WHERE SQLID = %d AND Status = 1", strval(WeapSQLID));
+	new Cache:result = mysql_query(SQL_CONNECTION, query);
+
+	if(cache_num_rows())
 	{
-		new WeapSQLID[4], query[150], str[64];
-	    strmid(WeapSQLID, inputtext, strfind(inputtext, "#") + 1,  strfind(inputtext, ")"));
+		new Weap = cache_get_field_content_int(0, "Weapon", SQL_CONNECTION);
+		new Ammo = cache_get_field_content_int(0, "Ammo", SQL_CONNECTION);
+		GivePlayerGun(playerid, Weap, Ammo);
+		MYSQL_Update_Interger(strval(WeapSQLID), "FactionWeapons", "Status", 0);
 
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT Weapon, Ammo FROM `FactionWeapons` WHERE SQLID = %d AND Status = 1", strval(WeapSQLID));
-		new Cache:result = mysql_query(SQL_CONNECTION, query);
-
-		if(cache_num_rows())
+		if(PlayerInfo[playerid][Faction] == 1)
 		{
-			new Weap = cache_get_field_content_int(0, "Weapon", SQL_CONNECTION);
-			new Ammo = cache_get_field_content_int(0, "Ammo", SQL_CONNECTION);
-			GivePlayerGun(playerid, Weap, Ammo);
-			MYSQL_Update_Interger(strval(WeapSQLID), "FactionWeapons", "Status", 0);
-
-			if(PlayerInfo[playerid][Faction] == 1)
-			{
-				format(str, sizeof(str), "Weapon OUT at %d:%d - %s with %d rounds.", ClockHours, ClockMinutes, WeaponNameList[Weap], Ammo);
-				Add_PoliceNationalComputer(0, playerid, PNC_WLOG, str, 0);
-			}
-
+			format(str, sizeof(str), "Weapon OUT at %d:%d - %s with %d rounds.", ClockHours, ClockMinutes, WeaponNameList[Weap], Ammo);
+			Add_PoliceNationalComputer(0, playerid, PNC_WLOG, str, 0);
 		}
-		else SendErrorMessage(playerid, "Weapon not found.");
-		cache_delete(result);
+
 	}
+	else SendErrorMessage(playerid, "Weapon not found.");
+	cache_delete(result);
+	
     return 1;
 }
 
