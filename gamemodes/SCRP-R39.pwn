@@ -11,7 +11,6 @@ still broken car
 - Faction Skins
 - Faction Weapons
 - Faction Pay
-- 911testing
 - batton hit instead of taser?
 - need equipment in order 2 hotwire vehicle 1 use onnly
 SP weapons have to be bought by the command team, they use money from the faction bank but get paid daily and they get lik,e 50% of fines
@@ -125,6 +124,12 @@ driving theory
 #define MAX_ICONS                                                               50
 #define MAX_OBJECTZ                                                             5000
 #define MAX_JOBS                                                                5
+//==============================================================================
+#define Range_VShort                                                            4.0
+#define Range_Short 															15.0
+#define Range_Normal															20.0
+#define Range_Long																40.0
+#define Range_VLong																100.0	
 //==============================================================================
 //          -- > Colors
 //==============================================================================
@@ -648,8 +653,8 @@ new Text:Clock;
 new ClockHours;
 new ClockMinutes;
 new ClockSeconds;
-new Text:BlackScreen;
-new Text:BlackOutText;
+new Text:BlackScreen[MAX_PLAYERS];
+new Text:BlackOutText[MAX_PLAYERS];
 //==========================================================================
 new PlayerText:SelectionBox[MAX_PLAYERS];
 new PlayerText:Slot01[MAX_PLAYERS];
@@ -675,6 +680,10 @@ new Float:InactivtyCheck_Y[MAX_PLAYERS];
 new Float:InactivtyCheck_Z[MAX_PLAYERS];
 new LastCommandTime[MAX_PLAYERS];
 
+
+new LoopAnim[MAX_PLAYERS];
+new LibsPreloaded[MAX_PLAYERS];
+new Text:AnimText[MAX_PLAYERS];
 //new LastQuestion;
 //==========================================================================
 new LetterList[26][] =
@@ -1176,28 +1185,38 @@ public OnGameModeInit()
 		TextDrawFont(SpeedBox[i], 2);
 		TextDrawSetProportional(SpeedBox[i], 1);
 
+		AnimText[i] = TextDrawCreate(610.0, 400.0,
+		"~r~~k~~PED_SPRINT~ ~w~to stop the animation");
+		TextDrawUseBox(AnimText[i], 0);
+		TextDrawFont(AnimText[i], 2);
+		TextDrawSetShadow(AnimText[i],0); 
+	    TextDrawSetOutline(AnimText[i],1);
+	    TextDrawBackgroundColor(AnimText[i],0x000000FF);
+	    TextDrawColor(AnimText[i],0xFFFFFFFF);
+	    TextDrawAlignment(AnimText[i],3);
 
-		BlackScreen = TextDrawCreate(644.000000, 0.000000, "                                                                                                                                ");
-		TextDrawBackgroundColor(BlackScreen, 255);
-		TextDrawFont(BlackScreen, 1);
-		TextDrawLetterSize(BlackScreen, 0.500000, 1.000000);
-		TextDrawColor(BlackScreen, -1);
-		TextDrawSetOutline(BlackScreen, 0);
-		TextDrawSetProportional(BlackScreen, 1);
-		TextDrawSetShadow(BlackScreen, 1);
-		TextDrawUseBox(BlackScreen, 1);
-		TextDrawBoxColor(BlackScreen, 255);
-		TextDrawTextSize(BlackScreen, -11.000000, 0.000000);
+
+		BlackScreen[i] = TextDrawCreate(644.000000, 0.000000, "                                                                                                                                ");
+		TextDrawBackgroundColor(BlackScreen[i], 255);
+		TextDrawFont(BlackScreen[i], 1);
+		TextDrawLetterSize(BlackScreen[i], 0.500000, 1.000000);
+		TextDrawColor(BlackScreen[i], -1);
+		TextDrawSetOutline(BlackScreen[i], 0);
+		TextDrawSetProportional(BlackScreen[i], 1);
+		TextDrawSetShadow(BlackScreen[i], 1);
+		TextDrawUseBox(BlackScreen[i], 1);
+		TextDrawBoxColor(BlackScreen[i], 255);
+		TextDrawTextSize(BlackScreen[i], -11.000000, 0.000000);
 		//192
 
-		BlackOutText = TextDrawCreate(10.000000, 192.000000, "You have been knocked unconscious!");
-		TextDrawBackgroundColor(BlackOutText, -1);
-		TextDrawFont(BlackOutText, 2);
-		TextDrawLetterSize(BlackOutText, 0.760000, 2.000000);
-		TextDrawColor(BlackOutText, -16776961);
-		TextDrawSetOutline(BlackOutText, 0);
-		TextDrawSetProportional(BlackOutText, 1);
-		TextDrawSetShadow(BlackOutText, 0);
+		BlackOutText[i] = TextDrawCreate(10.000000, 192.000000, "You have been knocked unconscious!");
+		TextDrawBackgroundColor(BlackOutText[i], -1);
+		TextDrawFont(BlackOutText[i], 2);
+		TextDrawLetterSize(BlackOutText[i], 0.760000, 2.000000);
+		TextDrawColor(BlackOutText[i], -16776961);
+		TextDrawSetOutline(BlackOutText[i], 0);
+		TextDrawSetProportional(BlackOutText[i], 1);
+		TextDrawSetShadow(BlackOutText[i], 0);
 
 	}
 
@@ -1472,13 +1491,18 @@ CMD:achangecharacterusername(playerid,params[])
 
 CMD:logout(playerid,params[])
 {
+	if(LoopAnim[playerid]) 
+    {
+        LoopAnim[playerid] = 0;
+        TextDrawHideForPlayer(playerid,AnimText[playerid]);
+	}
 	GetPlayerPos(playerid, PlayerInfo[playerid][PosX], PlayerInfo[playerid][PosY], PlayerInfo[playerid][PosZ]);
 	KillTimer(InactivtyCheck[playerid]);
 	FailDrivingTest(playerid, "You logged out.");
 	EndTruckingMission(playerid, "You logged out.");
 	new str[128];
 	format(str, sizeof(str), "%s has logged out.", GetRoleplayName(playerid));
-	SendLocalMessage(playerid, str, 30.0, COLOR_GRAY, COLOR_GRAY);
+	SendLocalMessage(playerid, str, Range_Normal, COLOR_GRAY, COLOR_GRAY);
 	SendAdminsMessage(1, COLOR_GRAY, str);
 	Save_Account(playerid);
 	Unload_Account_Vehicles(playerid);
@@ -1930,6 +1954,28 @@ public OnPlayerDisconnect(playerid, reason)
 
 public OnPlayerSpawn(playerid)
 {
+	if(!LibsPreloaded[playerid]) {
+   		PreloadAnimLib(playerid,"BOMBER");
+   		PreloadAnimLib(playerid,"RAPPING");
+    	PreloadAnimLib(playerid,"SHOP");
+   		PreloadAnimLib(playerid,"BEACH");
+   		PreloadAnimLib(playerid,"SMOKING");
+    	PreloadAnimLib(playerid,"FOOD");
+    	PreloadAnimLib(playerid,"ON_LOOKERS");
+    	PreloadAnimLib(playerid,"DEALER");
+    	PreloadAnimLib(playerid,"MISC");
+    	PreloadAnimLib(playerid,"SWEET");
+    	PreloadAnimLib(playerid,"RIOT");
+    	PreloadAnimLib(playerid,"PED");
+    	PreloadAnimLib(playerid,"POLICE");
+		PreloadAnimLib(playerid,"CRACK");
+		PreloadAnimLib(playerid,"CARRY");
+		PreloadAnimLib(playerid,"COP_AMBIENT");
+		PreloadAnimLib(playerid,"PARK");
+		PreloadAnimLib(playerid,"INT_HOUSE");
+		PreloadAnimLib(playerid,"FOOD");
+		LibsPreloaded[playerid] = 1;
+	}
 	return 1;
 }
 
@@ -2081,11 +2127,24 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 }
 
 
+stock IsKeyJustDown(key, newkeys, oldkeys)
+{
+    if((newkeys & key) && !(oldkeys & key))
+        return 1;
+
+    return 0;
+}
 
 public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
-
-
+	if(LoopAnim[playerid])
+	{
+		if(IsKeyJustDown(KEY_SPRINT,newkeys,oldkeys)) 
+		{
+		    StopLoopingAnim(playerid);
+	        TextDrawHideForPlayer(playerid,AnimText[playerid]);
+	    }
+    }
 	return 1;
 }
 forward GivePlayerPayday(playerid, amount);
@@ -2304,6 +2363,8 @@ stock ResetPlayerVariables(playerid)
  	DMV[playerid][MDL] = 0;
 
  	PickedUpPickup[playerid] = false;
+	LoopAnim[playerid] = 0;
+	LibsPreloaded[playerid] = 0;
 	return 1;
 }
 
@@ -2443,7 +2504,7 @@ public OnPlayerUpdate(playerid)
 		{
 			SetVehicleHealth(VID, 300.0);	
 			Engine_SET(playerid, VID, 0);
-	    	SendLocalMessage(playerid, "* The engine packs up after sustaining a considerable amount of damage. *", 20.0, COLOR_RP, COLOR_RP);
+	    	SendLocalMessage(playerid, "* The engine packs up after sustaining a considerable amount of damage. *", Range_Normal, COLOR_RP, COLOR_RP);
 		}
 		else if(VHP < 300.0 && Engine[VID] == 0)	
 		{
@@ -5214,14 +5275,23 @@ public OnPlayerDeath(playerid, killerid, reason)
 		return SendToJail(playerid);
 	}
 
+
     PlayerInfo[playerid][InHospital] = 1;
     GetPlayerPos(playerid, PlayerInfo[playerid][PosX], PlayerInfo[playerid][PosY], PlayerInfo[playerid][PosZ]);
 
-	TextDrawShowForPlayer(playerid, BlackScreen);
-    TextDrawShowForPlayer(playerid, BlackOutText);
+
+	if(LoopAnim[playerid]) 
+    {
+        LoopAnim[playerid] = 0;
+        TextDrawHideForPlayer(playerid,AnimText[playerid]);
+	}
+
+	TextDrawShowForPlayer(playerid, BlackScreen[playerid]);
+    TextDrawShowForPlayer(playerid, BlackOutText[playerid]);
+
 
 	format(str, sizeof(str), "* %s falls to the floor, knocked unconscious. *", GetRoleplayName(playerid));
-	SendLocalMessage(playerid, str, 20.0, COLOR_RP, COLOR_RP);
+	SendLocalMessage(playerid, str, Range_Normal, COLOR_RP, COLOR_RP);
 
     ClearPlayerWeapons(playerid);
 
@@ -5266,8 +5336,8 @@ public Hospital(playerid)
 	SetPlayerPosEx(playerid, -320.2086, 1048.7581, 20.3403, 0, 0);
 	SetPlayerFacingAngle(playerid, 91.4410);
 
-	TextDrawHideForPlayer(playerid, BlackScreen);
-	TextDrawHideForPlayer(playerid, BlackOutText);
+	TextDrawHideForPlayer(playerid, BlackScreen[playerid]);
+	TextDrawHideForPlayer(playerid, BlackOutText[playerid]);
 
 	FailDrivingTest(playerid, "You died.");
 	EndTruckingMission(playerid, "You died.");
@@ -5310,7 +5380,7 @@ CMD:help(playerid, params[])
 
 
 	SendClientMessage(playerid, COLOR_YELLOW, "Help Commands:");
-	SendClientMessage(playerid, COLOR_WHITE, "/fhelp /bhelp /phelp /rhelp");
+	SendClientMessage(playerid, COLOR_WHITE, "/fhelp /bhelp /phelp /rhelp /animlist");
 
 	Line(playerid);
 
@@ -5455,10 +5525,10 @@ CMD:enter(playerid)
 		else
 		{
 			format(str, sizeof(str), "* %s attempts to open the business's door.*", GetRoleplayName(playerid));
-			SendLocalMessage(playerid, str, 20.0, COLOR_RP, COLOR_RP);
+			SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 
 			format(str, sizeof(str), "* As the door is locked, it doesn't open. ((%s))",GetRoleplayName(playerid));
-			SendLocalMessage(playerid, str, 20.0, COLOR_RP, COLOR_RP);
+			SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 		}
 
 	}
@@ -5476,10 +5546,10 @@ CMD:enter(playerid)
 		else
 		{
 		    format(str, sizeof(str), "* %s attempts to open the house door.*", GetRoleplayName(playerid));
-			SendLocalMessage(playerid, str, 20.0, COLOR_RP, COLOR_RP);
+			SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 
 			format(str, sizeof(str), "* As the door is locked, it doesn't open. ((%s))",GetRoleplayName(playerid));
-			SendLocalMessage(playerid, str, 20.0, COLOR_RP, COLOR_RP);
+			SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 		}
     }
 	return 1;
@@ -5788,7 +5858,7 @@ stock BuyItem(playerid, item)
 		GivePlayerMoneyEx(playerid, -GeneralStore[item][0]);
 
 		format(str, sizeof(str), "* The cashier swipes the object past the scanner. The cash register would display $%d. *", GeneralStore[item][0]);
-		SendLocalMessage(playerid, str, 20.0, COLOR_RP, COLOR_RP);
+		SendLocalMessage(playerid, str, Range_VShort, COLOR_RP, COLOR_RP);
 	}
 	else
 	{
@@ -6040,16 +6110,16 @@ public OnPlayerText(playerid, text[])
 		    if(Inventory[playerid][PhoneStatus] != 4)
 		    {
 			    format(str, sizeof(str), "%s says: %s",GetRoleplayName(playerid), text);
-				SendLocalSplitMessage(playerid, 17.0, COLOR_WHITE, COLOR_GRAY, str);
-				SetPlayerChatBubble(playerid, text, COLOR_WHITE, 10.0, 7000);
+				SendLocalSplitMessage(playerid, Range_Normal, COLOR_WHITE, COLOR_GRAY, str);
+				SetPlayerChatBubble(playerid, text, COLOR_WHITE, Range_Normal, 7000);
 			}
 			else
 			{
 
 			    format(str, sizeof(str), "[Phone] %s says: %s",GetRoleplayName(playerid), text);
 				SendClientSplitMessage(Inventory[playerid][PhoneCaller], COLOR_WHITE, str);
-				SendLocalSplitMessage(playerid, 17.0, COLOR_WHITE, COLOR_GRAY, str);
-				SetPlayerChatBubble(playerid, text, COLOR_WHITE, 10.0, 7000);
+				SendLocalSplitMessage(playerid, Range_Normal, COLOR_WHITE, COLOR_GRAY, str);
+				SetPlayerChatBubble(playerid, text, COLOR_WHITE, Range_Normal, 7000);
 
 				if(Inventory[playerid][PhoneEmergency] == 1)
 				{
@@ -6126,8 +6196,8 @@ CMD:b(playerid, params[])
 	if(PlayerInfo[playerid][Muted] == 0)
 	{
 		format(str, sizeof(str), "(( %s: %s ))", GetRoleplayName(playerid), str);
-		SendLocalSplitMessage(playerid, 20.0, COLOR_LBLUE, COLOR_LBLUE, str);
-		SetPlayerChatBubble(playerid, str, COLOR_LBLUE, 20.0, 7000);
+		SendLocalSplitMessage(playerid, Range_Normal, COLOR_LBLUE, COLOR_LBLUE, str);
+		SetPlayerChatBubble(playerid, str, COLOR_LBLUE, Range_Normal, 7000);
 	}
     else
     {
@@ -6143,8 +6213,8 @@ CMD:me(playerid, params[])
 	if(PlayerInfo[playerid][Muted] == 0)
 	{
 		format(str, sizeof(str), "%s %s", GetRoleplayName(playerid), str);
-		SendLocalSplitMessage(playerid, 20.0, COLOR_RP, COLOR_RP, str);
-		SetPlayerChatBubble(playerid, str, COLOR_RP, 20.0, 7000);
+		SendLocalSplitMessage(playerid, Range_Normal, COLOR_RP, COLOR_RP, str);
+		SetPlayerChatBubble(playerid, str, COLOR_RP, Range_Normal, 7000);
 	}
 	else
 	{
@@ -6160,7 +6230,7 @@ CMD:ame(playerid, params[])
 	if(PlayerInfo[playerid][Muted] == 0)
 	{
 		format(str, sizeof(str), "* %s %s *", GetRoleplayName(playerid), str);
-		SetPlayerChatBubble(playerid, str, COLOR_RP, 10.0, 7000);
+		SetPlayerChatBubble(playerid, str, COLOR_RP, Range_Short, 7000);
 		SendClientMessage(playerid, COLOR_RP, str);
 	}
 	else
@@ -6193,7 +6263,7 @@ CMD:do(playerid, params[])
    	if(PlayerInfo[playerid][Muted] == 0)
    	{
 		format(str, sizeof(str), "%s ((%s))", str, GetRoleplayName(playerid));
-		SendLocalSplitMessage(playerid, 20.0, COLOR_RP, COLOR_RP, str);
+		SendLocalSplitMessage(playerid, Range_Normal, COLOR_RP, COLOR_RP, str);
 	}
 	else
 	{
@@ -6211,15 +6281,15 @@ CMD:shout(playerid, params[])
 		if(Inventory[playerid][PhoneStatus] != 4)
 		{
 		    format(str, sizeof(str), "%s shouts: %s!", GetRoleplayName(playerid), msg);
-			SendLocalSplitMessage(playerid, 20.0, COLOR_ORANGE, COLOR_ORANGE, str);
-			SetPlayerChatBubble(playerid, str, COLOR_ORANGE, 30.0, 7000);
+			SendLocalSplitMessage(playerid, Range_Long, COLOR_ORANGE, COLOR_ORANGE, str);
+			SetPlayerChatBubble(playerid, str, COLOR_ORANGE, Range_Long, 7000);
 		}
 		else
 		{
 		    format(str, sizeof(str), "%s shouts: %s!", GetRoleplayName(playerid), msg);
 			SendClientSplitMessage(Inventory[playerid][PhoneCaller], COLOR_ORANGE, msg);
-			SendLocalSplitMessage(playerid, 20.0, COLOR_ORANGE, COLOR_ORANGE, str);
-			SetPlayerChatBubble(playerid, str, COLOR_ORANGE, 30.0, 7000);
+			SendLocalSplitMessage(playerid, Range_Long, COLOR_ORANGE, COLOR_ORANGE, str);
+			SetPlayerChatBubble(playerid, str, COLOR_ORANGE, Range_Long, 7000);
 		}
 	}
 	else
@@ -6237,8 +6307,8 @@ CMD:low(playerid, params[])
     if(PlayerInfo[playerid][Muted] == 0)
     {
     	format(str, sizeof(str), "[LOW] %s: %s", GetRoleplayName(playerid), msg);
-		SendLocalSplitMessage(playerid, 20.0, COLOR_GRAY, COLOR_GRAY, str);
-		SetPlayerChatBubble(playerid, "* Speaks quietly. *", COLOR_RP, 8.0, 4000);
+		SendLocalSplitMessage(playerid, Range_VShort, COLOR_GRAY, COLOR_GRAY, str);
+		SetPlayerChatBubble(playerid, "* Speaks quietly. *", COLOR_RP, Range_VShort, 4000);
 	}
 	else
 	{
@@ -6259,8 +6329,8 @@ CMD:whisper(playerid, params[])
 	        format(str, sizeof(str), "%s whispers: %s", GetRoleplayName(playerid), msg);
 	        SendClientSplitMessage(pID, COLOR_WHITE, str);
 	        format(str, sizeof(str), "* %s whispers something to %s. *", GetRoleplayName(playerid), GetRoleplayName(pID));
-	        SendLocalSplitMessage(playerid, 8.0, COLOR_RP, COLOR_RP, str);
-	        SetPlayerChatBubble(playerid, str, COLOR_RP, 10.0, 7000);
+	        SendLocalSplitMessage(playerid, Range_Short, COLOR_RP, COLOR_RP, str);
+	        SetPlayerChatBubble(playerid, str, COLOR_RP, Range_Short, 7000);
 	    }
 	    else
 	    {
@@ -6493,7 +6563,7 @@ CMD:key(playerid, params[])
      	        if(Houses[id][Locked] == 0)
      	        {
              		format(str, sizeof(str), "* %s places the key in the door, locking it.*", GetRoleplayName(playerid), str);
-					SendLocalMessage(playerid, str, 20.0, COLOR_RP, COLOR_RP);
+					SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 					Houses[id][Locked] = 1;
 					MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Locked", 1);
 					return 1;
@@ -6501,7 +6571,7 @@ CMD:key(playerid, params[])
      	        else
      	        {
      	            format(str, sizeof(str), "* %s places the key in the door, unlocking it.*", GetRoleplayName(playerid), str);
-					SendLocalMessage(playerid, str, 20.0, COLOR_RP, COLOR_RP);
+					SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 					Houses[id][Locked] = 0;
 					MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Locked", 0);
 					return 1;
@@ -6518,7 +6588,7 @@ CMD:key(playerid, params[])
      	        if(Biz[id][Locked] == 0)
      	        {
              		format(str, sizeof(str), "* %s places the key in the door, locking it.*", GetRoleplayName(playerid), str);
-					SendLocalMessage(playerid, str, 20.0, COLOR_RP, COLOR_RP);
+					SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 					Biz[id][Locked] = 1;
 					MYSQL_Update_Interger(Houses[id][SQLID], "Biz", "Locked", 1);
 					return 1;
@@ -6526,7 +6596,7 @@ CMD:key(playerid, params[])
      	        else
      	        {
      	            format(str, sizeof(str), "* %s places the key in the door, unlocking it.*", GetRoleplayName(playerid), str);
-					SendLocalMessage(playerid, str, 20.0, COLOR_RP, COLOR_RP);
+					SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 					MYSQL_Update_Interger(Houses[id][SQLID], "Biz", "Locked", 1);
 					Biz[id][Locked] = 0;
 					return 1;
@@ -6662,7 +6732,7 @@ stock Engine_TOGGLE(playerid, vid)
     if(Engine[vid] <= 0)
     {
         format(str, sizeof(str), "* %s places the key into the ignition, turning the key, attempting to turn the engine on. *", GetRoleplayName(playerid));
-		SendLocalMessage(playerid, str, 20.0, COLOR_RP, COLOR_RP);
+		SendLocalMessage(playerid, str, Range_Normal, COLOR_RP, COLOR_RP);
 
 		Engine_SET(playerid, vid, 1);
 
@@ -6672,7 +6742,7 @@ stock Engine_TOGGLE(playerid, vid)
     else if(Engine[vid] >= 1)
     {
         format(str, sizeof(str), "* %s turns the key, turning the engine off and removing the keys from the ignition. *", GetRoleplayName(playerid));
-		SendLocalMessage(playerid, str, 20.0, COLOR_RP, COLOR_RP);
+		SendLocalMessage(playerid, str, Range_Normal, COLOR_RP, COLOR_RP);
 
 		Engine_SET(playerid, vid, 0);
         return 1;
@@ -6690,8 +6760,8 @@ stock Engine_SET(playerid, vid, State)
     {
     	static Float:VehicleHP;
     	GetVehicleHealth(vid, VehicleHP);
-    	if(VehicleHP <= 300.0) return SendLocalMessage(playerid, "* The engine wouldn't start as it's extensively damaged. *", 20.0, COLOR_RP, COLOR_RP);
-    	if(Vehicles[vid][Fuel] <= 0) return SendLocalMessage(playerid, "* The engine wouldn't turn on due to a lack of fuel. *", 20.0, COLOR_RP, COLOR_RP);
+    	if(VehicleHP <= 300.0) return SendLocalMessage(playerid, "* The engine wouldn't start as it's extensively damaged. *", Range_Normal, COLOR_RP, COLOR_RP);
+    	if(Vehicles[vid][Fuel] <= 0) return SendLocalMessage(playerid, "* The engine wouldn't turn on due to a lack of fuel. *", Range_Normal, COLOR_RP, COLOR_RP);
 		
 		SetVehicleParamsEx(vid,1,Lights[vid],alarm[vid],doors[vid],bonnet[vid],boot[vid],objective[vid]);
 		Engine[vid] = 1;
@@ -6716,14 +6786,14 @@ stock Lights_TOGGLE(playerid, vid)
     if(Lights[vid] == 0)
     {
         format(str, sizeof(str), "* %s turns the vehicle light knob, turning the headlights on .*", GetRoleplayName(playerid));
-		SendLocalMessage(playerid, str, 20.0, COLOR_RP, COLOR_RP);
+		SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 		SetVehicleParamsEx(vid,Engine[vid],1,alarm[vid],doors[vid],bonnet[vid],boot[vid],objective[vid]);
 		Lights[vid] = 1;
     }
     else
     {
         format(str, sizeof(str), "* %s turns the vehicle light knob, turning the headlights off .*", GetRoleplayName(playerid));
-		SendLocalMessage(playerid, str, 20.0, COLOR_RP, COLOR_RP);
+		SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 		SetVehicleParamsEx(vid,Engine[vid],0,alarm[vid],doors[vid],bonnet[vid],boot[vid],objective[vid]);
 		Lights[vid] = 0;
     }
@@ -8068,7 +8138,7 @@ CMD:installstereo(playerid, params[])
 					Inventory[playerid][VehicleRadio] --;
 
 					format(str, sizeof(str), "* %s swiftly slides the new stereo system into the free compartment before screwing it into place. *", GetRoleplayName(playerid));
-					SendLocalMessage(playerid, str, 15.0, COLOR_RP, COLOR_RP);
+					SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 
 					mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE PlayerVehicles SET Radio = %d WHERE SQLID = %d LIMIT 1", Vehicles[vid][Radio], Vehicles[vid][SQLID]);
 					mysql_tquery(SQL_CONNECTION, query);
@@ -8669,7 +8739,7 @@ CMD:pay(playerid, params[])
 			if(amount > PlayerInfo[playerid][Cash] || amount > 250000 || amount <= 0 || PlayerInfo[playerid][Cash] <= 0 || playerid == player) return SendErrorMessage(playerid, ERROR_VALUE);
 			
 			format(str, sizeof(str), "* %s withdraws their wallet, and takes out some cash before giving it to %s. *", GetRoleplayName(playerid), GetRoleplayName(player));
-			SendLocalMessage(playerid, str, 17.0, COLOR_RP, COLOR_RP);
+			SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 
 			format(str, sizeof(str), "You have paid $%d to %s.", amount, GetRoleplayName(player));
 			SendClientMessage(playerid, COLOR_OLIVE, str);	
@@ -10870,7 +10940,7 @@ CMD:radio(playerid, params[])
 			format(str, sizeof(str), "[Radio | %dMHz] %s: %s", Inventory[playerid][RadioFreq], GetRoleplayName(playerid), msg);
 			SendFreqMessage(playerid, Inventory[playerid][RadioFreq], str);
 			format(str, sizeof(str), "[Radio] %s: %s", GetRoleplayName(playerid), msg);
-			SendLocalMessage(playerid, str, 12.0, COLOR_SLATEGRAY, COLOR_SLATEGRAY);
+			SendLocalMessage(playerid, str, Range_Short, COLOR_SLATEGRAY, COLOR_SLATEGRAY);
 		}
 		else SendErrorMessage(playerid, "Invalid frequency.");	
 	}
@@ -10891,7 +10961,7 @@ CMD:radioon(playerid, params[])
 			Inventory[playerid][Radio] = RADIO_ON;
 			MYSQL_Update_Account(playerid, "Radio", Inventory[playerid][Radio]);
 			format(str, sizeof(str), "* %s flicks a switch on the side of their radio turning it on. *", GetRoleplayName(playerid));
-			SendLocalMessage(playerid, str, 12.0, COLOR_RP, COLOR_RP);
+			SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 		}
 		else SendErrorMessage(playerid, "Your radio is already on!");
 	}
@@ -10910,7 +10980,7 @@ CMD:radiooff(playerid, params[])
 			Inventory[playerid][Radio] = RADIO_OFF;
 			MYSQL_Update_Account(playerid, "Radio", Inventory[playerid][Radio]);
 			format(str, sizeof(str), "* %s flicks a switch on the side of their radio turning it off. *", GetRoleplayName(playerid));
-			SendLocalMessage(playerid, str, 12.0, COLOR_RP, COLOR_RP);
+			SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 		}
 		else SendErrorMessage(playerid, "Your radio is already off!");
 	}
@@ -10934,7 +11004,7 @@ CMD:radiotune(playerid, params[])
 			MYSQL_Update_Account(playerid, "RadioFreq", Inventory[playerid][RadioFreq]);
 
 			format(str, sizeof(str), "* %s fiddles with their radio for a moment, changing the frequency. *", GetRoleplayName(playerid));
-			SendLocalMessage(playerid, str, 10.0, COLOR_RP, COLOR_RP);
+			SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 		}
 		else SendErrorMessage(playerid, "Your radio is off!");
 	}
@@ -10975,7 +11045,7 @@ CMD:cuff(playerid, params[])
 	      			PlayerInfo[player][Cuffed] = 1;
 
 	      			format(str, sizeof(str), "* %s has been placed into handcuffs by %s. *", GetRoleplayName(player), GetRoleplayName(playerid));
-	      			SendLocalMessage(playerid, str, 10.0, COLOR_RP, COLOR_RP);
+	      			SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 	      		}
 	      		else SendErrorMessage(playerid, "This player is already cuffed!");
   			}
@@ -11006,7 +11076,7 @@ CMD:uncuff(playerid, params[])
 	      			PlayerInfo[player][Cuffed] = 0;
 
 	      			format(str, sizeof(str), "* %s has been uncuffed by %s. *", GetRoleplayName(player), GetRoleplayName(playerid));
-	      			SendLocalMessage(playerid, str, 10.0, COLOR_RP, COLOR_RP);
+	      			SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 				}
 				else SendErrorMessage(playerid, "This player isn't cuffed.");
   			}
@@ -11118,7 +11188,7 @@ CMD:megaphone(playerid, params[])
 				if(sscanf(params, "s[128]", str)) return SendClientMessage(playerid, COLOR_GRAY, "/megaphone [message]");
 
 				format(str, sizeof(str), "[MEGAPHONE] << %s: %s >>", GetRoleplayName(playerid), str);
-				SendLocalMessage(playerid, str, 50.0, COLOR_YELLOW, COLOR_YELLOW);
+				SendLocalMessage(playerid, str, Range_VLong, COLOR_YELLOW, COLOR_YELLOW);
 				SetPlayerChatBubble(playerid, str, COLOR_VIOLET, 20.0, 7000);
 			}
 			else SendErrorMessage(playerid, "This vehicle isn't fitted with a megaphone.");
@@ -13010,7 +13080,7 @@ stock ProcessCall(playerid, number)
 {	 
 	new str[128];
  	format(str, sizeof(str), "* %s presses a few buttons on his phone before holding it to his ear. *",GetRoleplayName(playerid));
-	SendLocalMessage(playerid, str, 7.0, COLOR_RP, COLOR_RP);
+	SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 	SetPlayerChatBubble(playerid, str, COLOR_RP, 10.0, 5000);
 
 	if(number == 911)
@@ -13038,7 +13108,7 @@ stock ProcessCall(playerid, number)
 
 	               
 					format(str, sizeof(str), "* %s phone would begin to ring. *",GetRoleplayName(Inventory[playerid][PhoneCaller]));
-					SendLocalMessage(Inventory[playerid][PhoneCaller], str, 10.0, COLOR_RP, COLOR_RP);
+					SendLocalMessage(Inventory[playerid][PhoneCaller], str, Range_Short, COLOR_RP, COLOR_RP);
 	    			SetPlayerChatBubble(Inventory[playerid][PhoneCaller], "** Ring, ring. **", COLOR_RP, 10.0, 5000);
 			        return 1;
 		        }
@@ -14320,6 +14390,474 @@ Dialog:FWeaponsBuy(playerid, response, listitem, inputtext[])
     return 1;
 }
 
+
+
+OnePlayAnim(playerid,animlib[],animname[], Float:Speed, looping, lockx, locky, lockz, lp)
+{
+	ApplyAnimation(playerid, animlib, animname, Speed, looping, lockx, locky, lockz, lp);
+}
+
+//=-=-=-=-=-=-=-=-=LoopingAnim=-=-=-=-=-=-=-=-=
+
+LoopingAnim(playerid,animlib[],animname[], Float:Speed, looping, lockx, locky, lockz, lp)
+{
+    LoopAnim[playerid] = 1;
+    ApplyAnimation(playerid, animlib, animname, Speed, looping, lockx, locky, lockz, lp);
+    TextDrawShowForPlayer(playerid,AnimText[playerid]);
+}
+
+//=-=-=-=-=-=-=-=-=StopLoopingAnim=-=-=-=-=-=-=-=-=
+
+StopLoopingAnim(playerid)
+{
+	LoopAnim[playerid] = 0;
+    ApplyAnimation(playerid, "CARRY", "crry_prtial", 4.0, 0, 0, 0, 0, 0);
+}
+
+//=-=-=-=-=-=-=-=-=PreloadAnimLib=-=-=-=-=-=-=-=-=
+
+PreloadAnimLib(playerid, animlib[])
+{
+	ApplyAnimation(playerid,animlib,"null",0.0,0,0,0,0,0);
+}
+
+
+CMD:animlist(playerid, params[])
+{
+    Line(playerid);
+    SendClientMessage(playerid,0x061FF9FF,"/handsup - /bomb - /getarrested - /handsup - /laugh - /lookout - /aim - /sup - /smokecig");
+    SendClientMessage(playerid,0x061FF9FF,"/crossarms - /hide - /vomit - /wave - /taichi - /scratch - /hitch - /getarrested - /clear");
+    SendClientMessage(playerid,0x061FF9FF,"/deal - /crack - /drunk - /smoke - /groundsit - /sit - /chat - /fucku - /push - /lowbodypush");
+    SendClientMessage(playerid,0xFFFF79FF,"/shouting - /chant - /frisked - /exhausted - /injured - /slapass - /dealstance - /bat");
+    SendClientMessage(playerid,0xFFFF79FF,"/fall - /fallback - /injured - /akick - /push - /lowbodypush - /handsup - /bomb - /drunk - /laugh");
+    SendClientMessage(playerid,0xFFFF79FF," /basket - /headbutt - /medic - /spraycan - /robman - /taichi - /lookout - /kiss - /cellin - /cellout - /crossarms");
+    SendClientMessage(playerid,0xFFFF79FF,"/deal - /crack - /groundsit - /chat - /dance - /fucku - /strip - /hide - /vomit - /eat - /chairsit - /reload");
+    SendClientMessage(playerid,0xE80000FF,"/lifejump - /exhaust - /leftslap - /carlock - /hoodfrisked - /lightcig - /tapcig - /box - /chant - /finger - /rollfall");
+    SendClientMessage(playerid,0xE80000FF,"/shouting - /knife - /cop - /elbow - /kneekick - /airkick - /gkick - /gpunch - /fstance - /lowthrow - /highthrow - /kostomach");
+    SendClientMessage(playerid,0xE80000FF,"/pee - /lean - /chairsit - /run - /groundsit - /relax - /fall - /fallback - /reload - /knife - /basket - /lay - /lay2 - /koface");
+    return 1;
+}
+
+
+CMD:lifejump(playerid, params[])
+{
+		 LoopingAnim(playerid,"PED","EV_dive",4.0,0,1,1,1,0);
+         return 1;
+}
+CMD:robman(playerid, params[])
+{
+    LoopingAnim(playerid, "SHOP", "ROB_Loop_Threat", 4.0, 1, 0, 0, 0, 0); // Rob
+	return 1;
+}
+CMD:exhaust(playerid, params[])
+{
+	LoopingAnim(playerid,"PED","IDLE_tired",3.0,1,0,0,0,0);
+    return 1;
+}
+CMD:carlock(playerid, params[])
+{
+	OnePlayAnim(playerid,"PED","CAR_doorlocked_LHS",4.0,0,0,0,0,0);
+    return 1;
+}
+CMD:hoodfrisked(playerid, params[])
+{
+    LoopingAnim(playerid,"POLICE","crm_drgbst_01",4.0,0,1,1,1,0);
+    return 1;
+}
+CMD:lightcig(playerid, params[])
+{
+    OnePlayAnim(playerid,"SMOKING","M_smk_in",3.0,0,0,0,0,0);
+    return 1;
+}
+CMD:tapcig(playerid, params[])
+{
+    OnePlayAnim(playerid,"SMOKING","M_smk_tap",3.0,0,0,0,0,0);
+    return 1;
+}
+CMD:bat(playerid, params[])
+{
+    LoopingAnim(playerid,"BASEBALL","Bat_IDLE",4.0,1,1,1,1,0);
+    return 1;
+}
+CMD:lean(playerid, params[])
+{
+    new option;
+    if(sscanf(params, "d", option)) return SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /lean [1-2]");
+	switch (option)
+	{
+    	case 1: LoopingAnim(playerid,"GANGS","leanIDLE",4.0,0,1,1,1,0);
+    	case 2: LoopingAnim(playerid,"MISC","Plyrlean_loop",4.0,0,1,1,1,0);
+    	default: SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /lean [1-2]");
+	}
+	return 1;
+}
+CMD:clear(playerid, params[])
+{
+	 //ClearAnimations(playerid);
+	 ApplyAnimation(playerid, "CARRY", "crry_prtial", 1.0, 0, 0, 0, 0, 0);
+     return 1;
+}
+CMD:strip(playerid, params[])
+{
+    new option;
+    if(sscanf(params, "d", option)) return SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /strip [1-7]");
+	switch (option)
+	{
+    	case 1: LoopingAnim(playerid,"STRIP", "strip_A", 4.1, 1, 1, 1, 1, 1 );
+    	case 2: LoopingAnim(playerid,"STRIP", "strip_B", 4.1, 1, 1, 1, 1, 1 );
+    	case 3: LoopingAnim(playerid,"STRIP", "strip_C", 4.1, 1, 1, 1, 1, 1 );
+    	case 4: LoopingAnim(playerid,"STRIP", "strip_D", 4.1, 1, 1, 1, 1, 1 );
+    	case 5: LoopingAnim(playerid,"STRIP", "strip_E", 4.1, 1, 1, 1, 1, 1 );
+    	case 6: LoopingAnim(playerid,"STRIP", "strip_F", 4.1, 1, 1, 1, 1, 1 );
+    	case 7: LoopingAnim(playerid,"STRIP", "strip_G", 4.1, 1, 1, 1, 1, 1 );
+    	default: SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /strip [1-7]");
+	}
+	return 1;
+}
+
+CMD:box(playerid, params[])
+{
+    LoopingAnim(playerid,"GYMNASIUM","GYMshadowbox",4.0,1,1,1,1,0);
+    return 1;
+}
+CMD:lowthrow(playerid, params[])
+{
+    OnePlayAnim(playerid,"GRENADE","WEAPON_throwu",3.0,0,0,0,0,0);
+    return 1;
+}
+CMD:highthrow(playerid, params[])
+{
+    OnePlayAnim(playerid,"GRENADE","WEAPON_throw",4.0,0,0,0,0,0);
+    return 1;
+}
+CMD:leftslap(playerid, params[])
+{
+    OnePlayAnim(playerid,"PED","BIKE_elbowL",4.0,0,0,0,0,0);
+    return 1;
+}
+CMD:fall(playerid, params[])
+{
+    LoopingAnim(playerid,"PED","KO_skid_front",4.1,0,1,1,1,0);
+    return 1;
+}
+CMD:fallback(playerid, params[])
+{
+    LoopingAnim(playerid, "PED","FLOOR_hit_f", 4.0, 1, 0, 0, 0, 0);
+    return 1;
+}
+CMD:rap(playerid, params[])
+{
+	new option;
+    if(sscanf(params, "d", option)) return SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /rap [1-4]");
+    switch (option)
+    {
+	    case 1: LoopingAnim(playerid,"RAPPING","RAP_A_Loop",4.0,1,0,0,0,0);
+    	case 2: LoopingAnim(playerid,"RAPPING","RAP_C_Loop",4.0,1,0,0,0,0);
+    	case 3: LoopingAnim(playerid,"GANGS","prtial_gngtlkD",4.0,1,0,0,0,0);
+    	case 4: LoopingAnim(playerid,"GANGS","prtial_gngtlkH",4.0,1,0,0,1,1);
+    	default: SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /rap [1-4]");
+	}
+	return 1;
+}
+CMD:push(playerid, params[])
+{
+    OnePlayAnim(playerid,"GANGS","shake_cara",4.0,0,0,0,0,0);
+    return 1;
+}
+CMD:akick(playerid, params[])
+{
+    OnePlayAnim(playerid,"POLICE","Door_Kick",4.0,0,0,0,0,0);
+    return 1;
+}
+CMD:lowbodypush(playerid, params[])
+{
+    OnePlayAnim(playerid,"GANGS","shake_carSH",4.0,0,0,0,0,0);
+    return 1;
+}
+CMD:spraycan(playerid, params[])
+{
+    OnePlayAnim(playerid,"SPRAYCAN","spraycan_full",4.0,0,0,0,0,0);
+    return 1;
+}
+CMD:headbutt(playerid, params[])
+{
+    OnePlayAnim(playerid,"WAYFARER","WF_Fwd",4.0,0,0,0,0,0);
+    return 1;
+}
+CMD:piss(playerid, params[])
+{
+    SetPlayerSpecialAction(playerid, 68);
+    return 1;
+}
+    
+CMD:pee(playerid, params[])
+{
+    SetPlayerSpecialAction(playerid, 68);
+    return 1;
+}
+CMD:koface(playerid, params[])
+{
+    LoopingAnim(playerid,"PED","KO_shot_face",4.0,0,1,1,1,0);
+    return 1;
+}
+CMD:kostomach(playerid, params[])
+{
+    LoopingAnim(playerid,"PED","KO_shot_stom",4.0,0,1,1,1,0);
+    return 1;
+}
+CMD:rollfall(playerid, params[])
+{
+    LoopingAnim(playerid,"PED","BIKE_fallR",4.0,0,1,1,1,0);
+    return 1;
+}
+CMD:lay2(playerid, params[])
+{
+    LoopingAnim(playerid,"SUNBATHE","Lay_Bac_in",3.0,0,1,1,1,0);
+    return 1;
+}
+CMD:hitch(playerid, params[])
+{
+    LoopingAnim(playerid,"MISC","Hiker_Pose", 4.0, 1, 0, 0, 0, 0);
+    return 1;
+}
+CMD:beach(playerid, params[])
+{
+    LoopingAnim(playerid,"BEACH","SitnWait_loop_W",4.1,0,1,1,1,1);
+    return 1;
+}
+	
+CMD:medic(playerid, params[])
+{
+    LoopingAnim(playerid,"MEDIC","CPR",4.1,0,1,1,1,1);
+    return 1;
+}
+CMD:scratch(playerid, params[])
+{
+	LoopingAnim(playerid,"MISC","Scratchballs_01", 4.0, 1, 0, 0, 0, 0);
+	return 1;
+}
+CMD:sit(playerid, params[])
+{
+	LoopingAnim(playerid,"PED","SEAT_idle", 4.0, 1, 0, 0, 0, 0);
+	return 1;
+}
+CMD:cellout(playerid, params[])
+{
+    SetPlayerSpecialAction(playerid,SPECIAL_ACTION_STOPUSECELLPHONE);
+    return 1;
+}
+CMD:drunk(playerid, params[])
+{
+	LoopingAnim(playerid,"PED","WALK_DRUNK",4.0,1,1,1,1,0);
+	return 1;
+}
+CMD:bomb(playerid, params[])
+{
+	ClearAnimations(playerid);
+	OnePlayAnim(playerid, "BOMBER", "BOM_Plant", 4.0, 0, 0, 0, 0, 0);
+	return 1;
+}
+CMD:getarrested(playerid, params[])
+{
+    LoopingAnim(playerid,"ped", "ARRESTgun", 4.0, 0, 1, 1, 1, -1); 
+    return 1;
+}
+CMD:laugh(playerid, params[])
+{
+    OnePlayAnim(playerid, "RAPPING", "Laugh_01", 4.0, 0, 0, 0, 0, 0); 
+    return 1;
+}
+CMD:lookout(playerid, params[])
+{
+    OnePlayAnim(playerid, "SHOP", "ROB_Shifty", 4.0, 0, 0, 0, 0, 0);
+    return 1;
+}
+CMD:aim(playerid, params[])
+{
+    LoopingAnim(playerid, "SHOP", "ROB_Loop_Threat", 4.0, 1, 0, 0, 0, 0); 
+    return 1;
+}
+CMD:crossarms(playerid, params[])
+{
+    LoopingAnim(playerid, "COP_AMBIENT", "Coplook_loop", 4.0, 0, 1, 1, 1, -1); 
+    return 1;
+}
+CMD:lay(playerid, params[])
+{
+    LoopingAnim(playerid,"BEACH", "bather", 4.0, 1, 0, 0, 0, 0); 
+    return 1;
+}
+CMD:hide(playerid, params[])
+{
+    LoopingAnim(playerid, "ped", "cower", 3.0, 1, 0, 0, 0, 0); 
+    return 1;
+}
+CMD:vomit(playerid, params[])
+{
+    OnePlayAnim(playerid, "FOOD", "EAT_Vomit_P", 3.0, 0, 0, 0, 0, 0);
+    return 1;
+}
+CMD:eat(playerid, params[])
+{
+      OnePlayAnim(playerid, "FOOD", "EAT_Burger", 3.0, 0, 0, 0, 0, 0); // Eat Burger
+	  return 1;
+}
+CMD:wave(playerid, params[])
+{
+    LoopingAnim(playerid, "ON_LOOKERS", "wave_loop", 4.0, 1, 0, 0, 0, 0); 
+    return 1;
+}
+CMD:smokecig(playerid, params[])
+{
+	new option;
+    if(sscanf(params, "d", option)) return SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /smokecig [1-4]");
+    switch (option)
+    {
+    	case 1: LoopingAnim(playerid,"SMOKING", "M_smklean_loop", 4.0, 1, 0, 0, 0, 0); // male
+    	case 2: LoopingAnim(playerid,"SMOKING", "F_smklean_loop", 4.0, 1, 0, 0, 0, 0); //female
+    	case 3: LoopingAnim(playerid,"SMOKING","M_smkstnd_loop", 4.0, 1, 0, 0, 0, 0); // standing-fucked
+    	case 4: LoopingAnim(playerid,"SMOKING","M_smk_out", 4.0, 1, 0, 0, 0, 0); // standing
+    	default: SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /smokecig [1-4]");
+	}
+	return 1;
+}
+CMD:shouting(playerid, params[])
+{
+    LoopingAnim(playerid,"RIOT","RIOT_shout",4.0,1,0,0,0,0);
+    return 1;
+}
+CMD:chant(playerid, params[])
+{
+    LoopingAnim(playerid,"RIOT","RIOT_CHANT",4.0,1,1,1,1,0);
+    return 1;
+}
+CMD:frisked(playerid, params[])
+{
+    LoopingAnim(playerid,"POLICE","crm_drgbst_01",4.0,0,1,1,1,0);
+    return 1;
+}
+CMD:exhausted(playerid, params[])
+{
+    LoopingAnim(playerid,"PED","IDLE_tired",3.0,1,0,0,0,0);
+    return 1;
+}
+CMD:injured(playerid, params[])
+{
+    LoopingAnim(playerid, "SWEET", "Sweet_injuredloop", 4.0, 1, 0, 0, 0, 0);
+    return 1;
+}
+CMD:slapass(playerid, params[])
+{
+    OnePlayAnim(playerid, "SWEET", "sweet_ass_slap", 4.0, 0, 0, 0, 0, 0);
+    return 1;
+}
+CMD:deal(playerid, params[])
+{
+    OnePlayAnim(playerid, "DEALER", "DEALER_DEAL", 4.0, 0, 0, 0, 0, 0); 
+    return 1;
+}
+CMD:dealstance(playerid, params[])
+{
+    LoopingAnim(playerid,"DEALER","DEALER_IDLE",4.0,1,0,0,0,0);
+    return 1;
+}
+CMD:crack(playerid, params[])
+{
+    LoopingAnim(playerid, "CRACK", "crckdeth2", 4.0, 1, 0, 0, 0, 0); 
+    return 1;
+}
+CMD:wank(playerid, params[])
+{
+    LoopingAnim(playerid,"PAULNMAC", "wank_loop", 1.800001, 1, 0, 0, 1, 600);
+    return 1;
+}
+CMD:groundsit(playerid, params[])
+{
+    LoopingAnim(playerid,"BEACH", "ParkSit_M_loop", 4.0, 1, 0, 0, 0, 0); 
+    return 1;
+}
+ 
+CMD:rocky(playerid, params[])
+{
+    LoopingAnim(playerid,"GYMNASIUM", "GYMshadowbox", 1.800001, 1, 0, 0, 1, 600);
+    return 1;
+}
+CMD:chairsit(playerid, params[])
+{
+    LoopingAnim(playerid,"BAR","dnk_stndF_loop",4.0,1,0,0,0,0);
+    return 1;
+}
+CMD:chat(playerid, params[])
+{
+    OnePlayAnim(playerid,"PED","IDLE_CHAT",4.0,0,0,0,0,0);
+    return 1;
+}
+CMD:fucku(playerid, params[])
+{
+    OnePlayAnim(playerid,"PED","fucku",4.0,0,0,0,0,0);
+    return 1;
+}
+CMD:taichi(playerid, params[])
+{
+    LoopingAnim(playerid,"PARK","Tai_Chi_Loop",4.0,1,0,0,0,0);
+    return 1;
+}
+CMD:sleep(playerid, params[])
+{
+    LoopingAnim(playerid,"CRACK", "crckdeth2", 1.800001, 1, 0, 0, 1, 600);
+    return 1;
+}
+	
+CMD:relax(playerid, params[])
+{
+    LoopingAnim(playerid,"BEACH", "bather", 4.0, 1, 0, 0, 0, 0);
+    return 1;
+}
+CMD:knife(playerid, params[])
+{
+	new option;
+    if(sscanf(params, "d", option)) return SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /knife [1-4]");
+    switch (option)
+    {
+    	    case 1: LoopingAnim(playerid,"KNIFE","KILL_Knife_Ped_Damage",4.0,0,1,1,1,0);
+        	case 2: LoopingAnim(playerid,"KNIFE","KILL_Knife_Ped_Die",4.0,0,1,1,1,0);
+        	case 3: OnePlayAnim(playerid,"KNIFE","KILL_Knife_Player",4.0,0,0,0,0,0);
+        	case 4: LoopingAnim(playerid,"KNIFE","KILL_Partial",4.0,0,1,1,1,1);
+        	default: SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /knife [1-4]");
+	}
+	return 1;
+}
+CMD:basket(playerid, params[])
+{
+	new option;
+    if(sscanf(params, "d", option)) return SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /basket [1-6]");
+    switch (option)
+    {
+    	case 1: LoopingAnim(playerid,"BSKTBALL","BBALL_idleloop",4.0,1,0,0,0,0);
+    	case 2: OnePlayAnim(playerid,"BSKTBALL","BBALL_Jump_Shot",4.0,0,0,0,0,0);
+    	case 3: OnePlayAnim(playerid,"BSKTBALL","BBALL_pickup",4.0,0,0,0,0,0);
+    	case 4: LoopingAnim(playerid,"BSKTBALL","BBALL_run",4.1,1,1,1,1,1);
+    	case 5: LoopingAnim(playerid,"BSKTBALL","BBALL_def_loop",4.0,1,0,0,0,0);
+    	case 6: LoopingAnim(playerid,"BSKTBALL","BBALL_Dnk",4.0,1,0,0,0,0);
+    	default: SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /basket [1-6]");
+	}
+	return 1;
+}
+CMD:dance(playerid, params[])
+{
+    new option;
+    if(sscanf(params, "d", option)) return SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /dance [1-4]");
+    switch (option)
+    {
+        case 1: SetPlayerSpecialAction(playerid,SPECIAL_ACTION_DANCE1);
+        case 2: SetPlayerSpecialAction(playerid,SPECIAL_ACTION_DANCE1);
+        case 3: SetPlayerSpecialAction(playerid,SPECIAL_ACTION_DANCE1);
+        case 4: SetPlayerSpecialAction(playerid,SPECIAL_ACTION_DANCE1);
+        default: SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /dance [1-4]");
+	}
+
+	return 1;
+}
 /*
 Dialog:(playerid, response, listitem, inputtext[])
 {
