@@ -600,7 +600,8 @@ enum inv
 	PhoneEmergency,
     VehicleRadio,
     Radio,
-    RadioFreq
+    RadioFreq,
+    Screwdriver
 };
 
 
@@ -1186,7 +1187,7 @@ public OnGameModeInit()
 		TextDrawSetProportional(SpeedBox[i], 1);
 
 		AnimText[i] = TextDrawCreate(610.0, 400.0,
-		"~r~~k~~PED_SPRINT~ ~w~to stop the animation");
+		"~r~~k~~PED_LOCK_TARGET~ ~w~to stop the animation");
 		TextDrawUseBox(AnimText[i], 0);
 		TextDrawFont(AnimText[i], 2);
 		TextDrawSetShadow(AnimText[i],0); 
@@ -2127,19 +2128,32 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 }
 
 
-stock IsKeyJustDown(key, newkeys, oldkeys)
-{
-    if((newkeys & key) && !(oldkeys & key))
-        return 1;
-
-    return 0;
-}
-
 public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
+	new vid = GetPlayerVehicleID(playerid);
+	if(IsPlayerInAnyVehicle(playerid))
+	{
+		if(GetPlayerState(playerid == PLAYER_STATE_DRIVER))
+		{
+			if(PRESSED(KEY_HANDBRAKE)) 
+			{
+				if(Engine[vid] == 0)
+				{
+					if(CanDriveVehicle(playerid, vid))
+					{
+						Engine_TOGGLE(playerid, vid);
+					}
+				}
+			}
+			else if(PRESSED(KEY_LOOK_BEHIND))
+			{
+				Lights_TOGGLE(playerid, vid);
+			}
+		}
+	}
 	if(LoopAnim[playerid])
 	{
-		if(IsKeyJustDown(KEY_SPRINT,newkeys,oldkeys)) 
+		if(PRESSED(KEY_HANDBRAKE)) 
 		{
 		    StopLoopingAnim(playerid);
 	        TextDrawHideForPlayer(playerid,AnimText[playerid]);
@@ -2342,6 +2356,7 @@ stock ResetPlayerVariables(playerid)
  	Inventory[playerid][VehicleRadio] = 0;
  	Inventory[playerid][Radio] = 0;
  	Inventory[playerid][RadioFreq] = 0;
+ 	Inventory[playerid][Screwdriver] = 0;
 
  	Trucking[playerid][TruckID] = 0;
  	Trucking[playerid][RouteID] = 0;
@@ -2907,13 +2922,14 @@ stock Save_Account(playerid)
 		mysql_tquery(SQL_CONNECTION, query);
 
 
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET PhoneStatus = %d, PhoneNumber = %d, VehicleRadio = %d, Radio = %d, RadioFreq = %d WHERE SQLID = %d LIMIT 1",
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET PhoneStatus = %d, PhoneNumber = %d, VehicleRadio = %d, Radio = %d, RadioFreq = %d, Screwdriver = %d WHERE SQLID = %d LIMIT 1",
 		
 			Inventory[playerid][PhoneStatus],
 			Inventory[playerid][PhoneNumber],
 			Inventory[playerid][VehicleRadio],
 			Inventory[playerid][Radio],
 			Inventory[playerid][RadioFreq],
+			Inventory[playerid][Screwdriver],
 			PlayerInfo[playerid][SQLID]);
 			
 		mysql_tquery(SQL_CONNECTION, query);
@@ -3206,6 +3222,7 @@ public Load_Account(playerid)
 	Inventory[playerid][VehicleRadio] = cache_get_field_content_int(0, "VehicleRadio", SQL_CONNECTION);
 	Inventory[playerid][Radio] = cache_get_field_content_int(0, "Radio", SQL_CONNECTION);
 	Inventory[playerid][RadioFreq] = cache_get_field_content_int(0, "RadioFreq", SQL_CONNECTION);
+	Inventory[playerid][Screwdriver] = cache_get_field_content_int(0, "Screwdriver", SQL_CONNECTION);
 
 	PlayerInfo[playerid][TruckingCompleted] = cache_get_field_content_int(0, "TruckingCompleted", SQL_CONNECTION);
 	PlayerInfo[playerid][TruckCoolDown] = cache_get_field_content_int(0, "TruckCoolDown", SQL_CONNECTION);
@@ -5641,7 +5658,6 @@ CMD:stats(playerid, params[])
 	    format(fac, sizeof(fac), "Civilian");
 	}
 	Line(playerid);
-	SendClientMessage(playerid, COLOR_WHITE, str);
 	format(str, sizeof(str), "> Name: \t|\t [%s] \t|\t", GetRoleplayName(playerid));
 	SendClientMessage(playerid, COLOR_GRAY, str);
 	format(str, sizeof(str), "> Age: [%d] \t|\t Money: [%d] \t|\t Bank: [%d]", PlayerInfo[playerid][Age], PlayerInfo[playerid][Cash], PlayerInfo[playerid][Bank]);
@@ -5699,7 +5715,8 @@ new GeneralStore[][] =
    {2, 		"Lighter"},		
    {12, 	"Rope"},
    {2400, 	"Vehicle Radio"},
-   {400, 	"Radio"}
+   {400, 	"Radio"},
+   {35, 	"Screwdriver"}
 };
 
 #define PHONE 												  				     0
@@ -5710,6 +5727,7 @@ new GeneralStore[][] =
 #define ROPE                                                             		 5
 #define VRADIO 																	 6
 #define RADIO 																	 7
+#define SCREWDRIVER																 8
 
 CMD:buy(playerid, params[])
 {
@@ -5833,6 +5851,16 @@ public GiveInventoryItem(playerid, item, quantity)
 		Inventory[playerid][RadioFreq] = 1000;
 		MYSQL_Update_Account(playerid, "Radio", Inventory[playerid][Radio]);
 		format(str, sizeof(str), "[Item] %d radio has been added to your inventory and tuned to 1000 MHz, for more help refer to /rhelp.", quantity);
+		SendClientMessage(playerid, COLOR_LIGHTGRAY, str);
+		return 1;
+
+	}
+	else if(item == SCREWDRIVER)
+	{
+		if(Inventory[playerid][Screwdriver] >= 5) return SendErrorMessage(playerid, "You cannot buy anymore of this item.");
+		Inventory[playerid][Screwdriver] += quantity;
+		MYSQL_Update_Account(playerid, "Screwdriver", Inventory[playerid][Screwdriver]);
+		format(str, sizeof(str), "[Item] %d screwdriver(s) has been added to your inventory.", quantity);
 		SendClientMessage(playerid, COLOR_LIGHTGRAY, str);
 		return 1;
 
@@ -6690,6 +6718,20 @@ stock IsPlayerVehicleOwner(playerid, vid)
 
 }
 
+CanDriveVehicle(playerid, vid)
+{
+	if(IsAdminSpawnedVehicle(vid) || IsPlayerVehicle(vid) && IsPlayerVehicleOwner(playerid, vid))
+	{
+		return 1;
+	}
+	else if(Vehicles[vid][Type] == 4 && GDL_Test[playerid] > 0 || Trucking[playerid][CheckpointID] > 0 && Vehicles[vid][Type] == 5 || Vehicles[vid][Type] == 3 && Vehicles[vid][Faction] == PlayerInfo[playerid][Faction] && Vehicles[vid][Rank] <= PlayerInfo[playerid][Rank])
+	{
+		return 1;
+	}
+	return 0;
+
+}
+
 CMD:engine(playerid,params[])
 {
 	new State = GetPlayerState(playerid), vid = GetPlayerVehicleID(playerid);
@@ -6698,15 +6740,10 @@ CMD:engine(playerid,params[])
 	{
 	    if(State == PLAYER_STATE_DRIVER)
 	    {
-	        if(IsAdminSpawnedVehicle(vid) || Vehicles[vid][Type] == 4 && GDL_Test[playerid] > 0 || IsPlayerVehicle(vid) && IsPlayerVehicleOwner(playerid, vid) || Trucking[playerid][CheckpointID] > 0 && Vehicles[vid][Type] == 5)
+	        if(CanDriveVehicle(playerid, vid))
 	        {
 		        Engine_TOGGLE(playerid, vid);
 			}
-			else if(Vehicles[vid][Type] == 3 && Vehicles[vid][Faction] == PlayerInfo[playerid][Faction] && Vehicles[vid][Rank] <= PlayerInfo[playerid][Rank])
-			{
-			    Engine_TOGGLE(playerid, vid);
-			}
-
 			else
 			{
 			    SendClientMessage(playerid, COLOR_GRAY, "You do not have the keys for this vehicle!");
@@ -6762,10 +6799,10 @@ stock Engine_SET(playerid, vid, State)
     	GetVehicleHealth(vid, VehicleHP);
     	if(VehicleHP <= 300.0) return SendLocalMessage(playerid, "* The engine wouldn't start as it's extensively damaged. *", Range_Normal, COLOR_RP, COLOR_RP);
     	if(Vehicles[vid][Fuel] <= 0) return SendLocalMessage(playerid, "* The engine wouldn't turn on due to a lack of fuel. *", Range_Normal, COLOR_RP, COLOR_RP);
-		
 		SetVehicleParamsEx(vid,1,Lights[vid],alarm[vid],doors[vid],bonnet[vid],boot[vid],objective[vid]);
 		Engine[vid] = 1;
 		Vehicles[vid][FuelTimer] = SetTimerEx("ReduceFuel", MINUTES(1), true, "d", vid);
+		GameTextForPlayer(playerid, "~g~Engine On!", 2000, 4);
 		return 1;
     }
     else if(Engine[vid] == 1 && State == 0)
@@ -6781,21 +6818,18 @@ stock Engine_SET(playerid, vid, State)
 
 stock Lights_TOGGLE(playerid, vid)
 {
-	new str[128];
 	GetVehicleParamsEx(vid, Engine[vid], Lights[vid], alarm[vid], doors[vid], bonnet[vid], boot[vid], objective[vid]);
     if(Lights[vid] == 0)
     {
-        format(str, sizeof(str), "* %s turns the vehicle light knob, turning the headlights on .*", GetRoleplayName(playerid));
-		SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 		SetVehicleParamsEx(vid,Engine[vid],1,alarm[vid],doors[vid],bonnet[vid],boot[vid],objective[vid]);
 		Lights[vid] = 1;
+		GameTextForPlayer(playerid, "~g~Lights ON!", 2000, 4);
     }
     else
     {
-        format(str, sizeof(str), "* %s turns the vehicle light knob, turning the headlights off .*", GetRoleplayName(playerid));
-		SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 		SetVehicleParamsEx(vid,Engine[vid],0,alarm[vid],doors[vid],bonnet[vid],boot[vid],objective[vid]);
 		Lights[vid] = 0;
+		GameTextForPlayer(playerid, "~r~Lights OFF!", 2000, 4);
     }
 	return 1;
 }
@@ -6808,6 +6842,7 @@ stock Lights_SET(vid, State)
     {
 		SetVehicleParamsEx(vid,Engine[vid],1,alarm[vid],doors[vid],bonnet[vid],boot[vid],objective[vid]);
 		Lights[vid] = 1;
+
     }
     else if(Lights[vid] == 1 && State == 0)
     {
@@ -8045,9 +8080,9 @@ CMD:starttrucking(playerid, params[])
 		if(Vehicles[GetPlayerVehicleID(playerid)][Type] == 5)
 		{
 			new vModel = GetVehicleModel(GetPlayerVehicleID(playerid));
-			if(vModel == 482 && PlayerInfo[playerid][TruckingCompleted] < 80) return SendErrorMessage(playerid, "You need to have done at least 80 missions before you can use this vehicle."); // burrito
-			if(vModel == 515 && PlayerInfo[playerid][TruckingCompleted] < 60) return SendErrorMessage(playerid, "You need to have done at least 60 missions before you can use this vehicle."); //road train
-			if(vModel == 422 && PlayerInfo[playerid][TruckingCompleted] < 40) return SendErrorMessage(playerid, "You need to have done at least 40 missions before you can use this vehicle."); //bobcat
+			if(vModel == 482 && PlayerInfo[playerid][TruckingCompleted] < 50) return SendErrorMessage(playerid, "You need to have done at least 50 missions before you can use this vehicle."); // burrito
+			if(vModel == 515 && PlayerInfo[playerid][TruckingCompleted] < 40) return SendErrorMessage(playerid, "You need to have done at least 40 missions before you can use this vehicle."); //road train
+			if(vModel == 422 && PlayerInfo[playerid][TruckingCompleted] < 30) return SendErrorMessage(playerid, "You need to have done at least 30 missions before you can use this vehicle."); //bobcat
 			if(vModel == 403 && PlayerInfo[playerid][TruckingCompleted] < 20) return SendErrorMessage(playerid, "You need to have done at least 20 missions before you can use this vehicle."); // linerunner
 			if(vModel == 440 && PlayerInfo[playerid][TruckingCompleted] < 10) return SendErrorMessage(playerid, "You need to have done at least 10 missions before you can use this vehicle."); // rumpo
 			new id = 0;
@@ -11245,10 +11280,10 @@ CMD:elm(playerid, params[])
 				}
 				else
 				{
-				 	new Panels, Doors, Lightz, Tires;
+				 	new VehicleDamage[4];
 			 		EmergencyLights[vid] = 0;
-				 	GetVehicleDamageStatus(vid,Panels, Doors, Lightz, Tires);
-					UpdateVehicleDamageStatus(vid, Panels, Doors, 0, Tires);
+				 	GetVehicleDamageStatus(vid, VehicleDamage[0], VehicleDamage[1], VehicleDamage[2], VehicleDamage[3]);
+					UpdateVehicleDamageStatus(vid, VehicleDamage[0], VehicleDamage[1], 0, VehicleDamage[3]);
 					Lights_SET(vid, Lights[vid]);
 
 					SendClientMessage(playerid, COLOR_LEMONCHIFFON, "You have turned off the emergency lights.");
@@ -11965,9 +12000,6 @@ CMD:membersonline(playerid, params[])
 //==============================================================================
 //==============================================================================
 //==============================================================================
-
-
-
 
 stock CreateClock()
 {
@@ -14390,14 +14422,11 @@ Dialog:FWeaponsBuy(playerid, response, listitem, inputtext[])
     return 1;
 }
 
-
-
 OnePlayAnim(playerid,animlib[],animname[], Float:Speed, looping, lockx, locky, lockz, lp)
 {
 	ApplyAnimation(playerid, animlib, animname, Speed, looping, lockx, locky, lockz, lp);
 }
 
-//=-=-=-=-=-=-=-=-=LoopingAnim=-=-=-=-=-=-=-=-=
 
 LoopingAnim(playerid,animlib[],animname[], Float:Speed, looping, lockx, locky, lockz, lp)
 {
@@ -14406,15 +14435,12 @@ LoopingAnim(playerid,animlib[],animname[], Float:Speed, looping, lockx, locky, l
     TextDrawShowForPlayer(playerid,AnimText[playerid]);
 }
 
-//=-=-=-=-=-=-=-=-=StopLoopingAnim=-=-=-=-=-=-=-=-=
-
 StopLoopingAnim(playerid)
 {
 	LoopAnim[playerid] = 0;
     ApplyAnimation(playerid, "CARRY", "crry_prtial", 4.0, 0, 0, 0, 0, 0);
 }
 
-//=-=-=-=-=-=-=-=-=PreloadAnimLib=-=-=-=-=-=-=-=-=
 
 PreloadAnimLib(playerid, animlib[])
 {
@@ -14426,7 +14452,7 @@ CMD:animlist(playerid, params[])
 {
     Line(playerid);
     SendClientMessage(playerid,0x061FF9FF,"/handsup - /bomb - /getarrested - /handsup - /laugh - /lookout - /aim - /sup - /smokecig");
-    SendClientMessage(playerid,0x061FF9FF,"/crossarms - /hide - /vomit - /wave - /taichi - /scratch - /hitch - /getarrested - /clear");
+    SendClientMessage(playerid,0x061FF9FF,"/crossarms - /hide - /vomit - /wave - /scratch - /hitch - /getarrested - /clear");
     SendClientMessage(playerid,0x061FF9FF,"/deal - /crack - /drunk - /smoke - /groundsit - /sit - /chat - /fucku - /push - /lowbodypush");
     SendClientMessage(playerid,0xFFFF79FF,"/shouting - /chant - /frisked - /exhausted - /injured - /slapass - /dealstance - /bat");
     SendClientMessage(playerid,0xFFFF79FF,"/fall - /fallback - /injured - /akick - /push - /lowbodypush - /handsup - /bomb - /drunk - /laugh");
@@ -14441,8 +14467,8 @@ CMD:animlist(playerid, params[])
 
 CMD:lifejump(playerid, params[])
 {
-		 LoopingAnim(playerid,"PED","EV_dive",4.0,0,1,1,1,0);
-         return 1;
+	LoopingAnim(playerid,"PED","EV_dive",4.0,0,1,1,1,0);
+	return 1;
 }
 CMD:robman(playerid, params[])
 {
