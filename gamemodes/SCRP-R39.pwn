@@ -369,6 +369,7 @@ enum pinfo
 	Job,
 	House,
 	Business,
+	Business2,
 	Float:Health,
 	Float:Armour,
 	bEntered,
@@ -407,7 +408,7 @@ enum pinfo
 
 enum business
 {
-	ID,
+	SQLID,
 	Name[32],
 	Float:PosX,
 	Float:PosY,
@@ -1134,7 +1135,7 @@ public OnGameModeInit()
 
     mysql_tquery(SQL_CONNECTION, "SELECT * FROM `Houses` ORDER BY SQLID ASC", "LoadHouses");
 
-	mysql_tquery(SQL_CONNECTION, "SELECT * FROM `Biz` ORDER BY ID ASC", "LoadBiz");
+	mysql_tquery(SQL_CONNECTION, "SELECT * FROM `Biz` ORDER BY SQLID ASC", "LoadBiz");
 
 	mysql_tquery(SQL_CONNECTION, "SELECT * FROM `Objects`", "LoadObjects");
 
@@ -1279,7 +1280,7 @@ public OnLookupComplete(playerid)
 	{
 		new str[128];
 		format(str, sizeof(str), "%s's connection has been rejected. (VPN/Proxy)", GetDatabaseName(playerid));
-		fKick(playerid);
+		KickPlayer(playerid);
 		SendAdminsMessage(1, COLOR_INDIANRED, str);
 	}
 }
@@ -1371,7 +1372,7 @@ public ShowPlayerLogin(playerid)
 
 Dialog:LOGIN(playerid, response, listitem, inputtext[])
 {
-	if(!response){ SendClientMessage(playerid, COLOR_RED, "You have left the server."); fKick(playerid);}
+	if(!response){ SendClientMessage(playerid, COLOR_RED, "You have left the server."); KickPlayer(playerid);}
     if(response)
     {
         new query[1000],escapepass[129];
@@ -1409,7 +1410,7 @@ public OnPlayerLogin(playerid)
 		else
 		{
 			SendClientMessage(playerid, COLOR_ORANGERED, "Too many failed login attempts.");
-			fKick(playerid);
+			KickPlayer(playerid);
 		}
 	}
 	return 1;
@@ -1562,7 +1563,7 @@ public Load_MasterAccount(playerid)
 	else
 	{
 	    SendErrorMessage(playerid, "Master Account not found.");
-	    fKick(playerid);
+	    KickPlayer(playerid);
 	}
 	return 1;
 }
@@ -1762,23 +1763,23 @@ public OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
 Dialog:REGISTER(playerid, response, listitem, inputtext[])
 {
 	if(strlen(inputtext) < 6 || strlen(inputtext) > 24)
-        {
-            SendClientMessage(playerid, COLOR_ORANGERED, "You must insert a password between 6-24 characters!");
-            Dialog_Show(playerid, REGISTER, DIALOG_STYLE_PASSWORD, ""COL_BLUE"Registration Menu","Input the password you chose to use for your account","Register","Cancel");
-        }
+    {
+        SendClientMessage(playerid, COLOR_ORANGERED, "You must insert a password between 6-24 characters!");
+        Dialog_Show(playerid, REGISTER, DIALOG_STYLE_PASSWORD, ""COL_BLUE"Registration Menu","Input the password you chose to use for your account","Register","Cancel");
+    }
     else if(strlen(inputtext) > 5 && strlen(inputtext) < 24)
-	    {
-	        new query[400],escapepass[129];
-	        
-	        WP_Hash(escapepass, sizeof(escapepass), inputtext);
+    {
+        new query[400],escapepass[129];
+        
+        WP_Hash(escapepass, sizeof(escapepass), inputtext);
 
-   			GetPlayerIp(playerid, PlayerInfo[playerid][RegisterIP], 16);
+		GetPlayerIp(playerid, PlayerInfo[playerid][RegisterIP], 16);
 
-	    	mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO MasterAccounts (MA_Name, MA_Password, RegisterIP, RegisterDate) VALUES('%e','%e','%e', %d)", GetDatabaseName(playerid), escapepass, PlayerInfo[playerid][RegisterIP], gettime());
-			mysql_tquery(SQL_CONNECTION, query, "GetMaSQLID", "i", playerid);
-			
-            Quiz(playerid, 1);
-		}
+    	mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO MasterAccounts (MA_Name, MA_Password, RegisterIP, RegisterDate) VALUES('%e','%e','%e', %d)", GetDatabaseName(playerid), escapepass, PlayerInfo[playerid][RegisterIP], gettime());
+		mysql_tquery(SQL_CONNECTION, query, "GetMaSQLID", "i", playerid);
+		
+        Quiz(playerid, 1);
+	}
     return 1;
 }
 forward GetMaSQLID(playerid);
@@ -1791,28 +1792,21 @@ public GetMaSQLID(playerid)
 forward GetPlayerSQLID(playerid);
 public GetPlayerSQLID(playerid)
 {
-    new query[400];
 	PlayerInfo[playerid][SQLID] = cache_insert_id();
 	if(MasterAccount[playerid][Account01] == 0)
 	{
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE MasterAccounts SET MA_Account01 = %d WHERE SQLID = %i LIMIT 1", PlayerInfo[playerid][SQLID], MasterAccount[playerid][SQLID]);
-		mysql_tquery(SQL_CONNECTION, query);
+		MYSQL_Update_Interger(MasterAccount[playerid][SQLID], "MasterAccounts", "MA_Account01", PlayerInfo[playerid][SQLID]);
 		MasterAccount[playerid][Account01] = PlayerInfo[playerid][SQLID];
-		return 1;
 	}
-	if(MasterAccount[playerid][Account02] == 0)
+	else if(MasterAccount[playerid][Account02] == 0)
 	{
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE MasterAccounts SET MA_Account02 = %d WHERE SQLID = %i LIMIT 1", PlayerInfo[playerid][SQLID], MasterAccount[playerid][SQLID]);
-		mysql_tquery(SQL_CONNECTION, query);
+		MYSQL_Update_Interger(MasterAccount[playerid][SQLID], "MasterAccounts", "MA_Account02", PlayerInfo[playerid][SQLID]);
 		MasterAccount[playerid][Account02] = PlayerInfo[playerid][SQLID];
-		return 1;
 	}
-	if(MasterAccount[playerid][Account03] == 0)
+	else if(MasterAccount[playerid][Account03] == 0)
 	{
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE MasterAccounts SET MA_Account03 = %d WHERE SQLID = %i LIMIT 1", PlayerInfo[playerid][SQLID], MasterAccount[playerid][SQLID]);
-		mysql_tquery(SQL_CONNECTION, query);
+		MYSQL_Update_Interger(MasterAccount[playerid][SQLID], "MasterAccounts", "MA_Account03", PlayerInfo[playerid][SQLID]);
 		MasterAccount[playerid][Account03] = PlayerInfo[playerid][SQLID];
-		return 1;
 	}
 	return 1;
 }
@@ -2226,6 +2220,19 @@ public GivePayday(playerid)
 		Biz[PlayerInfo[playerid][Business]][Safe] += Biz[PlayerInfo[playerid][Business]][Payout];
 	}
 
+	if(PlayerInfo[playerid][Business2] > 0)
+	{
+		format(bizincome, sizeof(bizincome), "Amount added to your second business' safe = $%d.", Biz[PlayerInfo[playerid][Business2]][Payout]);
+		SendClientMessage(playerid, COLOR_YELLOW, bizincome);
+		
+		GivePlayerXP(playerid, PAYDAY_XP_BIZ);
+		
+		format(bizincome, sizeof(bizincome), "You have received %d XP for owning a business.", PAYDAY_XP_BIZ);
+		SendClientMessage(playerid, COLOR_GRAY, bizincome);
+
+		Biz[PlayerInfo[playerid][Business2]][Safe] += Biz[PlayerInfo[playerid][Business2]][Payout];
+	}
+
 //No faction Payout
 	if(PlayerInfo[playerid][Faction] == 0)
 	{
@@ -2318,6 +2325,7 @@ stock ResetPlayerVariables(playerid)
 	PlayerInfo[playerid][Job] = 0;
 	PlayerInfo[playerid][House] = 0;
 	PlayerInfo[playerid][Business] = 0;
+	PlayerInfo[playerid][Business2] = 0;
 	PlayerInfo[playerid][Health] = 0;
 	PlayerInfo[playerid][Armour] = 0;
 	PlayerInfo[playerid][bEntered] = 0;
@@ -2466,7 +2474,7 @@ stock NameCheck(playerid)
         InfoBoxForPlayer(playerid, "~y~== [SC:RP] == ~n~~w~ Here, on Small County Roleplay, we have a 'Master Account' system. In order to register an account you will need to join with a nickname(without the '_'), not your roleplay name.");
 		format(str, sizeof(str), "%s was kicked by the server for joining with a roleplay name.",GetDatabaseName(playerid));
 		SendAdminsMessage(1, COLOR_ORANGERED, str);
-		fKick(playerid);
+		KickPlayer(playerid);
 	}
 	return 1;
 }
@@ -2543,7 +2551,7 @@ public OnPlayerUpdate(playerid)
 				    	//SetVehicleHealth(VID, NewHealth);
 						format(str, sizeof(str), "POSSIBLE HACK DETECTED: %s (Repair Hack) Damage received: %f", GetRoleplayName(playerid), Calculation);
 						SendAdminsMessage(1, COLOR_RED, str);
-				        //fKick(playerid);
+				        //KickPlayer(playerid);
 					}
 					StartHealth[VID] = VehicleHP;
 		    	}
@@ -2779,7 +2787,7 @@ public CheckForRepairHack(playerid, vehicleid, Float:Calculation)
 	    	new str[128];
 			format(str, sizeof(str), "HACK DETECTED: %s (Repair Hack)", GetRoleplayName(playerid));
 			SendAdminsMessage(1, COLOR_RED, str);
-	        //fKick(playerid);
+	        //KickPlayer(playerid);
 		}
 	}
     return 1;
@@ -2865,7 +2873,7 @@ stock ShowSpeedo(playerid, speed, fuel)
 }
 
 
-stock fKick(playerid)
+stock KickPlayer(playerid)
 {
 	SetTimerEx("FixKick", 200, false, "d", playerid);
 }
@@ -3263,6 +3271,18 @@ public Load_Account(playerid)
 	    }
 	}
 
+	if(PlayerInfo[playerid][Business] > 0)
+	{
+		for(new b = 1; b < MAX_BIZ; b++)
+		{
+		    if(Biz[b][Owner] == PlayerInfo[playerid][SQLID] && b != PlayerInfo[playerid][Business])
+		    {
+		        PlayerInfo[playerid][Business2] = b;
+		        break;
+		    }
+		}
+	}
+
 	for(new h; h < MAX_HOUSES; h++)
 	{
 	    if(Houses[h][Owner] == PlayerInfo[playerid][SQLID])
@@ -3284,7 +3304,7 @@ public CheckBans(playerid)
     if(cache_num_rows())
     {
         SendClientMessage(playerid, COLOR_WHITE, "You are banned from the server.");
-	    fKick(playerid);
+	    KickPlayer(playerid);
 	}
 	else
 	{
@@ -3302,7 +3322,7 @@ IssueBan(playerid, adminname[], reason[])
 	
     mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO Bans (PlayerName, IP, SQLID, MasterAccount, Timestamp, BannedBy, Reason) VALUES('%s', '%s', %d, %d, %d, '%s', '%e')", GetDatabaseName(playerid), ip, PlayerInfo[playerid][SQLID], MasterAccount[playerid][SQLID], gettime(), adminname, reason);
 	mysql_tquery(SQL_CONNECTION, query);
-	fKick(playerid);
+	KickPlayer(playerid);
 	return 1;
 }
 
@@ -3368,22 +3388,13 @@ public PlayerSpawnIn(playerid)
 	}
 
 
-	if(PlayerInfo[playerid][Spawn] == 0)
-	{
-		SetPlayerPosEx(playerid, NoobSpawns[0][0], NoobSpawns[0][1], NoobSpawns[0][2], 0, 0);
-	}
+	if(PlayerInfo[playerid][Spawn] == 0) SetPlayerPosEx(playerid, NoobSpawns[0][0], NoobSpawns[0][1], NoobSpawns[0][2], 0, 0);
 
-	else if(PlayerInfo[playerid][Spawn] == 1)
-	{
-		SetPlayerPosEx(playerid, PlayerInfo[playerid][PosX], PlayerInfo[playerid][PosY], PlayerInfo[playerid][PosZ], PlayerInfo[playerid][Interior], PlayerInfo[playerid][VWorld]);
-	}
+	else if(PlayerInfo[playerid][Spawn] == 1) SetPlayerPosEx(playerid, PlayerInfo[playerid][PosX], PlayerInfo[playerid][PosY], PlayerInfo[playerid][PosZ], PlayerInfo[playerid][Interior], PlayerInfo[playerid][VWorld]);
 
 	else if(PlayerInfo[playerid][Spawn] == 2)
 	{
-		if(PlayerInfo[playerid][House] > 0)
-		{
-			SetPlayerPosEx(playerid, Houses[PlayerInfo[playerid][House]][PosX], Houses[PlayerInfo[playerid][House]][PosY], Houses[PlayerInfo[playerid][House]][PosZ], 0, 0);
-		}
+		if(PlayerInfo[playerid][House] > 0) SetPlayerPosEx(playerid, Houses[PlayerInfo[playerid][House]][PosX], Houses[PlayerInfo[playerid][House]][PosY], Houses[PlayerInfo[playerid][House]][PosZ], 0, 0);
 		else
 		{
 			SendErrorMessage(playerid, "Couldn't spawn at house.");
@@ -3393,10 +3404,7 @@ public PlayerSpawnIn(playerid)
 
 	else if(PlayerInfo[playerid][Spawn] == 3)
 	{
-		if(PlayerInfo[playerid][Business] > 0)
-		{
-			SetPlayerPosEx(playerid, Biz[PlayerInfo[playerid][Business]][PosX], Biz[PlayerInfo[playerid][Business]][PosY], Biz[PlayerInfo[playerid][Business]][PosZ], 0 ,0);
-		}
+		if(PlayerInfo[playerid][Business] > 0) SetPlayerPosEx(playerid, Biz[PlayerInfo[playerid][Business]][PosX], Biz[PlayerInfo[playerid][Business]][PosY], Biz[PlayerInfo[playerid][Business]][PosZ], 0 ,0);
 		else
 		{
 			SendErrorMessage(playerid, "Couldn't spawn at business.");
@@ -3405,6 +3413,16 @@ public PlayerSpawnIn(playerid)
 	}
 
 	else if(PlayerInfo[playerid][Spawn] == 4)
+	{
+		if(PlayerInfo[playerid][Business2] > 0) SetPlayerPosEx(playerid, Biz[PlayerInfo[playerid][Business2]][PosX], Biz[PlayerInfo[playerid][Business2]][PosY], Biz[PlayerInfo[playerid][Business2]][PosZ], 0 ,0);
+		else
+		{
+			SendErrorMessage(playerid, "Couldn't spawn at business.");
+			SetPlayerPosEx(playerid, PlayerInfo[playerid][PosX], PlayerInfo[playerid][PosY], PlayerInfo[playerid][PosZ], PlayerInfo[playerid][Interior], PlayerInfo[playerid][VWorld]);
+		}
+	}
+
+	else if(PlayerInfo[playerid][Spawn] == 5)
 	{
 		
 		if(PlayerInfo[playerid][Faction] != 0)
@@ -3433,15 +3451,41 @@ public PlayerSpawnIn(playerid)
 
 CMD:changespawn(playerid, params[])
 {
-	Dialog_Show(playerid, ChangeSpawn, DIALOG_STYLE_LIST, "Change Character Spawn","Noob Spawn\nLast Position\nYour House\nYour Business\nFaction Spawn","Select","Cancel");
+	new str[128], dialog[600];
+ 	format(str, sizeof(str), "(0) Noob Spawn\n(1) Last Position\n");
+    strcat(dialog, str, sizeof(dialog));
+	if(PlayerInfo[playerid][House])
+	{
+	 	format(str, sizeof(str), "(2) %s\n", Houses[PlayerInfo[playerid][House]][Name]);
+	    strcat(dialog, str, sizeof(dialog));
+	}
+	if(PlayerInfo[playerid][Business])
+	{
+	 	format(str, sizeof(str), "(3) %s\n", Biz[PlayerInfo[playerid][Business]][Name]);
+	    strcat(dialog, str, sizeof(dialog));
+	}
+	if(PlayerInfo[playerid][Business2])
+	{
+	 	format(str, sizeof(str), "(4) %s\n", Biz[PlayerInfo[playerid][Business2]][Name]);
+	    strcat(dialog, str, sizeof(dialog));
+	}
+ 	format(str, sizeof(str), "(5) Faction Spawn");
+    strcat(dialog, str, sizeof(dialog));
+
+	Dialog_Show(playerid, ChangeSpawn, DIALOG_STYLE_LIST, "Change Character Spawn", dialog,"Select","Cancel");
 	return 1;
 }
 
 Dialog:ChangeSpawn(playerid, response, listitem, inputtext[])
 {
 	if(!response) return 0;
-	MYSQL_Update_Account(playerid, "Spawn", listitem);
-	PlayerInfo[playerid][Spawn] = listitem;
+
+	new spawnid[6], finalid;
+    strmid(spawnid, inputtext, strfind(inputtext, "(") + 1,  strfind(inputtext, ")"));
+    finalid = strval(spawnid);
+	MYSQL_Update_Account(playerid, "Spawn", finalid);
+
+	PlayerInfo[playerid][Spawn] = finalid;
 	SendClientMessage(playerid, COLOR_GREEN, "Spawn updated.");
     return 1;
 }
@@ -3456,7 +3500,7 @@ public CheckActivity(playerid)
 		new str[128];
 		format(str, sizeof(str), "%s has been kicked for inactivty.", GetRoleplayName(playerid));
 		SendPunishmentMessage(str);
-		fKick(playerid);
+		KickPlayer(playerid);
 	}
 	else
 	{
@@ -3675,7 +3719,7 @@ stock Quiz_Info(playerid, info, section)
 	if(info == 0)
 	{
 	    InfoBoxForPlayer(playerid, "That is the ~r~INCORRECT ~w~please review your answer - reconnect to try the quiz again.");
-        fKick(playerid);
+        KickPlayer(playerid);
 	}
 	if(info == 1)
 	{
@@ -3701,7 +3745,7 @@ public LoadBiz()
         for(new id = 1; id<cache_num_rows(); id++)
         {
 
-			Biz[id][ID] = cache_get_field_content_int(id, "ID", SQL_CONNECTION);
+			Biz[id][SQLID] = cache_get_field_content_int(id, "SQLID", SQL_CONNECTION);
     		cache_get_field_content(id, "Name", Biz[id][Name], SQL_CONNECTION, 32);
 			Biz[id][PosX] = cache_get_field_content_float(id, "PosX", SQL_CONNECTION);
 			Biz[id][PosY] = cache_get_field_content_float(id, "PosY", SQL_CONNECTION);
@@ -3781,7 +3825,7 @@ public LoadBusiness(id)
 	if(cache_num_rows())
     {
 
-		Biz[id][ID] = cache_get_field_content_int(0, "ID", SQL_CONNECTION);
+		Biz[id][SQLID] = cache_get_field_content_int(0, "SQLID", SQL_CONNECTION);
 		cache_get_field_content(0, "Name", Biz[id][Name], SQL_CONNECTION, 32);
 		Biz[id][PosX] = cache_get_field_content_float(0, "PosX", SQL_CONNECTION);
 		Biz[id][PosY] = cache_get_field_content_float(0, "PosY", SQL_CONNECTION);
@@ -4256,7 +4300,7 @@ CMD:gate(playerid, params[])
 		new Object = InRangeOfMovableFactionObject(playerid, 6.5);
 	    if(Object)
     	{
-    		if(Objects[Object][Faction] == PlayerInfo[playerid][Faction] && Objects[Object][Model] == 11313)
+    		if(Objects[Object][Faction] == PlayerInfo[playerid][Faction] && Objects[Object][Model] == 2957)
 			{
 		 		if(!strcmp(option1, "open", true))
 				{
@@ -4970,7 +5014,7 @@ stock ReloadBiz()
         	DestroyDynamic3DTextLabel(Biz[id][LabelID]);
         	DestroyDynamicPickup(Biz[id][PickupID]);
 	}
-	mysql_tquery(SQL_CONNECTION, "SELECT * FROM `Biz` ORDER BY ID ASC", "LoadBiz");
+	mysql_tquery(SQL_CONNECTION, "SELECT * FROM `Biz` ORDER BY SQLID ASC", "LoadBiz");
 	return 1;
 }
 
@@ -5005,7 +5049,7 @@ stock ReloadBusiness(id)
 	DestroyDynamic3DTextLabel(Biz[id][LabelID]);
 	DestroyDynamicPickup(Biz[id][PickupID]);
 
-	mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT * FROM `Biz` WHERE ID = %d LIMIT 1", Biz[id][ID]);
+	mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT * FROM `Biz` WHERE SQLID = %d LIMIT 1", Biz[id][SQLID]);
 	mysql_tquery(SQL_CONNECTION, query, "LoadBusiness", "d", id);
 	return 1;
 }
@@ -5017,7 +5061,7 @@ stock ReloadIcon(id)
 	DestroyDynamic3DTextLabel(Icons[id][LabelID]);
 	DestroyDynamicPickup(Icons[id][PickupID]);
 
-	mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT * FROM `Icons` WHERE SQLID = %d LIMIT 1", Biz[id][ID]);
+	mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT * FROM `Icons` WHERE SQLID = %d LIMIT 1", Biz[id][SQLID]);
 	mysql_tquery(SQL_CONNECTION, query, "LoadIcon", "d", id);
 	return 1;
 }
@@ -5041,7 +5085,7 @@ public AddBusinessMoney(id, amount)
 	{
 		new query[128];
 		Biz[id][Safe] += amount;
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Safe = %d WHERE ID = %i LIMIT 1", Biz[id][Safe], Biz[id][ID]);
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Safe = %d WHERE SQLID = %i LIMIT 1", Biz[id][Safe], Biz[id][SQLID]);
 		mysql_tquery(SQL_CONNECTION, query);
 		return 1;
 	}
@@ -5462,14 +5506,14 @@ CMD:fhelp(playerid, params[])
 
 CMD:bhelp(playerid, params[])
 {
-	if(PlayerInfo[playerid][Business] >0)
+	if(PlayerInfo[playerid][Business] > 0 || PlayerInfo[playerid][Business2] > 2)
 	{
 		SendClientMessage(playerid, COLOR_YELLOW, "Business Commands:");
 		SendClientMessage(playerid, COLOR_WHITE, "/entrancefee /checksafe /safeget /safestore /lock");
 	}
 	else
 	{
-		SendClientMessage(playerid, COLOR_YELLOW, ERROR_FACTION);
+		SendClientMessage(playerid, COLOR_GRAY, "You don't own a business.");
 	}
 	return 1;
 }
@@ -5519,7 +5563,7 @@ CMD:enter(playerid)
 					SetPlayerPosEx(playerid, Biz[bID][InteriorX], Biz[bID][InteriorY], Biz[bID][InteriorZ], Biz[bID][Interior], Biz[bID][World]);
 
 
-					if(bID == PlayerInfo[playerid][Business])
+					if(bID == PlayerInfo[playerid][Business] || bID == PlayerInfo[playerid][Business2])
 					{
 						SendClientMessage(playerid, COLOR_YELLOW, "You appear to own this business, for a list of commands use /bhelp!");
 					}
@@ -5664,7 +5708,7 @@ CMD:stats(playerid, params[])
 	SendClientMessage(playerid, COLOR_GRAY, str);
 	format(str, sizeof(str), "> Faction: [%s] \t|\t Rank: [%s(%d)]", fac, GetPlayerRank(playerid), PlayerInfo[playerid][Rank]);
 	SendClientMessage(playerid, COLOR_GRAY, str);
-	format(str, sizeof(str), "> Business: [%s] \t|\t House: [%s]", Biz[PlayerInfo[playerid][Business]][Name], Houses[PlayerInfo[playerid][House]][Name]);
+	format(str, sizeof(str), "> Business: [%s] \t|\t House: [%s] Business2 [%s]", Biz[PlayerInfo[playerid][Business]][Name], Houses[PlayerInfo[playerid][House]][Name], Biz[PlayerInfo[playerid][Business2]][Name]);
 	SendClientMessage(playerid, COLOR_GRAY, str);
 	format(str, sizeof(str), "> Vehicles: [%d] \t|\t Job: [%s] \t|\t TotalTimePlayed: [%d]", PlayerInfo[playerid][TotalVehicles], JobNames[PlayerInfo[playerid][Job]][0], PlayerInfo[playerid][TotalTimePlayed]);
 	SendClientMessage(playerid, COLOR_GRAY, str);
@@ -5805,6 +5849,11 @@ CMD:inventory(playerid, params[])
 	if(Inventory[playerid][Radio] > 0)
 	{
 		format(str, sizeof(str), "Radio System (%d Mhz)\n", Inventory[playerid][Radio], Inventory[playerid][RadioFreq]);
+		strcat(dialog, str, sizeof(dialog));
+	}
+	if(Inventory[playerid][Screwdriver] > 0)
+	{
+		format(str, sizeof(str), "Screwdriver(x%d)\n", Inventory[playerid][Screwdriver]);
 		strcat(dialog, str, sizeof(dialog));
 	}
 	Dialog_Show(playerid, INVENTORY, DIALOG_STYLE_MSGBOX, "Player Inventory", dialog,"Close","");
@@ -6473,7 +6522,7 @@ CMD:buybiz(playerid, params[])
 	{
  	    if(Biz[id][Owned] == 0)
  	    {
- 	        if(PlayerInfo[playerid][Business] == 0)
+ 	        if(PlayerInfo[playerid][Business] == 0 || PlayerInfo[playerid][Business2] == 0)
  	        {
      	        if(Biz[id][Price] <= PlayerInfo[playerid][Cash])
 				{
@@ -6482,16 +6531,26 @@ CMD:buybiz(playerid, params[])
 					{
 						if(!strcmp(option, "confirm", true))
 						{
-							format(str, sizeof(str), "> You have bought this biz(ID:%d)!", Biz[id][ID]);
+							format(str, sizeof(str), "> You have bought this biz(ID:%d)!", Biz[id][SQLID]);
 						    SendClientMessage(playerid, COLOR_LBLUE, str);
 
 						    GivePlayerMoneyEx(playerid, -Biz[id][Price]);
-							PlayerInfo[playerid][Business] = id;
+
+						    if(PlayerInfo[playerid][Business] == 0)
+					    	{
+					    		PlayerInfo[playerid][Business] = id;
+					    	}
+					    	else if(PlayerInfo[playerid][Business2] == 0)
+					    	{
+				    			PlayerInfo[playerid][Business2] = id;
+					    	}
+					    	else return SendErrorMessage(playerid, "You already own two businesses!");
+							
 
 							Biz[id][Owned] = 1;
 							Biz[id][Owner] = PlayerInfo[playerid][SQLID];
 
-							mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `Biz` SET Owner = %d, Owned = %d WHERE ID = %d LIMIT 1",  Biz[id][Owner],Biz[id][Owned],Biz[id][ID]);
+							mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `Biz` SET Owner = %d, Owned = %d WHERE SQLID = %d LIMIT 1",  Biz[id][Owner],Biz[id][Owned],Biz[id][SQLID]);
 							mysql_tquery(SQL_CONNECTION, query);
 							
 							mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT `Username` FROM Accounts WHERE SQLID = %d LIMIT 1", Biz[id][Owner]);
@@ -6534,7 +6593,7 @@ CMD:sellbiz(playerid, params[])
 	{
     	if(Biz[id][Owned] == 1)
  	    {
- 	        if(PlayerInfo[playerid][Business] == id)
+ 	        if(PlayerInfo[playerid][Business] == id || PlayerInfo[playerid][Business2] == id)
 			{
 			    new option[12];
 				if(sscanf(params, "s[12]", option)) return SendClientMessage(playerid, COLOR_LBLUE, "Are you sure that you want to sell your business? (/sellbiz [confirm/decline])");
@@ -6545,15 +6604,18 @@ CMD:sellbiz(playerid, params[])
 
 					    SalePrice = Biz[id][Price] / 2 + 1000;
 					    GivePlayerMoneyEx(playerid, SalePrice);
-					    format(str, sizeof(str), "> You have sold your business(ID:%d) for $%d!", Biz[id][ID], SalePrice);
+					    format(str, sizeof(str), "> You have sold your business(ID:%d) for $%d!", Biz[id][SQLID], SalePrice);
 					    SendClientMessage(playerid, COLOR_LBLUE, str);
-						PlayerInfo[playerid][Business] = 0;
+
+					    if(PlayerInfo[playerid][Business] == id) PlayerInfo[playerid][Business] = 0;
+					    else if(PlayerInfo[playerid][Business2] == id) PlayerInfo[playerid][Business2] = 0;
+					    else return SendErrorMessage(playerid, "Couldn't find business.");
 
 						//format(Biz[id][Owner], 32, "");
 						Biz[id][Owned] = 0;
 						Biz[id][Owner] = 0;
 
-						mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `Biz` SET Owned = 0, Owner = 0 WHERE ID = %d LIMIT 1",Biz[id][ID]);
+						mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `Biz` SET Owned = 0, Owner = 0 WHERE SQLID = %d LIMIT 1",Biz[id][SQLID]);
                         mysql_tquery(SQL_CONNECTION, query);
                         
                         mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT `Username` FROM Accounts WHERE SQLID = %d LIMIT 1", Biz[id][Owner]);
@@ -6611,7 +6673,7 @@ CMD:key(playerid, params[])
 	{
 	    if(IsPlayerInRangeOfPoint(playerid, 2.0, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ]))
      	{
-     	    if(PlayerInfo[playerid][Business] == id)
+     	    if(PlayerInfo[playerid][Business] == id || PlayerInfo[playerid][Business2] == id)
      	    {
      	        if(Biz[id][Locked] == 0)
      	        {
@@ -7115,19 +7177,30 @@ CMD:lights(playerid, params[])
 }
 ALTCMD:lon->lights;
 
+IsBusinessOwner(playerid, bid)
+{
+	if(Business[bid][Owner] == PlayerInfo[playerid][SQLID]) return 1;
+	return 0;
+}
+
+IsInOwnedBusiness(playerid)
+{
+	if(PlayerInfo[playerid][bEntered] == PlayerInfo[playerid][Business] || PlayerInfo[playerid][bEntered] == PlayerInfo[playerid][Business2]) return PlayerInfo[playerid][bEntered];
+	return 0;
+}
+
 
 
 CMD:safestore(playerid,params[])
 {
-		new str[128], query[128], amount;
-		if(PlayerInfo[playerid][bEntered] == PlayerInfo[playerid][Business])
+		new str[128], amount, bid = IsInOwnedBusiness(playerid);
+		if(bid)
 		{
 			if(sscanf(params, "d", amount)) return SendClientMessage(playerid, COLOR_GRAY, "/safestore [amount]");
 			if(PlayerInfo[playerid][Cash] >= amount)
 			{
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Safe = %d WHERE ID = %d LIMIT 1", Biz[PlayerInfo[playerid][Business]][Safe] += amount, PlayerInfo[playerid][Business]);
-				mysql_tquery(SQL_CONNECTION, query);
-				format(str, sizeof(str), "You stored $%d in the safe! Total($%d)", amount, Biz[PlayerInfo[playerid][Business]][Safe]);
+				MYSQL_Update_Interger(Biz[bid][SQLID], "Biz", "Safe", Biz[bid][Safe] += amount);
+				format(str, sizeof(str), "You stored $%d in the safe! Total($%d)", amount, Biz[bid][Safe]);
 				SendClientMessage(playerid, COLOR_GREEN, str);
 				GivePlayerMoneyEx(playerid, -amount);
 			}
@@ -7156,15 +7229,14 @@ CMD:safestore(playerid,params[])
 
 CMD:safeget(playerid,params[])
 {
-		new str[128], query[128], amount;
-		if(PlayerInfo[playerid][bEntered] == PlayerInfo[playerid][Business])
+		new str[128], amount, bid = IsInOwnedBusiness(playerid);
+		if(bid)
 		{
 			if(sscanf(params, "d", amount)) return SendClientMessage(playerid, COLOR_GRAY, "/safeget [amount]");
-			if(Biz[PlayerInfo[playerid][Business]][Safe] >= amount)
+			if(Biz[bid][Safe] >= amount)
 			{
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Safe = %d WHERE ID = %d LIMIT 1", Biz[PlayerInfo[playerid][Business]][Safe] -= amount, PlayerInfo[playerid][Business]);
-				mysql_tquery(SQL_CONNECTION, query);
-				format(str, sizeof(str), "You taken $%d from the safe! Total($%d)", amount, Biz[PlayerInfo[playerid][Business]][Safe]);
+				MYSQL_Update_Interger(Biz[bid][SQLID], "Biz", "Safe", Biz[bid][Safe] -= amount);
+				format(str, sizeof(str), "You taken $%d from the safe! Total($%d)", amount, Biz[bid][Safe]);
 				SendClientMessage(playerid, COLOR_GREEN, str);
 				GivePlayerMoneyEx(playerid, amount);
 			}
@@ -7182,11 +7254,11 @@ CMD:safeget(playerid,params[])
 
 CMD:checksafe(playerid,params[])
 {
-		new str[128], bizid;
-		if(PlayerInfo[playerid][bEntered] == PlayerInfo[playerid][Business])
+		new str[128], bid = IsInOwnedBusiness(playerid);
+		if(bid)
 		{
-		    bizid = PlayerInfo[playerid][bEntered];
-			format(str, sizeof(str), "There is $%d in the safe!", Biz[bizid][Safe]);
+		    bid = PlayerInfo[playerid][bEntered];
+			format(str, sizeof(str), "There is $%d in the safe!", Biz[bid][Safe]);
 			SendClientMessage(playerid, COLOR_GREEN, str);
 		}
 		else
@@ -7198,18 +7270,17 @@ CMD:checksafe(playerid,params[])
 
 CMD:entrancefee(playerid,params[])
 {
-		new str[128], query[128], amount;
-		if(PlayerInfo[playerid][bEntered] == PlayerInfo[playerid][Business])
+		new str[128], amount, bid = IsInOwnedBusiness(playerid);
+		if(bid)
 		{
 			if(sscanf(params, "d", amount)) return SendClientMessage(playerid, COLOR_GRAY, "/entrancefee [amount]");
 			if(amount <= 50)
 			{
-			    Biz[PlayerInfo[playerid][Business]][EntranceFee] = amount;
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET EntranceFee = %d WHERE ID = %d LIMIT 1", Biz[PlayerInfo[playerid][Business]][EntranceFee], Biz[PlayerInfo[playerid][Business]][ID]);
-				mysql_tquery(SQL_CONNECTION, query);
-				format(str, sizeof(str), "EntranceFee set at $%d!", Biz[PlayerInfo[playerid][Business]][EntranceFee]);
+			    Biz[bid][EntranceFee] = amount;
+			    MYSQL_Update_Interger(Biz[bid][SQLID], "Biz", "EntranceFee", Biz[bid][EntranceFee]);
+				format(str, sizeof(str), "EntranceFee set at $%d!", Biz[bid][EntranceFee]);
 				SendClientMessage(playerid, COLOR_GREEN, str);
-				ReloadBusiness(PlayerInfo[playerid][Business]);
+				ReloadBusiness(bid);
 			}
 			else
 			{
@@ -7482,7 +7553,7 @@ CMD:restart(playerid, params[])
 	    SendRconCommand("password 38rwbui8b8");
 	   	foreach(Player, i)
 		{
-		    fKick(i);
+		    KickPlayer(i);
 		}
 		SetTimer("RestartServer", SECONDS(5), false);
 	}
@@ -7538,7 +7609,7 @@ CMD:kick(playerid, params[])
 		format(str, sizeof(str), "Admin %s has kicked %s | Reason: %s", GetRoleplayName(playerid), GetRoleplayName(pID), reason);
 		SendPunishmentMessage(str);
 		PlayerInfo[pID][Kicks] ++;
-		fKick(pID);
+		KickPlayer(pID);
 
  	}
 	else
@@ -8529,7 +8600,7 @@ new Mod_Wheels[][] =
 
 stock VehicleMod_Wheels(playerid)
 {
-	new str[128], dialog[400];
+	new str[128], dialog[600];
 	for (new i = 0; i < sizeof(Mod_Wheels); ++i)
 	{
 		format(str, sizeof(str), "%s ("COL_GREEN"$%d"COL_WHITE")\n", Mod_Wheels[i][2], Mod_Wheels[i][1]);
@@ -9117,7 +9188,7 @@ CMD:deletebiz(playerid, params[])
 	if(MasterAccount[playerid][Admin] == 6)
 	{
 	    if(sscanf(params, "d", bizid)) return SendClientMessage(playerid, COLOR_GRAY, "/deletebiz [id]");
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "DELETE FROM `%e`.`Biz` WHERE `Biz`.`ID` = %d", SQL_DB, Biz[bizid][ID]);
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "DELETE FROM `%e`.`Biz` WHERE `Biz`.`ID` = %d", SQL_DB, Biz[bizid][SQLID]);
 		mysql_tquery(SQL_CONNECTION, query);
 		Total_Biz_Created --;
 		format(str, sizeof(str), "%s has deleted a business(ID:%d).", GetRoleplayName(playerid), bizid);
@@ -9381,6 +9452,22 @@ CMD:setplayer(playerid, params[])
 	                        if(option2 > 0 && option2 <= MAX_BIZ)
 							{
 	                            PlayerInfo[player][Business] = option2;
+						        SendSetMessages(player, playerid, option1, option2);
+	                            return 1;
+						    }
+						    else
+						    {
+						        SendErrorMessage(playerid, ERROR_OPTION);
+						    }
+				        }
+					}
+					else if(!strcmp(option1, "business2", true))
+					{
+					    if (MasterAccount[playerid][Admin] >= 6)
+						{
+	                        if(option2 > 0 && option2 <= MAX_BIZ)
+							{
+	                            PlayerInfo[player][Business2] = option2;
 						        SendSetMessages(player, playerid, option1, option2);
 	                            return 1;
 						    }
@@ -9732,7 +9819,7 @@ CMD:setbiz(playerid, params[])
 				Biz[id][Interior] = int;
 				GetPlayerPos(playerid, Biz[id][InteriorX], Biz[id][InteriorY], Biz[id][InteriorZ]);
 
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Interior = %d, InteriorX = %f, InteriorY = %f, InteriorZ = %f WHERE ID = %d LIMIT 1", Biz[id][Interior], Biz[id][InteriorX], Biz[id][InteriorY], Biz[id][InteriorZ], Biz[id][ID]);
+				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Interior = %d, InteriorX = %f, InteriorY = %f, InteriorZ = %f WHERE SQLID = %d LIMIT 1", Biz[id][Interior], Biz[id][InteriorX], Biz[id][InteriorY], Biz[id][InteriorZ], Biz[id][SQLID]);
 				mysql_tquery(SQL_CONNECTION, query);
 
 				format(str, sizeof(str), "Biz id: "COL_BLUE"%i "COL_WHITE"interior has been set to "COL_BLUE"%i", id, int);
@@ -9745,12 +9832,12 @@ CMD:setbiz(playerid, params[])
 			{
 				GetPlayerPos(playerid, Biz[id][PosX],Biz[id][PosY],Biz[id][PosZ]);
 
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET PosX = %f, PosY = %f, PosZ = %f WHERE ID = %d LIMIT 1",
+				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET PosX = %f, PosY = %f, PosZ = %f WHERE SQLID = %d LIMIT 1",
 
 												Biz[id][PosX],
 												Biz[id][PosY],
 												Biz[id][PosZ],
-												Biz[id][ID]);
+												Biz[id][SQLID]);
 
 				mysql_tquery(SQL_CONNECTION, query);
 				SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
@@ -9759,7 +9846,7 @@ CMD:setbiz(playerid, params[])
 
 			if(!strcmp(option2, "owner", true))
 			{
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Owner = %d WHERE ID = %d LIMIT 1", option3, Biz[id][ID]);
+				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Owner = %d WHERE SQLID = %d LIMIT 1", option3, Biz[id][SQLID]);
 				mysql_tquery(SQL_CONNECTION, query);
 
 				SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
@@ -9770,9 +9857,7 @@ CMD:setbiz(playerid, params[])
 			{
 			    if(option3 <= 3)
 			    {
-					mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Owned = %d WHERE ID = %d LIMIT 1", option3, Biz[id][ID]);
-					mysql_tquery(SQL_CONNECTION, query);
-
+					MYSQL_Update_Interger(Biz[id][SQLID], "Biz", "Owned", option3);
 					SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
 					ReloadBusiness(id);
 				}
@@ -9780,17 +9865,14 @@ CMD:setbiz(playerid, params[])
 
 			if(!strcmp(option2, "price", true))
 			{
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Price = %d WHERE ID = %d LIMIT 1", option3, Biz[id][ID]);
-				mysql_tquery(SQL_CONNECTION, query);
-
+				MYSQL_Update_Interger(Biz[id][SQLID], "Biz", "Price", option3);
 				SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
 				ReloadBusiness(id);
 			}
 
 			if(!strcmp(option2, "payout", true))
 			{
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Payout = %d WHERE ID = %d LIMIT 1", option3, Biz[id][ID]);
-				mysql_tquery(SQL_CONNECTION, query);
+				MYSQL_Update_Interger(Biz[id][SQLID], "Biz", "Payout", option3);
 
 				SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
 				ReloadBusiness(id);
@@ -9798,32 +9880,21 @@ CMD:setbiz(playerid, params[])
 
 			if(!strcmp(option2, "Safe", true))
 			{
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Safe = %d WHERE ID = %d LIMIT 1", option3, Biz[id][ID]);
-				mysql_tquery(SQL_CONNECTION, query);
-
+				MYSQL_Update_Interger(Biz[id][SQLID], "Biz", "Safe", option3);
 				SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
 				ReloadBusiness(id);
 			}
 
 			if(!strcmp(option2, "Type", true))
 			{
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Type = %d WHERE ID = %d LIMIT 1", option3, Biz[id][ID]);
-				mysql_tquery(SQL_CONNECTION, query);
-
+				MYSQL_Update_Interger(Biz[id][SQLID], "Biz", "Type", option3);
 				SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
 				ReloadBusiness(id);
 			}
 
 			if(!strcmp(option2, "EntranceFee", true))
 			{
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET EntranceFee = %d WHERE ID = %d LIMIT 1", option3, Biz[id][ID]);
-				mysql_tquery(SQL_CONNECTION, query);
-
-				for(new b = 0; b < MAX_BIZ; b++)
-				{
-				    printf("ID %d - %s - sql %d", b, Biz[b][Name], Biz[b][ID]);
-				}
-
+				MYSQL_Update_Interger(Biz[id][SQLID], "Biz", "EntranceFee", option3);
 				SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
 				ReloadBusiness(id);
 			}
@@ -9832,9 +9903,7 @@ CMD:setbiz(playerid, params[])
 			{
 			    if(option3 <= 3)
 			    {
-					mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz Locked = %d WHERE ID = %d LIMIT 1", option3, Biz[id][ID]);
-					mysql_tquery(SQL_CONNECTION, query);
-
+					MYSQL_Update_Interger(Biz[id][SQLID], "Biz", "Locked", option3);
 					SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
 					ReloadBusiness(id);
 				}
@@ -9918,43 +9987,37 @@ CMD:sethouse(playerid, params[])
 			if(!strcmp(option, "interior", true))
 			{
 				Houses[id][Interior] = option2;
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Houses SET Interior = %d WHERE SQLID = %d LIMIT 1", Houses[id][Interior], Houses[id][SQLID]);
-                mysql_tquery(SQL_CONNECTION, query);
+				MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Interior", Houses[id][Interior]);
                 ReloadHouse(id);
 			}
 			if(!strcmp(option, "world", true))
 			{
 				Houses[id][World] = option2;
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Houses SET World = %d WHERE SQLID = %d LIMIT 1", Houses[id][World], Houses[id][SQLID]);
-                mysql_tquery(SQL_CONNECTION, query);
+				MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "World", Houses[id][World]);
                 ReloadHouse(id);
 			}
 			if(!strcmp(option, "owner", true))
 			{
 				Houses[id][Owner] = option2;
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Houses SET Owner = %d WHERE SQLID = %d LIMIT 1", Houses[id][Owner], Houses[id][SQLID]);
-                mysql_tquery(SQL_CONNECTION, query);
+				MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Owner", Houses[id][Owner]);
                 ReloadHouse(id);
 			}
 			if(!strcmp(option, "price", true))
 			{
 				Houses[id][Price] = option2;
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Houses SET Price = %d WHERE SQLID = %d LIMIT 1", Houses[id][Price], Houses[id][SQLID]);
-                mysql_tquery(SQL_CONNECTION, query);
+				MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Price", Houses[id][Price]);
                 ReloadHouse(id);
 			}
 			if(!strcmp(option, "locked", true))
 			{
 				Houses[id][Locked] = option2;
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Houses SET Locked = %d WHERE SQLID = %d LIMIT 1", Houses[id][Locked], Houses[id][SQLID]);
-                mysql_tquery(SQL_CONNECTION, query);
+				MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Locked", Houses[id][Locked]);
                 ReloadHouse(id);
 			}
 			if(!strcmp(option, "safe", true))
 			{
 				Houses[id][Safe] = option2;
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Houses SET Safe = %d WHERE SQLID = %d LIMIT 1", Houses[id][Safe], Houses[id][SQLID]);
-                mysql_tquery(SQL_CONNECTION, query);
+				MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Safe", Houses[id][Safe]);
                 ReloadHouse(id);
 			}
 		}
@@ -12254,7 +12317,7 @@ Dialog:SPAWN_SELECT(playerid, response, listitem, inputtext[])
     }
     else
     {
-		fKick(playerid);
+		KickPlayer(playerid);
     }
     return 1;
 }
@@ -12896,7 +12959,7 @@ Dialog:CREATEBUSINESS2(playerid, response, listitem, inputtext[])
         if(strval(inputtext) > 0 && strval(inputtext) < 5000000)
         {
 			Biz[Create_New_Biz_ID[playerid]][Price] = strval(inputtext);
-			mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Price = %d WHERE ID = %d LIMIT 1", Biz[Create_New_Biz_ID[playerid]][Price], Create_New_Biz_ID[playerid]);
+			mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Price = %d WHERE SQLID = %d LIMIT 1", Biz[Create_New_Biz_ID[playerid]][Price], Create_New_Biz_ID[playerid]);
 			mysql_tquery(SQL_CONNECTION, query);
 
 			new str[128];
@@ -12921,7 +12984,7 @@ Dialog:CREATEBUSINESS4(playerid, response, listitem, inputtext[])
     {
         new query[400];
 		Biz[Create_New_Biz_ID[playerid]][Payout] = strval(inputtext);
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Payout = %d WHERE ID = %d LIMIT 1", Biz[Create_New_Biz_ID[playerid]][Payout], Create_New_Biz_ID[playerid]);
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Payout = %d WHERE SQLID = %d LIMIT 1", Biz[Create_New_Biz_ID[playerid]][Payout], Create_New_Biz_ID[playerid]);
 		mysql_tquery(SQL_CONNECTION, query);
 
 		new str[128];
@@ -12945,7 +13008,7 @@ Dialog:CREATEBUSINESS3(playerid, response, listitem, inputtext[])
 		Biz[Create_New_Biz_ID[playerid]][World] = Create_New_Biz_ID[playerid];
 		Biz[Create_New_Biz_ID[playerid]][Interior] = BusinessInteriors[listitem][2][0];
 		Biz[Create_New_Biz_ID[playerid]][Type] = BusinessInteriors[listitem][0][0];
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Interior = %d, World = %d, Type = %d, InteriorX = %f, InteriorY = %f, InteriorZ = %f WHERE ID = %d LIMIT 1", BusinessInteriors[listitem][2][0], Biz[Create_New_Biz_ID[playerid]][World], BusinessInteriors[listitem][0][0], BusinessInteriorPos[listitem][0], BusinessInteriorPos[listitem][1], BusinessInteriorPos[listitem][2], Biz[Create_New_Biz_ID[playerid]][ID]);
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Interior = %d, World = %d, Type = %d, InteriorX = %f, InteriorY = %f, InteriorZ = %f WHERE SQLID = %d LIMIT 1", BusinessInteriors[listitem][2][0], Biz[Create_New_Biz_ID[playerid]][World], BusinessInteriors[listitem][0][0], BusinessInteriorPos[listitem][0], BusinessInteriorPos[listitem][1], BusinessInteriorPos[listitem][2], Biz[Create_New_Biz_ID[playerid]][SQLID]);
 		mysql_tquery(SQL_CONNECTION, query);
 		format(str, sizeof(str), "%s has created/updated business: %s.", GetRoleplayName(playerid), Biz[Create_New_Biz_ID[playerid]][Name]);
 		SendAdminsMessage(1, COLOR_ORANGERED, str);
@@ -12986,7 +13049,7 @@ Dialog:ChangeBizName(playerid, response, listitem, inputtext[])
 		new str[128], query[400];
 		format(str, sizeof(str), "You have set business %d's name to %s.", bizzid[playerid], Biz[bizzid[playerid]][Name]);
 		SendClientMessage(playerid, COLOR_YELLOW, str);
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Name = '%e' WHERE ID = %d LIMIT 1", Biz[bizzid[playerid]][Name], Biz[bizzid[playerid]][ID]);
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Name = '%e' WHERE SQLID = %d LIMIT 1", Biz[bizzid[playerid]][Name], Biz[bizzid[playerid]][SQLID]);
 		mysql_tquery(SQL_CONNECTION, query);
 		ReloadBusiness(bizzid[playerid]);
 	}
@@ -14083,7 +14146,7 @@ Dialog:IconType(playerid, response, listitem, inputtext[])
 
 stock Icon_Set_Type(type)
 {
-	new query[52];
+	new query[64];
 	mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Icons SET Type = %d WHERE SQLID = %d LIMIT 1", type, Icons[IconID][SQLID]);
 	mysql_tquery(SQL_CONNECTION, query);
 	ReloadIcon(IconID);
@@ -14102,7 +14165,7 @@ Dialog:IconText(playerid, response, listitem, inputtext[])
 
 stock Icon_Set_Text(txt[])
 {
-	new query[64];
+	new query[128];
 	mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Icons SET Name = '%e' WHERE SQLID = %d LIMIT 1", txt, Icons[IconID][SQLID]);
 	mysql_tquery(SQL_CONNECTION, query);
 	ReloadIcon(IconID);
