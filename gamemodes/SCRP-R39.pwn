@@ -8,6 +8,8 @@
 			|-----------------------------------------------------------------------------------------------------------------------------|
 still broken car
 /n system
+hotwire
+/sell vehicle
 - Faction Skins
 - Faction Weapons
 - Faction Pay
@@ -455,7 +457,12 @@ enum vehicle
 	RadioURL[128],
 	Nitrous,
 	Hydraulics,
-	Wheels
+	Wheels,
+	vPanels,
+	vDoors,
+	vLights,
+	vTires,
+	Broken
 };
 
 
@@ -767,6 +774,37 @@ new FactionTypeName[][] =
 };
 
 
+new Mod_Hydraulics[][] =
+{
+   // {componentid, price, name}
+   {1087, 5000, "Hydraulics"}
+};
+
+new Mod_NOS[][] =
+{
+   // {componentid, price, name}
+   {1009, 1000, "NOS x2"},
+   {1008, 3000, "NOS x5"},
+   {1010, 7000, "NOS x10"}
+};
+
+new Mod_Wheels[][] =
+{
+   // {componentid, price, name}
+   {1073, 5000, "Shadow"},
+   {1074, 5000, "Mega"},
+   {1075, 5000, "Rimshine"}, 
+   {1076, 5000, "Wires"}, 
+   {1077, 5000, "Classic"}, 
+   {1078, 5000, "Twist"}, 
+   {1079, 5000, "Cutter"}, 
+   {1080, 5000, "Switch"},
+   {1081, 5000, "Grove"}, 
+   {1082, 5000, "Import"}, 
+   {1083, 5000, "Dollar"},
+   {1084, 5000, "Trance"}, 
+   {1085, 5000, "Atomic"} 
+};
 
 
 
@@ -822,160 +860,7 @@ new DealershipData_Normal[47][2] =
    {602, 60500} //Alpha
 };
 
-new Vehicle_Information[][][] =
-{
-	// {Model, {CapX, CapY, CapZ}}
-	{400, {-1.10, -2.06, -0.07}},
-	{401, {1.09, -0.94, 0.00}},
-	{402, {1.04, -1.92, 0.14}},
-	{403, {-1.45, 0.07, -0.80}},
-	{404, {-0.94, -2.36, -0.01}},
-	{405, {-1.04, -2.18, -0.04}},
-	{407, {-1.11, -3.66, -0.54}},
-	{408, {-1.23, 1.30, -0.66}},
-	{409, {-0.98, -2.83, 0.12}},
-	{410, {-1.02, -1.67, 0.21}},
-	{411, {1.09, -2.10, 0.09}},
-	{412, {0.00, -3.55, -0.17}},
-	{413, {-1.05, 0.34, -0.53}},
-	{414, {-0.92, -0.74, -0.70}},
-	{415, {-1.13, -2.07, 0.02}},
-	{416, {-1.35, -2.74, -0.19}},
-	{418, {-1.18, -1.77, -0.02}},
-	{418, {1.21, -1.57, -0.08}},
-	{419, {-1.08, -1.99, 0.03}},
-	{420, {-1.10, -2.15, 0.10}},
-	{421, {-1.07, -2.44, -0.17}},
-	{422, {-1.08, -0.42, -0.20}},
-	{423, {-1.17, -1.90, -0.32}},
-	{424, {0.18, 1.08, 0.43}},
-	{426, {-1.10, -2.15, 0.09}},
-	{427, {-1.27, -3.20, -0.16}},
-	{428, {-1.01, -3.06, -0.49}},
-	{429, {0.99, -2.14, 0.14}},
-	{431, {-1.45, -5.47, -0.13}},
-	{433, {-1.52, 0.16, -0.68}},
-	{434, {-0.73, -1.58, 0.29}},
-	{436, {-1.07, -1.82, 0.14}},
-	{437, {-1.49, -4.97, -0.50}},
-	{438, {-1.09, -1.93, -0.02}},
-	{439, {-1.11, -1.51, 0.06}},
-	{440, {-1.09, -0.46, -0.42}},
-	{442, {-1.21, -2.21, 0.06}},
-	{443, {-1.53, 1.24, -0.90}},
-	{444, {0.00, -2.60, -0.06}},
-	{445, {-1.04, -1.94, 0.13}},
-	{451, {1.06, -1.22, -0.04}},
-	{455, {-1.53, -0.01, -0.76}},
-	{456, {0.79, -0.05, -0.61}},
-	{458, {-1.11, -2.05, -0.11}},
-	{459, {-0.82, -2.39, -0.48}},
-	{459, {-1.05, -2.29, 0.22}},
-	{461, {0.00, 0.14, 0.54}},
-	{463, {0.00, 0.17, 0.47}},
-	{466, {0.00, -3.00, -0.13}},
-	{467, {-1.07, -2.30, 0.12}},
-	{468, {0.00, 0.01, 0.41}},
-	{470, {-1.26, -2.38, 0.24}},
-	{475, {-1.07, -1.60, 0.13}},
-	{477, {-1.20, -1.53, 0.24}},
-	{478, {1.09, -0.34, 0.23}},
-	{479, {-1.09, -1.97, 0.03}},
-	{480, {-1.00, -0.88, 0.10}},
-	{482, {1.07, -2.19, 0.00}},
-	{483, {0.93, -2.51, -0.04}},
-	{485, {-0.89, 0.72, 0.02}},
-	{486, {-0.70, -3.17, 0.58}},
-	{489, {1.16, -0.74, 0.00}},
-	{490, {1.37, -1.25, 0.00}},
-	{491, {-1.07, -2.18, 0.00}},
-	{492, {-0.98, -2.24, 0.12}},
-	{494, {-1.02, -2.20, 0.12}},
-	{495, {1.21, -1.91, -0.10}},
-	{496, {1.06, -1.86, 0.15}},
-	{498, {-1.30, -0.01, 0.09}},
-	{499, {-1.11, -1.07, -0.35}},
-	{500, {-0.98, -1.71, -0.07}},
-	{502, {-1.08, -1.88, 0.14}},
-	{503, {-1.10, -2.05, 0.03}},
-	{504, {0.00, -3.00, -0.13}},
-	{504, {-1.16, -1.83, 0.11}},
-	{505, {1.16, -0.74, 0.00}},
-	{506, {1.05, -1.11, -0.05}},
-	{507, {-1.17, -2.30, 0.11}},
-	{508, {-1.38, -3.05, -0.67}},
-	{514, {1.43, 0.38, -0.65}},
-	{515, {-1.45, 0.48, -1.31}},
-	{516, {-1.10, -2.45, -0.03}},
-	{517, {-1.18, -1.95, 0.07}},
-	{518, {1.21, -2.19, -0.07}},
-	{521, {0.00, 0.13, 0.61}},
-	{522, {0.00, 0.14, 0.61}},
-	{523, {0.00, 0.15, 0.55}},
-	{524, {1.53, 0.48, -0.99}},
-	{525, {-1.39, -0.51, -0.09}},
-	{526, {-0.99, -1.96, 0.06}},
-	{527, {-1.14, -1.69, 0.14}},
-	{528, {-1.09, -2.03, 0.12}},
-	{529, {-1.20, -2.22, 0.20}},
-	{531, {-0.01, 0.82, 0.43}},
-	{533, {1.02, -1.96, 0.14}},
-	{534, {-1.04, -0.82, -0.20}},
-	{535, {-1.20, -0.56, 0.27}},
-	{536, {-1.07, -1.69, 0.09}},
-	{540, {-1.17, -2.52, -0.02}},
-	{541, {1.01, -1.99, 0.15}},
-	{542, {-1.12, -1.92, 0.31}},
-	{543, {-1.10, -0.95, 0.00}},
-	{544, {-1.30, 2.07, 0.32}},
-	{545, {0.00, -2.22, -0.32}},
-	{546, {1.09, -2.03, 0.15}},
-	{547, {-1.17, -2.01, 0.12}},
-	{549, {-1.08, -1.18, 0.22}},
-	{550, {-1.07, -2.49, 0.04}},
-	{551, {-1.15, -2.67, 0.09}},
-	{552, {-1.29, -0.96, 0.49}},
-	{554, {1.21, -2.39, 0.12}},
-	{555, {-0.79, -1.50, 0.18}},
-	{557, {1.19, -2.57, 0.85}},
-	{558, {-1.09, -1.94, 0.27}},
-	{559, {-1.08, -1.71, 0.27}},
-	{560, {1.14, -1.90, 0.13}},
-	{561, {1.11, -2.30, 0.11}},
-	{562, {1.04, -0.70, 0.07}},
-	{565, {0.91, -0.87, 0.03}},
-	{566, {1.08, -2.44, 0.02}},
-	{567, {0.00, -2.86, -0.46}},
-	{568, {-0.50, -0.66, 0.38}},
-	{571, {0.00, 0.19, 0.02}},
-	{572, {-0.38, -0.97, 0.16}},
-	{573, {-1.18, 0.48, -0.48}},
-	{574, {-0.75, -0.97, 0.28}},
-	{575, {0.00, -2.78, -0.05}},
-	{576, {0.00, -3.16, -0.25}},
-	{578, {-1.24, 2.91, -0.02}},
-	{579, {1.22, -2.30, 0.17}},
-	{580, {1.19, -1.82, 0.24}},
-	{581, {0.00, 0.13, 0.54}},
-	{582, {-1.06, 0.14, -0.28}},
-	{583, {-0.76, 0.41, -0.06}},
-	{584, {0.00, 0.00, 0.00}},
-	{585, {1.14, -2.30, 0.20}},
-	{587, {-1.23, -1.22, 0.10}},
-	{588, {-1.46, -2.16, 0.22}},
-	{589, {0.98, -0.89, 0.12}},
-	{596, {-1.11, -2.16, 0.10}},
-	{597, {-1.10, -2.15, 0.10}},
-	{598, {-1.08, -1.96, 0.16}},
-	{599, {1.16, -0.74, 0.00}},
-	{600, {1.09, -2.03, 0.08}},
-	{601, {-1.33, -1.69, 0.92}},
-	{602, {1.09, -1.99, 0.11}},
-	{603, {1.18, -2.19, -0.08}},
-	{604, {0.00, -3.00, -0.13}},
-	{605, {-1.10, -0.95, 0.00}},
-	{609, {-1.30, 0.00, 0.10}}
-};
+
 
 new Float:GDL_ROUTE[24][3] =
 {
@@ -1764,8 +1649,10 @@ Dialog:REGISTER(playerid, response, listitem, inputtext[])
 {
 	if(strlen(inputtext) < 6 || strlen(inputtext) > 24)
     {
+    	new str[128];
         SendClientMessage(playerid, COLOR_ORANGERED, "You must insert a password between 6-24 characters!");
-        Dialog_Show(playerid, REGISTER, DIALOG_STYLE_PASSWORD, ""COL_BLUE"Registration Menu","Input the password you chose to use for your account","Register","Cancel");
+        format(str, sizeof(str), "{FFFFFF}Hello, %s!\n\nWelcome to {D69929}Small County RP{FFFFFF}.\nThe password you'd selected didn't match the requirements!\n\nEnter your desired password:", GetDatabaseName(playerid));
+		Dialog_Show(playerid, REGISTER, DIALOG_STYLE_PASSWORD, "Register", str,"Register","Cancel");
     }
     else if(strlen(inputtext) > 5 && strlen(inputtext) < 24)
     {
@@ -2718,8 +2605,12 @@ CMD:repair(playerid,params[])
 		    if(PlayerInfo[playerid][Cash] >= 1000)
 		    {
 		        GivePlayerMoneyEx(playerid, -1000);
-		        RepairVehicle(GetPlayerVehicleID(playerid));
+		        new vid = GetPlayerVehicleID(playerid);
+				RepairVehicle(vid);
+				Vehicles[vid][Broken] = 0;
+				if(IsPlayerVehicle(vid)) MYSQL_Update_Interger(Vehicles[vid][SQLID], "PlayerVehicles", "Broken", 0);
 		        SendClientMessage(playerid, COLOR_LGREEN, "> Your vehicle has been insta-repaired because I haven't got a better way of doing it yet");
+		    	
 		    }
 		    else
 		    {
@@ -2739,8 +2630,11 @@ CMD:afix(playerid,params[])
 	    new str[128];
 	    if(GetPlayerVehicleID(playerid))
 	    {
-			RepairVehicle(GetPlayerVehicleID(playerid));
-			format(str, sizeof(str), "%s has repaired vehicle %d.", GetRoleplayName(playerid), GetPlayerVehicleID(playerid));
+	    	new vid = GetPlayerVehicleID(playerid);
+			RepairVehicle(vid);
+			Vehicles[vid][Broken] = 0;
+			if(IsPlayerVehicle(vid)) MYSQL_Update_Interger(Vehicles[vid][SQLID], "PlayerVehicles", "Broken", 0);
+			format(str, sizeof(str), "%s has repaired vehicle %d.", GetRoleplayName(playerid), vid);
 			SendAdminsMessage(6, COLOR_SLATEGRAY, str);
 	    	//SendAdminsMessage(1, COLOR_SEAGREEN, str);
 	    }
@@ -3540,9 +3434,12 @@ stock Register(playerid)
 
 stock SetSelectionPos(playerid)
 {
-	SetPlayerPosEx(playerid, 184.6707, -88.0618, 1002.0234, 18, playerid + 1000);
+	SetPlayerPos(playerid, 184.6707, -88.0618, 1002.0234);
 	SetPlayerFacingAngle(playerid, 90.0);
 	
+	SetPlayerInterior(playerid, 18);
+	SetPlayerVirtualWorld(playerid, playerid + 1000);
+
 	SetPlayerCameraPos(playerid,181.6707, -88.0618, 1002.0234);
 	SetPlayerCameraLookAt(playerid,181.6707, -88.0618, 1002.0234);
 	
@@ -3563,18 +3460,18 @@ new QAnswer[MAX_PLAYERS] = 0;
 new QuizQuestions[][][] = {
 
 	{"1", "[QUIZ] Is it ever acceptable to ban evade?", " (A) No, doing so will result in the loss of any chance of getting unbanned. \n (B) Yes, unless you were caught hacking. \n (C) No, unless you feel that you've been wrongfully banned. \n (D) No, unless any player tells you otherwise."},
-	{"2", "[QUIZ] Are certain hacks permitted on the server?", " (A) Yes, a very small proportion of hacks are indeed permitted for use. \n (B) No, under no circumstances should hacks be used/installed when playing on this server. \n No, unless an individual with high authority creates an extenuating circumstance for you and gives you the go-ahead. \n (D) Indeed, all hacks can be used provided that they are used sensibly."},
+	{"2", "[QUIZ] Are certain hacks permitted on the server?", " (A) Yes, a very small proportion of hacks are indeed permitted for use. \n (B) No, under no circumstances should hacks be used/installed when playing on this server. \n (C) No, unless an individual with high authority creates an extenuating circumstance for you and gives you the go-ahead. \n (D) Indeed, all hacks can be used provided that they are used sensibly."},
 	{"3", "[QUIZ] Which of the following adheres to the correct use of an expression of quantity?", " (A) 1 Grands \n (B) 1 Millions \n (C) 1 Million \n (D) 5 Millions."},
 	{"2", "[QUIZ] How can the term 'METAGAMING' be defined?", " (A) Messing around OOCly. \n (B) Using information obtained OOC'ly in an IC situation.\n (C) Using information obtained IC'ly in an OOC situation.\n (D) Forcing certain actions upon a player."},
 	{"4", "[QUIZ] How can the term 'POWERGAMING' be defined?", " (A) The act of acquiring a position of power within the server. \n (B) Using the OOC chat IC'ly. \n (C) Acting in a realistic manner that can be appreciated by all. \n (D) None of the above."},
 	{"1", "[QUIZ] How can the term 'Money Farming' be defined?", " (A) Creating accounts for the sole purpose of gaining money. \n (B) Adopting a farm IC'ly, and selling goods produced by this farm with the intention to make profit. \n (C) Taking on the role of a homeless individual and begging others for money with adequate role-play. \n (D) Approaching other community members and offering to pay IRL cash in return for IG cash."},
 	{"3", "[QUIZ] What is the correct definition of the abbreviation 'IC'?", " (A) In Chapter - A specific chapter in your character's life. \n (B) In Church - The act of role-playing within a church. \n (C) In Character - Taking the role of your character and acting realistically and appropriately whilst doing so. \n (D) Idiotic Characters - The concept of role-playing characters of the idiotic nature."},
 	{"3", "[QUIZ] Select the proper form of a /me.", " (A) /me there is a bottle by my feet. \n (B) /me you would hear the vehicle screeching to a halt. \n (C) /me rotates his head as he catches a glimpse of the suited man."},
-	{"2", "[QUIZ] Select the proper form of a /do.", " (A) /do paces himself to his intended destination, panting heavily upon arrival. \n (B) /do Large quantities of blood would be seen cascading down from my receding hairline. \n (C) /do Places his dominant hand on the his waist, taking the general shape of the Colt M1911 as he swiftly lifts his shirt and withdraws the pistol from his waistline. \n (D) /do What do you think you're doing?"},
+	{"2", "[QUIZ] Select the proper form of a /do.", " (A) /do paces himself to his intended destination, panting heavily upon arrival. \n (B) /do Large quantities of blood would be seen cascading down from my receding hairline. \n (C) /do Places his dominant hand on the his waist, as he swiftly lifts his shirt and withdraws the pistol from his waistline. \n (D) /do What do you think you're doing?"},
 	{"2", "[QUIZ] What is the correct usage of the standard IC chat?", " (A) Hey, how long have you been role-playing on this server? \n (B) Greetings, the name's Donovan, but you may call me Don. \n (C) Woah, what is that name tag hovering over your head and where can I procure one? \n (D) What is the CMD to check which administrator are online at the moment?"},
 	{"4", "[QUIZ] What is the expected way to speak to an administrator when requesting for assistance?", " (A) Uh, where the fuck is my car, you fucking knob? \n (B) I just logged in and I can't seem to see car anywhere, TP it to me this instant. \n (C) This guy in front of me has absolutely no idea how to RP, ban him now. \n (D) Hi, I was wondering if you could possibly TP to me, I appear to be experiencing a bug that requires your attention."},
-	{"4", "[QUIZ] Which of the following is expected of you when playing on this server?", " (A) Act politely in the IC chat, avoid any illegal role-play whatsoever. \n (B) Role-playing with others at all times, as oppose to role-playing passively. \n (C) Logging in with a ping that never exceeds 100 or more. (D) Role-playing realistically and to the standards that satisfy that of SC:RP."},
-	{"1", "[QUIZ] What is the threshold in relation to the things you are permitted to role-play?", " (A) Non-existent, with the exception of paedophilia and so long as the actions demonstrated is realistic and does not genuinely offend members involved in the particular scenario. \n (B) Illegal role-play - Under no circumstances should such role-play be exercised. \n (C) Passive role-play - Role-play must always involve other parties for it to be regarded as realistic. \n (D) None of the above."},
+	{"4", "[QUIZ] Which of the following is expected of you when playing on this server?", " (A) Act politely in the IC chat, avoid any illegal role-play whatsoever. \n (B) Role-playing with others at all times, as oppose to role-playing passively. \n (C) Logging in with a ping that never exceeds 100 or more. \n (D) Role-playing realistically and to the standards that satisfy that of SC:RP."},
+	{"1", "[QUIZ] What is the threshold in relation to the things you are permitted to role-play?", " (A) Non-existent, with the exception of paedophilia and so long as the actions demonstrated are realistic. \n (B) Illegal role-play - Under no circumstances should such role-play be exercised. \n (C) Passive role-play - Role-play must always involve other parties for it to be regarded as realistic. \n (D) None of the above."},
 	{"3", "[QUIZ] What is the minimum age to play on this server?", " (A) 18. \n (B) 16. \n (C) There is none, so long as the standards of English and the standards of role-play upholds what is expected on SC:RP. \n (D)  14."}, 
 	{"4", "[QUIZ] Are OOC insults permitted in this community?", " (A) Yes, but only when the opposing party has warranted the particular insult. \n (B) Yes, members who partake in the community must neglect all emotions and simply ignore insults that are thrown towards them. \n (C) No, unless you are conversing with an administrator. \n (D) No, under no circumstances should words of such nature be undertook."}
 };
@@ -3612,15 +3509,20 @@ stock Quiz(playerid, section)
 	
     if(section == 1)
 	{
-		Dialog_Show(playerid, QUIZ1, DIALOG_STYLE_LIST, "[QUIZ] Do you know how to Roleplay?","A.) Yes\nB.) No","Select","");
+		Dialog_Show(playerid, QUIZ1, DIALOG_STYLE_LIST, "[QUIZ] Do you know how to Roleplay?"," (A) Yes\n (B) No","Select","");
 	}
     else
 	{
 	    new rand = random(sizeof(QuizQuestions));
 
+	    CreateSpacer(playerid, 10);
+
 	    format(QAnswer[playerid], 2, "%d", strval(QuizQuestions[rand][0]));
 
 		Dialog_Show(playerid, QUIZ2, DIALOG_STYLE_LIST, QuizQuestions[rand][1], QuizQuestions[rand][2],"Select","");
+
+		SendClientSplitMessage(playerid, COLOR_SLATEGRAY, QuizQuestions[rand][1]);
+		SendClientSplitMessage(playerid, COLOR_WHITE, QuizQuestions[rand][2]);
 	}
 	return 1;
 }
@@ -3704,6 +3606,7 @@ Dialog:QUIZ2(playerid, response, listitem, inputtext[])
 		}
 		else
 		{
+			CreateSpacer(playerid, 10);
 			Dialog_Show(playerid, CREATECHARCTER, DIALOG_STYLE_INPUT, "Character Creation", "Please enter your new character's (roleplay)name, it must include the underscore('_'):", "Create","Cancel");
 		}
 	}
@@ -4644,7 +4547,7 @@ public Load_Account_Vehicles(playerid)
 			if(PlayerInfo[playerid][TotalVehicles] < 4)
 			{
 				Total_Vehicles_Created++;
-				static Float:VehicleHP, VehicleDamage[4];
+				static Float:VehicleHP;
 			  	new vid = GetFreeVehicleSlot();
 			  	ResetVehicleVariables(vid);
 			    validvehicle[vid] = true;
@@ -4666,10 +4569,10 @@ public Load_Account_Vehicles(playerid)
 				Vehicles[vid][Nitrous] = cache_get_field_content_int(i, "Nitrous", SQL_CONNECTION);
 				Vehicles[vid][Hydraulics] = cache_get_field_content_int(i, "Hydraulics", SQL_CONNECTION);
 				Vehicles[vid][Wheels] = cache_get_field_content_int(i, "Wheels", SQL_CONNECTION);
-				VehicleDamage[0] = cache_get_field_content_int(i, "Panels", SQL_CONNECTION);
-				VehicleDamage[1] = cache_get_field_content_int(i, "Doors", SQL_CONNECTION);
-				VehicleDamage[2] = cache_get_field_content_int(i, "Lights", SQL_CONNECTION);
-				VehicleDamage[3] = cache_get_field_content_int(i, "Tires", SQL_CONNECTION);
+				Vehicles[vid][vPanels] = cache_get_field_content_int(i, "Panels", SQL_CONNECTION);
+				Vehicles[vid][vDoors] = cache_get_field_content_int(i, "Doors", SQL_CONNECTION);
+				Vehicles[vid][vLights] = cache_get_field_content_int(i, "Lights", SQL_CONNECTION);
+				Vehicles[vid][vTires] = cache_get_field_content_int(i, "Tires", SQL_CONNECTION);
 
 				if(Vehicles[vid][Model] > 399 && Vehicles[vid][Model] < 612)
 				{	
@@ -4693,13 +4596,15 @@ public Load_Account_Vehicles(playerid)
 					Vehicles[Vehicle][Hydraulics] = Vehicles[vid][Hydraulics];
 					Vehicles[Vehicle][Wheels] = Vehicles[vid][Wheels];
 
+
+
 					PlayerInfo[playerid][TotalVehicles]++;
 
 					SetVehicleToRespawn(Vehicle);
 					SetVehicleNumberPlate(Vehicle, Vehicles[vid][Plate]);
 				    SetVehicleHealth(Vehicle, VehicleHP);
-				    UpdateVehicleDamageStatus(Vehicle, VehicleDamage[0], VehicleDamage[1], VehicleDamage[2], VehicleDamage[3]);
-				    SetVehicleParamsEx(Vehicle, 0, 0,  alarm[vid], doors[vid], bonnet[vid], boot[vid], objective[vid]);
+				    UpdateVehicleDamageStatus(Vehicle, Vehicles[Vehicle][vPanels], Vehicles[Vehicle][vDoors], Vehicles[Vehicle][vLights], Vehicles[Vehicle][vTires]);
+				    SetVehicleParamsEx(Vehicle, 0, 0,  alarm[Vehicle], doors[Vehicle], bonnet[Vehicle], boot[Vehicle], objective[Vehicle]);
 
 				    if(Vehicles[Vehicle][Nitrous] > 1007 && Vehicles[Vehicle][Nitrous] < 1011)
 			    	{
@@ -4736,11 +4641,11 @@ stock Unload_Account_Vehicles(playerid)
 					static Float:VehicleHP[1], VehicleDamage[4];
 					GetVehicleHealth(id, VehicleHP[0]);
 					GetVehicleDamageStatus(id, VehicleDamage[0], VehicleDamage[1], VehicleDamage[2], VehicleDamage[3]);
-					MYSQL_Update_Float(Vehicles[id][SQLID], "playervehicles", "Damage", VehicleHP[0]);
-					MYSQL_Update_Interger(Vehicles[id][SQLID], "playervehicles", "Panels", VehicleDamage[0]);
-					MYSQL_Update_Interger(Vehicles[id][SQLID], "playervehicles", "Doors",  VehicleDamage[1]);
-					MYSQL_Update_Interger(Vehicles[id][SQLID], "playervehicles", "Lights", VehicleDamage[2]);
-					MYSQL_Update_Interger(Vehicles[id][SQLID], "playervehicles", "Tires",  VehicleDamage[3]);
+					MYSQL_Update_Float(Vehicles[id][SQLID], "PlayerVehicles", "Damage", VehicleHP[0]);
+					MYSQL_Update_Interger(Vehicles[id][SQLID], "PlayerVehicles", "Panels", VehicleDamage[0]);
+					MYSQL_Update_Interger(Vehicles[id][SQLID], "PlayerVehicles", "Doors",  VehicleDamage[1]);
+					MYSQL_Update_Interger(Vehicles[id][SQLID], "PlayerVehicles", "Lights", VehicleDamage[2]);
+					MYSQL_Update_Interger(Vehicles[id][SQLID], "PlayerVehicles", "Tires",  VehicleDamage[3]);
 					DestroyVehicle(id);
 					Total_Vehicles_Created --;
 					validvehicle[id] = false;
@@ -4893,6 +4798,7 @@ ResetVehicleVariables(id)
 	Vehicles[id][Nitrous] = 0;
 	Vehicles[id][Hydraulics] = 0;
 	Vehicles[id][Wheels] = 0;
+	Vehicles[id][Broken] = 0;
 	return 1;
 }
 
@@ -5066,41 +4972,37 @@ stock ReloadIcon(id)
 	return 1;
 }
 
-forward SetPlayerMoneyEx(playerid, amount);
-public SetPlayerMoneyEx(playerid, amount)
-{
-	new query[128];
-    ResetPlayerMoney(playerid);
-	PlayerInfo[playerid][Cash] = amount;
-	mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET Cash = %d WHERE SQLID = %i LIMIT 1", PlayerInfo[playerid][Cash], PlayerInfo[playerid][SQLID]);
-	mysql_tquery(SQL_CONNECTION, query);
-	GivePlayerMoney(playerid, PlayerInfo[playerid][Cash]);
-	return 1;
-}
 
 forward AddBusinessMoney(id, amount);
 public AddBusinessMoney(id, amount)
 {
 	if(id > 0)
 	{
-		new query[128];
 		Biz[id][Safe] += amount;
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Safe = %d WHERE SQLID = %i LIMIT 1", Biz[id][Safe], Biz[id][SQLID]);
-		mysql_tquery(SQL_CONNECTION, query);
+        MYSQL_Update_Interger(Biz[id][SQLID], "Biz", "Safe", Biz[id][Safe]);
 		return 1;
 	}
 	return 0;
 }
 
+forward SetPlayerMoneyEx(playerid, amount);
+public SetPlayerMoneyEx(playerid, amount)
+{
+	PlayerInfo[playerid][Cash] = amount;
+	MYSQL_Update_Account(playerid, "Cash", PlayerInfo[playerid][Cash]);
+
+    ResetPlayerMoney(playerid);
+	GivePlayerMoney(playerid, PlayerInfo[playerid][Cash]);
+	return 1;
+}
 
 forward GivePlayerMoneyEx(playerid, amount);
 public GivePlayerMoneyEx(playerid, amount)
 {
-	new query[128];
-    ResetPlayerMoney(playerid);
 	PlayerInfo[playerid][Cash] += amount;
-	mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET Cash = %d WHERE SQLID = %i LIMIT 1", PlayerInfo[playerid][Cash], PlayerInfo[playerid][SQLID]);
-	mysql_tquery(SQL_CONNECTION, query);
+	MYSQL_Update_Account(playerid, "Cash", PlayerInfo[playerid][Cash]);
+
+    ResetPlayerMoney(playerid);
 	GivePlayerMoney(playerid, PlayerInfo[playerid][Cash]);
 	return 1;
 }
@@ -5108,10 +5010,8 @@ public GivePlayerMoneyEx(playerid, amount)
 forward GivePlayerXP(playerid, amount);
 public GivePlayerXP(playerid, amount)
 {
-	new query[128];
 	PlayerInfo[playerid][XP] += amount;
-	mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET XP = %d WHERE SQLID = %i LIMIT 1", PlayerInfo[playerid][XP], PlayerInfo[playerid][SQLID]);
-	mysql_tquery(SQL_CONNECTION, query);
+	MYSQL_Update_Account(playerid, "XP", PlayerInfo[playerid][XP]);
 	return 1;
 }
 
@@ -5127,11 +5027,9 @@ stock GetFreeVehicleSlot()
 
 stock IsInRangeOfPlayer(playerid, targetid, distance)
 {
-    new
-        Float:X, Float:Y, Float:Z, Float:tX, Float:tY, Float:tZ;
-    GetPlayerPos(playerid, X, Y, Z);
-    GetPlayerPos(targetid, tX, tY, tZ);
-    if(IsPlayerInRangeOfPoint(playerid, distance, tX, tY, tZ)) return 1;
+    new Float:TargetPos[3];
+    GetPlayerPos(targetid, TargetPos[0], TargetPos[1], TargetPos[2]);
+    if(IsPlayerInRangeOfPoint(playerid, distance, TargetPos[0], TargetPos[1], TargetPos[2])) return 1;
     return 0;
 }
 
@@ -5558,7 +5456,7 @@ CMD:enter(playerid)
 	            	GivePlayerMoneyEx(playerid, -Biz[bID][EntranceFee]);
 
 					format(str, sizeof(str), "Welcome to the %s.", Biz[bID][Name]);
-					SendClientMessage(playerid, COLOR_WHITE, str);
+					if(Biz[bID][Owned] != 3) SendClientMessage(playerid, COLOR_WHITE, str);
 
 					SetPlayerPosEx(playerid, Biz[bID][InteriorX], Biz[bID][InteriorY], Biz[bID][InteriorZ], Biz[bID][Interior], Biz[bID][World]);
 
@@ -5640,7 +5538,7 @@ CMD:exit(playerid)
     }
 
 
-    if(IsPlayerInRangeOfPoint(playerid, 5.0, Biz[bID][InteriorX], Biz[bID][InteriorY], Biz[bID][InteriorZ]))
+    if(IsPlayerInRangeOfPoint(playerid, 5.0, Biz[bID][InteriorX], Biz[bID][InteriorY], Biz[bID][InteriorZ]) && GetPlayerVirtualWorld(playerid) == Biz[bID][World])
     {
         SetPlayerPosEx(playerid, Biz[bID][PosX], Biz[bID][PosY], Biz[bID][PosZ], 0, 0);
         PlayerInfo[playerid][bEntered] = 0;
@@ -6140,14 +6038,12 @@ CMD:ooc(playerid, params[])
 	    	format(str, sizeof(str), "(([Global]%s: %s ))", GetRoleplayName(playerid), params);
 	    	SendClientMessageToAll(COLOR_LBLUE, str);
 	    }
-	    else
-	    {
-	        SendClientMessage(playerid, COLOR_RED, "> You are currently muted, if you believe this is a mistake, please make an appeal on forums.");
-	    }
+	    else SendErrorMessage(playerid, "You are muted.");
+	
 	}
 	else
 	{
-	    SendClientMessage(playerid, COLOR_RED, "> Global chat is currently unavailable.");
+	    SendErrorMessage(playerid, "Global chat is currently DISABLED!");
 	}
     return 1;
 }
@@ -6164,11 +6060,7 @@ CMD:announcement(playerid, params[])
 		SendSplitMessageToAll(playerid, COLOR_VIOLET, str);
 		SetPlayerChatBubble(playerid, str, COLOR_VIOLET, 20.0, 7000);
 	}
-	else
-	{
-		SendErrorMessage(playerid, ERROR_ADMIN);
-	}
-	
+	else SendErrorMessage(playerid, ERROR_ADMIN);
 	return 1;
 }
 ALTCMD:announce->announcement;
@@ -6863,6 +6755,7 @@ stock Engine_SET(playerid, vid, State)
     	if(Vehicles[vid][Fuel] <= 0) return SendLocalMessage(playerid, "* The engine wouldn't turn on due to a lack of fuel. *", Range_Normal, COLOR_RP, COLOR_RP);
 		SetVehicleParamsEx(vid,1,Lights[vid],alarm[vid],doors[vid],bonnet[vid],boot[vid],objective[vid]);
 		Engine[vid] = 1;
+		KillTimer(Vehicles[vid][FuelTimer]);
 		Vehicles[vid][FuelTimer] = SetTimerEx("ReduceFuel", MINUTES(1), true, "d", vid);
 		GameTextForPlayer(playerid, "~g~Engine On!", 2000, 4);
 		return 1;
@@ -6918,6 +6811,7 @@ public OnVehicleSpawn(vehicleid)
 {
 	Engine[vehicleid] = 0;
 	Lights[vehicleid] = 0;
+
 	EmergencyLights[vehicleid] = 0;
 	SetVehicleParamsEx(vehicleid, 0, 0,alarm[vehicleid],doors[vehicleid],bonnet[vehicleid],boot[vehicleid],objective[vehicleid]);
 
@@ -6942,7 +6836,28 @@ public OnVehicleSpawn(vehicleid)
     	}
 	}
 
+	if(IsPlayerVehicle(vehicleid))
+	{
+		if(Vehicles[vehicleid][Broken] == 1)
+		{
+			SetVehicleHealth(vehicleid, 300.0);
+		}
+	}
+
 	return 1;
+}
+
+public OnVehicleDeath(vehicleid, killerid)
+{
+	if(IsPlayerVehicle(vehicleid)) 
+	{
+		if(Vehicles[vehicleid][Broken] == 0) 
+		{
+			Vehicles[vehicleid][Broken] = 1;
+			MYSQL_Update_Interger(Vehicles[vehicleid][SQLID], "PlayerVehicles", "Broken", 1);
+		}
+    }
+    return 1;
 }
 
 forward ReduceFuel(vehicleid);
@@ -6952,7 +6867,6 @@ public ReduceFuel(vehicleid)
 	{
 		if(Vehicles[vehicleid][Fuel] > 0)
 		{
-			new query[128];
 			//printf("Fuel Down");
 			//printf("From: %d", Vehicles[vehicleid][Fuel]);
 			Vehicles[vehicleid][Fuel] --;
@@ -6960,18 +6874,15 @@ public ReduceFuel(vehicleid)
 			//printf("Timer: %d", Vehicles[vehicleid][FuelTimer]);
 			if(Vehicles[vehicleid][Type] == 2 || Vehicles[vehicleid][Type] == 4 || Vehicles[vehicleid][Type] == 5)
 			{
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE ServerVehicles SET Fuel = %d WHERE SQLID = %d LIMIT 1", Vehicles[vehicleid][Fuel], Vehicles[vehicleid][SQLID]);
-				mysql_tquery(SQL_CONNECTION, query);
+				MYSQL_Update_Interger(Vehicles[vehicleid][SQLID], "ServerVehicles", "Fuel", Vehicles[vehicleid][Fuel]);
 			}
 			else if(Vehicles[vehicleid][Type] == 1)
 			{
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE PlayerVehicles SET Fuel = %d WHERE SQLID = %d LIMIT 1", Vehicles[vehicleid][Fuel], Vehicles[vehicleid][SQLID]);
-				mysql_tquery(SQL_CONNECTION, query);
+				MYSQL_Update_Interger(Vehicles[vehicleid][SQLID], "PlayerVehicles", "Fuel", Vehicles[vehicleid][Fuel]);
 			}
 			else if(Vehicles[vehicleid][Type] == 3)
 			{
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE FactionVehicles SET Fuel = %d WHERE SQLID = %d LIMIT 1", Vehicles[vehicleid][Fuel], Vehicles[vehicleid][SQLID]);
-				mysql_tquery(SQL_CONNECTION, query);
+				MYSQL_Update_Interger(Vehicles[vehicleid][SQLID], "FactionVehicles", "Fuel", Vehicles[vehicleid][Fuel]);
 			}
 		}
 		else
@@ -6982,10 +6893,7 @@ public ReduceFuel(vehicleid)
 			Lights[vehicleid] = 0;
 		}
 	}
-	else
-	{
-		KillTimer(Vehicles[vehicleid][FuelTimer]);
-	}
+	else KillTimer(Vehicles[vehicleid][FuelTimer]);
 	return 1;
 }
 
@@ -7177,7 +7085,7 @@ CMD:lights(playerid, params[])
 }
 ALTCMD:lon->lights;
 
-IsBusinessOwner(playerid, bid)
+stock IsBusinessOwner(playerid, bid)
 {
 	if(Business[bid][Owner] == PlayerInfo[playerid][SQLID]) return 1;
 	return 0;
@@ -7274,7 +7182,7 @@ CMD:entrancefee(playerid,params[])
 		if(bid)
 		{
 			if(sscanf(params, "d", amount)) return SendClientMessage(playerid, COLOR_GRAY, "/entrancefee [amount]");
-			if(amount <= 50)
+			if(amount < 0 && amount >= 50)
 			{
 			    Biz[bid][EntranceFee] = amount;
 			    MYSQL_Update_Interger(Biz[bid][SQLID], "Biz", "EntranceFee", Biz[bid][EntranceFee]);
@@ -7383,7 +7291,48 @@ CMD:bizinfo(playerid,params[])
 }
 ALTCMD:binfo->bizinfo;
 
+Dialog:QUIZ22(playerid, response, listitem, inputtext[])
+{
+	if(listitem + 1 == strval(QAnswer[playerid]))
+	{
+		Quiz_Info2(playerid, CORRECT);
+	}
+	else
+	{
+		Quiz_Info2(playerid, WRONG);
+	}
+    return 1;
+}
 
+stock Quiz_Info2(playerid, info)
+{
+	if(info == 0)
+	{
+	    InfoBoxForPlayer(playerid, "That is the ~r~INCORRECT ~w~please review your answer - reconnect to try the quiz again.");
+	}
+	if(info == 1)
+	{
+	    InfoBoxForPlayer(playerid, "Good job, you got the answer ~g~CORRECT~w~!");
+	}
+	return 1;
+}
+
+CMD:quiztest(playerid,params[])
+{
+	if(MasterAccount[playerid][Admin] >= 1)
+	{
+		new rand;
+		if(sscanf(params, "d", rand)) return SendClientMessage(playerid, COLOR_GRAY, "/quiztest [section]");
+	    //new rand = random(sizeof(QuizQuestions));
+	    CreateSpacer(playerid, 10);
+	    format(QAnswer[playerid], 2, "%d", strval(QuizQuestions[rand][0]));
+		Dialog_Show(playerid, QUIZ22, DIALOG_STYLE_LIST, QuizQuestions[rand][1], QuizQuestions[rand][2],"Select","");
+		SendClientSplitMessage(playerid, COLOR_SLATEGRAY, QuizQuestions[rand][1]);
+		SendClientSplitMessage(playerid, COLOR_WHITE, QuizQuestions[rand][2]);
+
+	}
+	return 1;
+}
 
 CMD:balance(playerid,params[])
 {
@@ -8249,26 +8198,15 @@ CMD:installstereo(playerid, params[])
 					mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE PlayerVehicles SET Radio = %d WHERE SQLID = %d LIMIT 1", Vehicles[vid][Radio], Vehicles[vid][SQLID]);
 					mysql_tquery(SQL_CONNECTION, query);
 				}
-				else
-				{
-					SendErrorMessage(playerid, "This vehicle already has a radio!");
-				}
+				else SendErrorMessage(playerid, "This vehicle already has a radio!");
+				
 			}
-			else
-			{
-				SendErrorMessage(playerid, "This can only be performed within a player-owned vehicle.");
-			}
+			else SendErrorMessage(playerid, "This can only be performed within a player-owned vehicle.");
+			
 		}
-		else
-		{
-			SendErrorMessage(playerid, "You don't have a radio to install!");
-		}
-
+		else SendErrorMessage(playerid, "You don't have a radio to install!");
 	}
-	else
-	{
-		SendErrorMessage(playerid, ERROR_JOB);
-	}
+	else SendErrorMessage(playerid, ERROR_JOB);
 	return 1;
 }
 
@@ -8300,6 +8238,7 @@ CMD:tow(playerid, params[])
 		
 	return 1;
 }
+
 CMD:detach(playerid, params[])
 {
     new vehicleid = GetPlayerVehicleID(playerid);
@@ -8321,25 +8260,13 @@ CMD:vmusic(playerid, params[])
 		{
 			if(IsPlayerVehicle(vid) && GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
 			{
-				
 				RadioSystem_MainMenu(playerid);
-
 			}
-			else
-			{
-				SendErrorMessage(playerid, "You must be in a player vehicle, in the driving seat in order to control the vehicle's radio.");
-			}
+			else SendErrorMessage(playerid, "You must be in a player vehicle, in the driving seat in order to control the vehicle's radio.");
 		}
-		else
-		{
-			SendErrorMessage(playerid, "This vehicle doesn't have a radio!");
-		}
-	}
-	else
-	{
-		SendErrorMessage(playerid, "You must be in a vehicle to perform this command.");
-	}
-
+		else SendErrorMessage(playerid, "This vehicle doesn't have a radio!");
+	} 
+	else SendErrorMessage(playerid, "You must be in a vehicle to perform this command.");
 	return 1;
 }
 ALTCMD:vstereo->vmusic;
@@ -8477,12 +8404,6 @@ Dialog:VehicleMods(playerid, response, listitem, inputtext[])
     return 1;
 }
 
-new Mod_Hydraulics[][] =
-{
-   // {componentid, price, name}
-   {1087, 5000, "Hydraulics"}
-};
-
 stock VehicleMods_Hydraulics(playerid)
 {
 	new str[128], dialog[400];
@@ -8524,15 +8445,6 @@ Dialog:VehicleMods_Hydraulics(playerid, response, listitem, inputtext[])
 	}
     return 1;
 }
-
-
-new Mod_NOS[][] =
-{
-   // {componentid, price, name}
-   {1009, 5000, "NOS x2"},
-   {1008, 5000, "NOS x5"},
-   {1010, 5000, "NOS x10"}
-};
 
 
 stock VehicleMods_Nitrous(playerid)
@@ -8578,25 +8490,6 @@ Dialog:VehicleMods_Nitrous(playerid, response, listitem, inputtext[])
     return 1;
 }
 
-
-
-new Mod_Wheels[][] =
-{
-   // {componentid, price, name}
-   {1073, 5000, "Shadow"},
-   {1074, 5000, "Mega"},
-   {1075, 5000, "Rimshine"}, 
-   {1076, 5000, "Wires"}, 
-   {1077, 5000, "Classic"}, 
-   {1078, 5000, "Twist"}, 
-   {1079, 5000, "Cutter"}, 
-   {1080, 5000, "Switch"},
-   {1081, 5000, "Grove"}, 
-   {1082, 5000, "Import"}, 
-   {1083, 5000, "Dollar"},
-   {1084, 5000, "Trance"}, 
-   {1085, 5000, "Atomic"} 
-};
 
 stock VehicleMod_Wheels(playerid)
 {
@@ -9536,10 +9429,8 @@ CMD:setplayer(playerid, params[])
 						{
                             if(option2 > 0 && option2 <= 6)
 							{
-								new query[128];
 	                            MasterAccount[player][Admin] = option2;
-                                mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE MasterAccounts SET %e = %d WHERE SQLID = %d LIMIT 1", option1, option2, MasterAccount[player][SQLID]);
-								mysql_tquery(SQL_CONNECTION, query);
+	                            MYSQL_Update_Interger(MasterAccount[player][SQLID], "MasterAccounts", "MA_Admin", MasterAccount[player][Admin]);
 						        SendSetMessages(player, playerid, option1, option2);
 	                            return 1;
 							}
