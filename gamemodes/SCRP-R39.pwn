@@ -1305,14 +1305,15 @@ public OnPlayerLogin(playerid)
 
 CMD:changemapassword(playerid,params[])
 {
-	new password[64], query[260], escapepass[129];
+	new password[64], escapepass[129];
 	if(sscanf(params, "s[32]", password)) return SendClientMessage(playerid, COLOR_GRAY, "/ChangeMAPassword [New Password]");
 	{
 		if(strlen(password) > 5 && strlen(password) < 24)
 		{
 			WP_Hash(escapepass, sizeof(escapepass), password);
-		    mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE MasterAccounts SET MA_Password = '%e' WHERE SQLID = %d LIMIT 1", escapepass, MasterAccount[playerid][SQLID]);
-			mysql_tquery(SQL_CONNECTION, query);
+			MYSQL_Update_String(MasterAccount[playerid][SQLID], "MasterAccounts", "MA_Password", escapepass);
+
+
 			SendClientMessage(playerid, COLOR_LGREEN, "You have successfully changed your password, keep it safe.");
 		}
 	    else
@@ -1357,12 +1358,10 @@ CMD:achangecharacterusername(playerid,params[])
 	
 	if(MasterAccount[playerid][Admin] >= 6)
 	{
-		new player, NewName[64], query[260];
+		new player, NewName[64];
 		if(sscanf(params, "us[32]", player, NewName)) return SendClientMessage(playerid, COLOR_GRAY, "/aChangeCharacterUsername [playerid] [New Name]");
 		{
-
-		    mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET Username = '%e' WHERE SQLID = %d LIMIT 1", NewName, PlayerInfo[player][SQLID]);
-			mysql_tquery(SQL_CONNECTION, query);
+			MYSQL_Update_String(PlayerInfo[player][SQLID], "Accounts", "Username", NewName);
 			SetPlayerName(player, NewName);
 			SendClientMessage(playerid, COLOR_LGREEN, "You have successfully changed the character's name.");
 
@@ -2045,19 +2044,17 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 forward GivePlayerPayday(playerid, amount);
 public GivePlayerPayday(playerid, amount)
 {
-	new query[128];
 	PlayerInfo[playerid][Payday] += amount;
 	if(PlayerInfo[playerid][Payday] > 20000)
 	{
 		PlayerInfo[playerid][Payday] = 20000;
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET Payday = %d WHERE SQLID = %i LIMIT 1", PlayerInfo[playerid][Payday], PlayerInfo[playerid][SQLID]);
-		mysql_tquery(SQL_CONNECTION, query);
+		MYSQL_Update_Account(playerid, "Payday", PlayerInfo[playerid][Payday]);
+
 		SendClientMessage(playerid, COLOR_DARKVIOLET, "You have reached your paycheck capacity($20,000). In order to continue earning money you will have to collect the accumulated funds.");
 	}
 	else
 	{
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET Payday = %d WHERE SQLID = %i LIMIT 1", PlayerInfo[playerid][Payday], PlayerInfo[playerid][SQLID]);
-		mysql_tquery(SQL_CONNECTION, query);
+		MYSQL_Update_Account(playerid, "Payday", PlayerInfo[playerid][Payday]);
 	}
 
 }
@@ -2473,11 +2470,12 @@ public OnPlayerUpdate(playerid)
     	GetPlayerKeys(playerid,Keys,ud,lr);
     	if(Keys == KEY_SECONDARY_ATTACK)
     	{
-    	    new query[120], str[128];
+    	    new str[128];
 		    PlayerInfo[playerid][ClothesSelection] = 0;
 		    PlayerInfo[playerid][Skin] = GetPlayerSkin(playerid);
-		    mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET Skin = %d WHERE SQLID = %d LIMIT 1",PlayerInfo[playerid][Skin],PlayerInfo[playerid][SQLID]);
-		    mysql_tquery(SQL_CONNECTION, query);
+
+			MYSQL_Update_Account(playerid, "Skin", PlayerInfo[playerid][Skin]);
+
 			SetPlayerPos(playerid, PlayerInfo[playerid][PosX], PlayerInfo[playerid][PosY], PlayerInfo[playerid][PosZ]);
 			SetPlayerInterior(playerid, PlayerInfo[playerid][Interior]);
 			SetPlayerVirtualWorld(playerid, PlayerInfo[playerid][VWorld]);
@@ -5855,14 +5853,14 @@ Dialog:GENERALSTORE(playerid, response, listitem, inputtext[])
 forward TakeInventoryItem(playerid, item, quantity);
 public TakeInventoryItem(playerid, item, quantity)
 {
-	new query[128], str[128];
+	new str[128];
 
 	if(item == VRADIO)
 	{
 		if(Inventory[playerid][VehicleRadio] <= 0) return SendErrorMessage(playerid, "Item cannot be taken.");
 		Inventory[playerid][VehicleRadio] -= quantity;
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET VehicleRadio = %d WHERE SQLID = %d LIMIT 1", Inventory[playerid][VehicleRadio], PlayerInfo[playerid][SQLID]);
-		mysql_tquery(SQL_CONNECTION, query);
+		MYSQL_Update_Account(playerid, "VehicleRadio", Inventory[playerid][VehicleRadio]);
+
 		format(str, sizeof(str), "[Item] You have had %d (vehicle) sound system(s) taken from your inventory, you now have a total of %d on you.", quantity, Inventory[playerid][VehicleRadio]);
 		SendClientMessage(playerid, COLOR_LIGHTGRAY, str);
 		return 1;
@@ -7361,14 +7359,14 @@ CMD:withdraw(playerid,params[])
 {
 	if(InRangeOfIcon(playerid, 5) == 1)
 	{
-		new str[128], amount, query[128];
+		new str[128], amount;
 		if(Biz[PlayerInfo[playerid][bEntered]][Owned] == 2)
 		{
 			if(sscanf(params, "d", amount)) return SendClientMessage(playerid, COLOR_GRAY, "/withdraw [amount]");
 			if(PlayerInfo[playerid][Bank] >= amount)
 			{
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET Bank = %d WHERE SQLID = %d LIMIT 1", PlayerInfo[playerid][Bank] -= amount, PlayerInfo[playerid][SQLID]);
-				mysql_tquery(SQL_CONNECTION, query);
+				MYSQL_Update_Account(playerid, "Bank", PlayerInfo[playerid][Bank] -= amount);
+
 				format(str, sizeof(str), ""COL_LBLUE"Withdrawal Amount: "COL_DGREEN"$%s\n"COL_LBLUE"Bank Balance: "COL_DGREEN"$%s", FormatNumber(amount), FormatNumber(PlayerInfo[playerid][Bank]));
 				Dialog_Show(playerid,BANK_BALANCE,DIALOG_STYLE_MSGBOX,"- My Bank -",str,"Close","");
 				GivePlayerMoneyEx(playerid, amount);
@@ -7390,14 +7388,13 @@ CMD:deposit(playerid,params[])
 {
 	if(InRangeOfIcon(playerid, 5) == 1)
 	{
-		new str[128], amount, query[128];
+		new str[128], amount;
 		if(Biz[PlayerInfo[playerid][bEntered]][Owned] == 2)
 		{
 			if(sscanf(params, "d", amount)) return SendClientMessage(playerid, COLOR_GRAY, "/deposit [amount]");
 			if(PlayerInfo[playerid][Cash] >= amount)
 			{
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET Bank = %d WHERE SQLID = %d LIMIT 1", PlayerInfo[playerid][Bank] += amount, PlayerInfo[playerid][SQLID]);
-				mysql_tquery(SQL_CONNECTION, query);
+				MYSQL_Update_Account(playerid, "Bank", PlayerInfo[playerid][Bank] += amount);
 				format(str, sizeof(str), ""COL_LBLUE"Deposited Amount: "COL_DGREEN"$%s\n"COL_LBLUE"Bank Balance: "COL_DGREEN"$%s", FormatNumber(amount), FormatNumber(PlayerInfo[playerid][Bank]));
 				Dialog_Show(playerid,BANK_BALANCE,DIALOG_STYLE_MSGBOX,"- My Bank -",str,"Close","");
 				GivePlayerMoneyEx(playerid, -amount);
@@ -8188,15 +8185,14 @@ CMD:installstereo(playerid, params[])
 			{
 				if(Vehicles[vid][Radio] != 1)
 				{
-					new query[128], str[128];
+					new str[128];
 					Vehicles[vid][Radio] = 1;
 					Inventory[playerid][VehicleRadio] --;
 
 					format(str, sizeof(str), "* %s swiftly slides the new stereo system into the free compartment before screwing it into place. *", GetRoleplayName(playerid));
 					SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 
-					mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE PlayerVehicles SET Radio = %d WHERE SQLID = %d LIMIT 1", Vehicles[vid][Radio], Vehicles[vid][SQLID]);
-					mysql_tquery(SQL_CONNECTION, query);
+					MYSQL_Update_Interger(Vehicles[vid][SQLID], "PlayerVehicles", "Radio", Vehicles[vid][Radio]);
 				}
 				else SendErrorMessage(playerid, "This vehicle already has a radio!");
 				
@@ -8378,10 +8374,8 @@ stock RadioSystem_MainMenu(playerid)
 
 stock Query_Set_PlayerVehicle(vehicleid, option1[], option2)
 {
-	new query[128];
 	if(Vehicles[vehicleid][Type] != 1) return print("Error in Query_Set_PlayerVehicle.");
-    mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE PlayerVehicles SET %e = %d WHERE SQLID = %d LIMIT 1", option1, option2, Vehicles[vehicleid][SQLID]);
-	mysql_tquery(SQL_CONNECTION, query);
+	MYSQL_Update_Interger(Vehicles[vehicleid][SQLID], "PlayerVehicles", option1, option2);
 	return 1;
 }
 
@@ -9737,9 +9731,7 @@ CMD:setbiz(playerid, params[])
 
 			if(!strcmp(option2, "owner", true))
 			{
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Owner = %d WHERE SQLID = %d LIMIT 1", option3, Biz[id][SQLID]);
-				mysql_tquery(SQL_CONNECTION, query);
-
+				MYSQL_Update_Interger(Biz[id][SQLID], "Biz", "Owner", option3);
 				SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
 				ReloadBusiness(id);
 			}
@@ -10258,7 +10250,7 @@ CMD:setrank(playerid, params[])
 {
 	if(IsPlayerInAnyVehicle(playerid))
 	{
-		new vid = GetPlayerVehicleID(playerid), str[128], query[400], rank, fid = GetFactionIDFromSQLID(PlayerInfo[playerid][Faction]);
+		new vid = GetPlayerVehicleID(playerid), str[128], rank, fid = GetFactionIDFromSQLID(PlayerInfo[playerid][Faction]);
 	 	if(Vehicles[vid][Faction] == PlayerInfo[playerid][Faction] && PlayerInfo[playerid][Rank] >= Factions[fid][CommandRank])
 	    {
 	    	if(sscanf(params, "d", rank)) return SendClientMessage(playerid, COLOR_GRAY, "/setrank [1-max faction rank] (sets the vehicle's rank)");
@@ -10271,8 +10263,7 @@ CMD:setrank(playerid, params[])
 			format(str, sizeof(str), "You have updated this vehicle's rank to %d! (ID: %d)", Vehicles[vid][Rank], Vehicles[vid][SQLID]);
 			SendClientMessage(playerid, COLOR_YELLOW, str);
 
-			mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE PlayerVehicles SET Rank = %d WHERE SQLID = %d LIMIT 1",Vehicles[vid][Rank], Vehicles[vid][SQLID]);
-   			mysql_tquery(SQL_CONNECTION, query);
+   			MYSQL_Update_Interger(Vehicles[vid][SQLID], "PlayerVehicles", "Rank", Vehicles[vid][Rank]);
    			return 1;
 		}
 	}
@@ -10356,58 +10347,57 @@ CMD:setvehicle(playerid, params[])
 		{
 			if(IsPlayerInAnyVehicle(playerid))
 			{
-
+				new vid = GetPlayerVehicleID(playerid);
  //				| Option 2 | Color |
 				if(!strcmp(option, "color1", true))
 				{
-					new Car = GetPlayerVehicleID(playerid);
-				 	new str[128], query[400];
+					
+				 	new str[128];
 
-				    if(Vehicles[Car][Type] != 1 && Vehicles[Car][Type] != 2)
+				    if(Vehicles[vid][Type] == 1)
 				    {
-				        Vehicles[Car][Color1] = option2;
-                        ChangeVehicleColor(Car,Vehicles[Car][Color1],Vehicles[Car][Color2]);
+				        Vehicles[vid][Color1] = option2;
+                        ChangeVehicleColor(vid,Vehicles[vid][Color1],Vehicles[vid][Color2]);
 
-						format(str, sizeof(str), "Resprayed vehicle(ID: %d) color2(%d).",Car, Vehicles[Car][Color1]);
+						format(str, sizeof(str), "Resprayed player vehicle(ID: %d) color1(%d).",vid, Vehicles[vid][Color1]);
 						SendClientMessage(playerid, COLOR_YELLOW, str);
 
-					}
-
-				    if(Vehicles[Car][Type] == 1)
-				    {
-				        Vehicles[Car][Color1] = option2;
-                        ChangeVehicleColor(Car,Vehicles[Car][Color1],Vehicles[Car][Color2]);
-
-						format(str, sizeof(str), "Resprayed player vehicle(ID: %d) color1(%d).",Car, Vehicles[Car][Color1]);
-						SendClientMessage(playerid, COLOR_YELLOW, str);
-
-						mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE PlayerVehicles SET Color1 = %d WHERE SQLID = %d LIMIT 1",Vehicles[Car][Color1],Vehicles[Car][SQLID]);
-			   			mysql_tquery(SQL_CONNECTION, query);
+   						MYSQL_Update_Interger(Vehicles[vid][SQLID], "PlayerVehicles", "Color1", Vehicles[vid][Color1]);
 					}
 
 
-				    if(Vehicles[Car][Type] == 2)
+				    else if(Vehicles[vid][Type] == 2)
 				    {
-				        Vehicles[Car][Color1] = option2;
-                        ChangeVehicleColor(Car,Vehicles[Car][Color1],Vehicles[Car][Color2]);
+				        Vehicles[vid][Color1] = option2;
+                        ChangeVehicleColor(vid,Vehicles[vid][Color1],Vehicles[vid][Color2]);
 
-						format(str, sizeof(str), "Resprayed server vehicle(ID: %d) color1(%d).",Car, Vehicles[Car][Color1]);
+						format(str, sizeof(str), "Resprayed server vehicle(ID: %d) color1(%d).",vid, Vehicles[vid][Color1]);
 						SendClientMessage(playerid, COLOR_YELLOW, str);
 
-						mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE ServerVehicles SET Color1 = %d WHERE SQLID = %d LIMIT 1",Vehicles[Car][Color1],Vehicles[Car][SQLID]);
-			   			mysql_tquery(SQL_CONNECTION, query);
+   						MYSQL_Update_Interger(Vehicles[vid][SQLID], "ServerVehicles", "Color1", Vehicles[vid][Color1]);
+
 					}
 
-					if(Vehicles[Car][Type] == 3)
+					else if(Vehicles[vid][Type] == 3)
 				    {
-				        Vehicles[Car][Color1] = option2;
-                        ChangeVehicleColor(Car,Vehicles[Car][Color1],Vehicles[Car][Color2]);
+				        Vehicles[vid][Color1] = option2;
+                        ChangeVehicleColor(vid,Vehicles[vid][Color1],Vehicles[vid][Color2]);
 
-						format(str, sizeof(str), "Resprayed server vehicle(ID: %d) color1(%d).",Car, Vehicles[Car][Color1]);
+						format(str, sizeof(str), "Resprayed server vehicle(ID: %d) color1(%d).",vid, Vehicles[vid][Color1]);
 						SendClientMessage(playerid, COLOR_YELLOW, str);
 
-						mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE FactionVehicles SET Color1 = %d WHERE SQLID = %d LIMIT 1",Vehicles[Car][Color1],Vehicles[Car][SQLID]);
-			   			mysql_tquery(SQL_CONNECTION, query);
+   						MYSQL_Update_Interger(Vehicles[vid][SQLID], "FactionVehicles", "Color1", Vehicles[vid][Color1]);
+						
+					}
+
+				    else
+				    {
+				        Vehicles[vid][Color1] = option2;
+                        ChangeVehicleColor(vid,Vehicles[vid][Color1],Vehicles[vid][Color2]);
+
+						format(str, sizeof(str), "Resprayed vehicle(ID: %d) color2(%d).",vid, Vehicles[vid][Color1]);
+						SendClientMessage(playerid, COLOR_YELLOW, str);
+
 					}
 
 			    }
@@ -10415,54 +10405,53 @@ CMD:setvehicle(playerid, params[])
  //				| Option 3 | Color2 |
 				if(!strcmp(option, "color2", true))
 				{
+					
+				 	new str[128];
 
-
-					new Car = GetPlayerVehicleID(playerid);
-				 	new str[128], query[400];
-
-				    if(Vehicles[Car][Type] != 1 && Vehicles[Car][Type] != 2)
+				    if(Vehicles[vid][Type] == 1)
 				    {
-				        Vehicles[Car][Color2] = option2;
-                        ChangeVehicleColor(Car,Vehicles[Car][Color1],Vehicles[Car][Color2]);
+				        Vehicles[vid][Color2] = option2;
+                        ChangeVehicleColor(vid,Vehicles[vid][Color2],Vehicles[vid][Color2]);
 
-						format(str, sizeof(str), "Resprayed vehicle(ID: %d) color2(%d).",Car, Vehicles[Car][Color2]);
+						format(str, sizeof(str), "Resprayed player vehicle(ID: %d) color1(%d).",vid, Vehicles[vid][Color2]);
 						SendClientMessage(playerid, COLOR_YELLOW, str);
+
+   						MYSQL_Update_Interger(Vehicles[vid][SQLID], "PlayerVehicles", "Color2", Vehicles[vid][Color2]);
+					}
+
+
+				    else if(Vehicles[vid][Type] == 2)
+				    {
+				        Vehicles[vid][Color2] = option2;
+                        ChangeVehicleColor(vid,Vehicles[vid][Color2],Vehicles[vid][Color2]);
+
+						format(str, sizeof(str), "Resprayed server vehicle(ID: %d) color1(%d).",vid, Vehicles[vid][Color2]);
+						SendClientMessage(playerid, COLOR_YELLOW, str);
+
+   						MYSQL_Update_Interger(Vehicles[vid][SQLID], "ServerVehicles", "Color2", Vehicles[vid][Color2]);
 
 					}
 
-				    if(Vehicles[Car][Type] == 1)
+					else if(Vehicles[vid][Type] == 3)
 				    {
-				        Vehicles[Car][Color2] = option2;
-                        ChangeVehicleColor(Car,Vehicles[Car][Color1],Vehicles[Car][Color2]);
+				        Vehicles[vid][Color2] = option2;
+                        ChangeVehicleColor(vid,Vehicles[vid][Color2],Vehicles[vid][Color2]);
 
-						format(str, sizeof(str), "Resprayed player vehicle(ID: %d) color2(%d).",Car, Vehicles[Car][Color2]);
+						format(str, sizeof(str), "Resprayed server vehicle(ID: %d) color1(%d).",vid, Vehicles[vid][Color2]);
 						SendClientMessage(playerid, COLOR_YELLOW, str);
 
-						mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE PlayerVehicles SET Color2 = %d WHERE SQLID = %d LIMIT 1",Vehicles[Car][Color2],Vehicles[Car][SQLID]);
-			   			mysql_tquery(SQL_CONNECTION, query);
+   						MYSQL_Update_Interger(Vehicles[vid][SQLID], "FactionVehicles", "Color2", Vehicles[vid][Color2]);
+						
 					}
 
-				    if(Vehicles[Car][Type] == 2)
+				    else
 				    {
-				        Vehicles[Car][Color2] = option2;
-                        ChangeVehicleColor(Car,Vehicles[Car][Color1],Vehicles[Car][Color2]);
+				        Vehicles[vid][Color2] = option2;
+                        ChangeVehicleColor(vid,Vehicles[vid][Color2],Vehicles[vid][Color2]);
 
-						format(str, sizeof(str), "Resprayed server vehicle(ID: %d) color2(%d).",Car, Vehicles[Car][Color2]);
+						format(str, sizeof(str), "Resprayed vehicle(ID: %d) color2(%d).",vid, Vehicles[vid][Color2]);
 						SendClientMessage(playerid, COLOR_YELLOW, str);
 
-						mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE ServerVehicles SET Color2 = %d WHERE SQLID = %d LIMIT 1",Vehicles[Car][Color2],Vehicles[Car][SQLID]);
-			   			mysql_tquery(SQL_CONNECTION, query);
-					}
-				    if(Vehicles[Car][Type] == 3)
-				    {
-				        Vehicles[Car][Color2] = option2;
-                        ChangeVehicleColor(Car,Vehicles[Car][Color1],Vehicles[Car][Color2]);
-
-						format(str, sizeof(str), "Resprayed server vehicle(ID: %d) color2(%d).",Car, Vehicles[Car][Color2]);
-						SendClientMessage(playerid, COLOR_YELLOW, str);
-
-						mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE FactionVehicles SET Color2 = %d WHERE SQLID = %d LIMIT 1",Vehicles[Car][Color2],Vehicles[Car][SQLID]);
-			   			mysql_tquery(SQL_CONNECTION, query);
 					}
 				}
 
@@ -10472,45 +10461,44 @@ CMD:setvehicle(playerid, params[])
 					if(MasterAccount[playerid][Admin])
 					{
 						if(!(399 < option2 < 612)) return SendClientMessage(playerid, COLOR_YELLOW, "ERROR: That ID is not a valid car id!");
-						new Car = GetPlayerVehicleID(playerid);
-					 	new str[128], query[400], NewModel;
+						
+					 	new str[128], NewModel;
 
-					    if(Vehicles[Car][Type] == 1)
+					    if(Vehicles[vid][Type] == 1)
 					    {
-	                        Vehicles[Car][Model] = option2;
-				     		GetVehiclePos(Car, Vehicles[Car][PosX],Vehicles[Car][PosY],Vehicles[Car][PosZ]);
-				      		GetVehicleZAngle(Car, Vehicles[Car][PosA]);
+	                        Vehicles[vid][Model] = option2;
+				     		GetVehiclePos(vid, Vehicles[vid][PosX],Vehicles[vid][PosY],Vehicles[vid][PosZ]);
+				      		GetVehicleZAngle(vid, Vehicles[vid][PosA]);
 
 							RemovePlayerFromVehicle(playerid);
-							DestroyVehicle(Car);
+							DestroyVehicle(vid);
 
-							NewModel = CreateVehicle(Vehicles[Car][Model],Vehicles[Car][PosX],Vehicles[Car][PosY],Vehicles[Car][PosZ],Vehicles[Car][PosA],Vehicles[Car][Color1],Vehicles[Car][Color2], 3600);
+							NewModel = CreateVehicle(Vehicles[vid][Model],Vehicles[vid][PosX],Vehicles[vid][PosY],Vehicles[vid][PosZ],Vehicles[vid][PosA],Vehicles[vid][Color1],Vehicles[vid][Color2], 3600);
 							PutPlayerInVehicle(playerid, NewModel, 0);
 
-							format(str, sizeof(str), "You have changed player vehicle(ID: %d) to vehicle (%d)",Car, Vehicles[Car][Model]);
+							format(str, sizeof(str), "You have changed player vehicle(ID: %d) to vehicle (%d)",vid, Vehicles[vid][Model]);
 							SendClientMessage(playerid, COLOR_YELLOW, str);
 
-							mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE PlayerVehicles SET Model = %d WHERE SQLID = %d LIMIT 1",Vehicles[Car][Model],Vehicles[Car][SQLID]);
-				   			mysql_tquery(SQL_CONNECTION, query);
+				   			MYSQL_Update_Interger(Vehicles[vid][SQLID], "PlayerVehicles", "Model", Vehicles[vid][Model]);
 						}
 
-					    if(Vehicles[Car][Type] == 2)
+					    if(Vehicles[vid][Type] == 2)
 					    {
-	                        Vehicles[Car][Model] = option2;
-				     		GetVehiclePos(Car, Vehicles[Car][PosX],Vehicles[Car][PosY],Vehicles[Car][PosZ]);
-				      		GetVehicleZAngle(Car, Vehicles[Car][PosA]);
+	                        Vehicles[vid][Model] = option2;
+				     		GetVehiclePos(vid, Vehicles[vid][PosX],Vehicles[vid][PosY],Vehicles[vid][PosZ]);
+				      		GetVehicleZAngle(vid, Vehicles[vid][PosA]);
 
 							RemovePlayerFromVehicle(playerid);
-							DestroyVehicle(Car);
+							DestroyVehicle(vid);
 
-							NewModel = CreateVehicle(Vehicles[Car][Model],Vehicles[Car][PosX],Vehicles[Car][PosY],Vehicles[Car][PosZ],Vehicles[Car][PosA],Vehicles[Car][Color1],Vehicles[Car][Color2], 3600);
+							NewModel = CreateVehicle(Vehicles[vid][Model],Vehicles[vid][PosX],Vehicles[vid][PosY],Vehicles[vid][PosZ],Vehicles[vid][PosA],Vehicles[vid][Color1],Vehicles[vid][Color2], 3600);
 							PutPlayerInVehicle(playerid, NewModel, 0);
 
-							format(str, sizeof(str), "You have changed server vehicle(ID: %d) to vehicle (%d)",Car, Vehicles[Car][Model]);
+							format(str, sizeof(str), "You have changed server vehicle(ID: %d) to vehicle (%d)",vid, Vehicles[vid][Model]);
 							SendClientMessage(playerid, COLOR_YELLOW, str);
 
-							mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE ServerVehicles SET Model = %d WHERE SQLID = %d LIMIT 1",Vehicles[Car][Model],Vehicles[Car][SQLID]);
-				   			mysql_tquery(SQL_CONNECTION, query);
+				   			MYSQL_Update_Interger(Vehicles[vid][SQLID], "ServerVehicles", "Model", Vehicles[vid][Model]);
+
 						}
 					}
 					else SendErrorMessage(playerid, ERROR_ADMIN);
@@ -10543,10 +10531,9 @@ CMD:spray(playerid, params[])
 		{
 			if(IsPlayerInAnyVehicle(playerid))
 			{
+				new vid = GetPlayerVehicleID(playerid), str[128];
 				if(!strcmp(option, "1", true))
 				{
-					new vid = GetPlayerVehicleID(playerid);
-				 	new str[128], query[400];
 					if(option2 < 256 && option2 > -1)
 					{
 					    if(Vehicles[vid][Type] != 1 && Vehicles[vid][Type] != 2)
@@ -10567,18 +10554,14 @@ CMD:spray(playerid, params[])
 							format(str, sizeof(str), "Resprayed player vehicle(ID: %d) color1(%d).",vid, Vehicles[vid][Color1]);
 							SendClientMessage(playerid, COLOR_YELLOW, str);
 
-							mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE PlayerVehicles SET Color1 = %d WHERE SQLID = %d LIMIT 1",Vehicles[vid][Color1],Vehicles[vid][SQLID]);
-				   			mysql_tquery(SQL_CONNECTION, query);
+   							MYSQL_Update_Interger(Vehicles[vid][SQLID], "PlayerVehicles", "Color1", Vehicles[vid][Color1]);
+
 						}
 					}
 			    }
 
 				if(!strcmp(option, "2", true))
 				{
-
-
-					new vid = GetPlayerVehicleID(playerid);
-				 	new str[128], query[400];
 
 				    if(IsAdminSpawnedVehicle(vid))
 				    {
@@ -10598,8 +10581,8 @@ CMD:spray(playerid, params[])
 						format(str, sizeof(str), "Resprayed player vehicle(ID: %d) color2(%d).",vid, Vehicles[vid][Color2]);
 						SendClientMessage(playerid, COLOR_YELLOW, str);
 
-						mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE PlayerVehicles SET Color2 = %d WHERE SQLID = %d LIMIT 1",Vehicles[vid][Color2],Vehicles[vid][SQLID]);
-			   			mysql_tquery(SQL_CONNECTION, query);
+   						MYSQL_Update_Interger(Vehicles[vid][SQLID], "PlayerVehicles", "Color2", Vehicles[vid][Color2]);
+						
 					}
 				}
 		 	}
@@ -12142,11 +12125,12 @@ Dialog:REG1(playerid, response, listitem, inputtext[])
     {
 		if(strval(inputtext) > 15 && strval(inputtext) < 99)
 		{
-			new query[120],str[64];
+			new str[64];
 	        TogglePlayerSpectating(playerid, 0);
-	        mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET Age = %d, Tutorial = 2 WHERE SQLID = %d LIMIT 1",strval(inputtext), PlayerInfo[playerid][SQLID]);
-	        mysql_tquery(SQL_CONNECTION, query);
 	        
+	        MYSQL_Update_Account(playerid, "Age", strval(inputtext));
+	        MYSQL_Update_Account(playerid, "Tutorial", 2);
+
 	        PlayerInfo[playerid][Tutorial] = 2;
 	        PlayerInfo[playerid][Age] = strval(inputtext);
 	        
@@ -12390,12 +12374,11 @@ stock GetFullRankList(faccid)
 Dialog:EditMaxRank(playerid, response, listitem, inputtext[])
 {
 	if(!response) return SendErrorMessage(playerid, ERROR_DIALOG);
-	new str[128], query[200];
+	new str[128];
 	Factions[facid[playerid]][MaxRank] = listitem + 1;
 	format(str, sizeof(str), "The max rank has sucessfully been changed to %s.", GetRankNameFromID(facid[playerid], listitem + 1));
 	SendClientMessage(playerid, COLOR_GREEN, str);
-	mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Factions SET MaxRank = %d WHERE SQLID = %d LIMIT 1", Factions[facid[playerid]][MaxRank], Factions[facid[playerid]][SQLID]);
-	mysql_tquery(SQL_CONNECTION, query);
+	MYSQL_Update_Interger(Factions[facid[playerid]][SQLID], "Factions", "MaxRank", Factions[facid[playerid]][MaxRank]);
 
 	return 1;
 }
@@ -12405,13 +12388,11 @@ Dialog:EditMaxRank(playerid, response, listitem, inputtext[])
 Dialog:EditCommandRank(playerid, response, listitem, inputtext[])
 {
 	if(!response) return SendErrorMessage(playerid, ERROR_DIALOG);
-	new str[128], query[200];
+	new str[128];
 	Factions[facid[playerid]][CommandRank] = listitem + 1;
 	format(str, sizeof(str), "The command rank has sucessfully been changed to %s.", GetRankNameFromID(facid[playerid], listitem + 1));
 	SendClientMessage(playerid, COLOR_GREEN, str);
-	mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Factions SET CommandRank = %d WHERE SQLID = %d LIMIT 1", Factions[facid[playerid]][CommandRank], Factions[facid[playerid]][SQLID]);
-	mysql_tquery(SQL_CONNECTION, query);
-
+	MYSQL_Update_Interger(Factions[facid[playerid]][SQLID], "Factions", "CommandRank", Factions[facid[playerid]][CommandRank]);
 	return 1;
 }
 
@@ -12464,11 +12445,12 @@ Dialog:FNAME(playerid, response, listitem, inputtext[])
     if(response)
     {
 		format(Factions[facid[playerid]][Name], 64, "%s", inputtext);
-		new str[128], query[400];
+		new str[128];
 		format(str, sizeof(str), "Faction(ID%d) name has been changed to %s.", facid[playerid], Factions[facid[playerid]][Name]);
 		SendAdminsMessage(1, COLOR_YELLOW, str);
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Factions SET Name = '%e' WHERE SQLID = %d LIMIT 1", Factions[facid[playerid]][Name], Factions[facid[playerid]][SQLID]);
-		mysql_tquery(SQL_CONNECTION, query);
+		MYSQL_Update_String(Factions[facid[playerid]][SQLID], "Factions", "Name", Factions[facid[playerid]][Name]);
+
+
 	}
     return 1;
 }
@@ -12476,13 +12458,12 @@ Dialog:FNAME(playerid, response, listitem, inputtext[])
 Dialog:FTYPE(playerid, response, listitem, inputtext[])
 {
 	if(!response) return SendErrorMessage(playerid, ERROR_DIALOG);
-	new str[128], query[400], fType = listitem;
+	new str[128], fType = listitem;
 
 	Factions[facid[playerid]][Type] = fType;
 	format(str, sizeof(str), "Faction(ID%d) has been changed to type %s.", facid[playerid], FactionTypeName[Factions[facid[playerid]][Type]][0]);
 	SendAdminsMessage(1, COLOR_YELLOW, str);
-	mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Factions SET Type = %d WHERE SQLID = %d LIMIT 1", Factions[facid[playerid]][Type], Factions[facid[playerid]][SQLID]);
-	mysql_tquery(SQL_CONNECTION, query);
+	MYSQL_Update_Interger(Factions[facid[playerid]][SQLID], "Factions", "Type", Factions[facid[playerid]][Type]);
 
     return 1;
 }
@@ -12539,11 +12520,11 @@ Dialog:RANK_SET(playerid, response, listitem, inputtext[])
 {
 	if(response)
     {
-		new query[400], str[8], str2[128];
+		new str[8], str2[128];
 		format(str, sizeof(str), "Rank%d", PlayerInfo[playerid][NewID]);
 
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Factions SET %e = '%e' WHERE SQLID = %d LIMIT 1", str, inputtext, Factions[facid[playerid]][SQLID]);
-		mysql_tquery(SQL_CONNECTION, query);
+		MYSQL_Update_String(Factions[facid[playerid]][SQLID], "Factions", str, inputtext);
+
 		format(str2, sizeof(str2), "You have successfully updated Rank %d to %s", PlayerInfo[playerid][NewID], inputtext);
 		SendClientMessage(playerid, COLOR_LBLUE, str2);
 		//format(Faction[facid[playerid]][Rank1], 32, "%s", inputtext);
@@ -12846,12 +12827,12 @@ Dialog:CREATEBUSINESS2(playerid, response, listitem, inputtext[])
 	if(!response) return SendErrorMessage(playerid, ERROR_DIALOG);
     if(response)
     {
-        new query[400];
+
         if(strval(inputtext) > 0 && strval(inputtext) < 5000000)
         {
 			Biz[Create_New_Biz_ID[playerid]][Price] = strval(inputtext);
-			mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Price = %d WHERE SQLID = %d LIMIT 1", Biz[Create_New_Biz_ID[playerid]][Price], Create_New_Biz_ID[playerid]);
-			mysql_tquery(SQL_CONNECTION, query);
+
+			MYSQL_Update_Interger(Create_New_Biz_ID[playerid], "Biz", "Price", Biz[Create_New_Biz_ID[playerid]][Price]);
 
 			new str[128];
 			format(str, sizeof(str), "Price set at: $%d", Biz[Create_New_Biz_ID[playerid]][Price]);
@@ -12873,10 +12854,9 @@ Dialog:CREATEBUSINESS4(playerid, response, listitem, inputtext[])
 	if(!response) return SendErrorMessage(playerid, ERROR_DIALOG);
     if(response)
     {
-        new query[400];
 		Biz[Create_New_Biz_ID[playerid]][Payout] = strval(inputtext);
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Payout = %d WHERE SQLID = %d LIMIT 1", Biz[Create_New_Biz_ID[playerid]][Payout], Create_New_Biz_ID[playerid]);
-		mysql_tquery(SQL_CONNECTION, query);
+		MYSQL_Update_Interger(Create_New_Biz_ID[playerid], "Biz", "Payout", Biz[Create_New_Biz_ID[playerid]][Payout]);
+
 
 		new str[128];
 		format(str, sizeof(str), "Payout set at: $%d", Biz[Create_New_Biz_ID[playerid]][Payout]);
@@ -12937,11 +12917,12 @@ Dialog:ChangeBizName(playerid, response, listitem, inputtext[])
     if(response)
     {
 		format(Biz[bizzid[playerid]][Name], 64, "%s", inputtext);
-		new str[128], query[400];
+		new str[128];
 		format(str, sizeof(str), "You have set business %d's name to %s.", bizzid[playerid], Biz[bizzid[playerid]][Name]);
 		SendClientMessage(playerid, COLOR_YELLOW, str);
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Name = '%e' WHERE SQLID = %d LIMIT 1", Biz[bizzid[playerid]][Name], Biz[bizzid[playerid]][SQLID]);
-		mysql_tquery(SQL_CONNECTION, query);
+
+		MYSQL_Update_String(Biz[bizzid[playerid]][SQLID], "Biz", "Name", Biz[bizzid[playerid]][Name]);
+
 		ReloadBusiness(bizzid[playerid]);
 	}
     return 1;
@@ -12953,11 +12934,11 @@ Dialog:ChangeHouseName(playerid, response, listitem, inputtext[])
     if(response)
     {
 		format(Houses[houseid[playerid]][Name], 64, "%s", inputtext);
-		new str[128], query[400];
+		new str[128];
 		format(str, sizeof(str), "You have set house %d's name to %s.", houseid[playerid], Houses[houseid[playerid]][Name]);
 		SendClientMessage(playerid, COLOR_YELLOW, str);
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Houses SET Name = '%e' WHERE SQLID = %d LIMIT 1", Houses[houseid[playerid]][Name], Houses[houseid[playerid]][SQLID]);
-		mysql_tquery(SQL_CONNECTION, query);
+		MYSQL_Update_String(Houses[houseid[playerid]][SQLID], "Houses", "Name", Houses[houseid[playerid]][Name]);
+
 		ReloadHouse(houseid[playerid]);
 	}
     return 1;
@@ -13366,10 +13347,7 @@ public OnWorldFreeIdCheck(hID, id)
 	}
 	else
 	{
-		new query[200];
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Houses SET World = %d WHERE SQLID = %d LIMIT 1", Houses[hID][World], Houses[hID][SQLID]);
-		mysql_tquery(SQL_CONNECTION, query);
-		print(query);
+		MYSQL_Update_Interger(Houses[hID][SQLID], "Houses", "World", Houses[hID][World]);
 		return 1;
 
 	}
@@ -14037,9 +14015,7 @@ Dialog:IconType(playerid, response, listitem, inputtext[])
 
 stock Icon_Set_Type(type)
 {
-	new query[64];
-	mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Icons SET Type = %d WHERE SQLID = %d LIMIT 1", type, Icons[IconID][SQLID]);
-	mysql_tquery(SQL_CONNECTION, query);
+	MYSQL_Update_Interger(Icons[IconID][SQLID], "Icons", "Type", type);
 	ReloadIcon(IconID);
 	return 1;
 }
@@ -14056,9 +14032,7 @@ Dialog:IconText(playerid, response, listitem, inputtext[])
 
 stock Icon_Set_Text(txt[])
 {
-	new query[128];
-	mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Icons SET Name = '%e' WHERE SQLID = %d LIMIT 1", txt, Icons[IconID][SQLID]);
-	mysql_tquery(SQL_CONNECTION, query);
+	MYSQL_Update_String(Icons[IconID][SQLID], "Icons", "Name", txt);
 	ReloadIcon(IconID);
 	return 1;
 }
@@ -14067,7 +14041,7 @@ Dialog:IconChange(playerid, response, listitem, inputtext[])
 {
     if(!response) return SendErrorMessage(playerid, ERROR_DIALOG);
 
- 	new modelid[6], query[128];
+ 	new modelid[6];
     strmid(modelid, inputtext, strfind(inputtext, "(") + 1,  strfind(inputtext, ")"));
 
     if(listitem == 0)
@@ -14075,9 +14049,7 @@ Dialog:IconChange(playerid, response, listitem, inputtext[])
 		Icon_Change(playerid);
 		return 1;
 	}
-
-	mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Icons SET Icon = %d WHERE SQLID = %d LIMIT 1", strval(modelid), Icons[IconID][SQLID]);
-	mysql_tquery(SQL_CONNECTION, query);
+	MYSQL_Update_Interger(Icons[IconID][SQLID], "Icons", "Icon", strval(modelid));
 	ReloadIcon(IconID);
     return 1;
 }
