@@ -1948,11 +1948,11 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 			format(str, sizeof(str), "Faction Vehicle:\t | \t %s \t | \tRank: %d", Factions[GetFactionIDFromSQLID(Vehicles[vid][Faction])][Name], Vehicles[vid][Rank]);
 			SendClientMessage(playerid, COLOR_GRAY, str);
 		}
-		if(Vehicles[vid][Type] == 4)
+		else if(Vehicles[vid][Type] == 4)
 		{
 			SendClientMessage(playerid, COLOR_GRAY, "| Department of Motor Vehicles | Instruction Vehicle |");
 		}
-		if(Vehicles[vid][Type] == 5)
+		else if(Vehicles[vid][Type] == 5)
 		{
 			if(Trucking[playerid][TimeTaken] == 0)
 			{
@@ -1963,6 +1963,10 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 			{
 				SendClientMessage(playerid, COLOR_GRAY, "| National Trucking Co. | You are currently doing a trucking mission, please proceed to the way-point. |");
 			}
+		}
+		else if(Vehicles[vid][Type] == 6)
+		{
+			SendClientMessage(playerid, COLOR_GRAY, "This vehicle can be hotwired (/hotwire), if you have the correct tools.");
 		}
 		SetPlayerArmedWeapon(playerid,0);
 	}
@@ -2330,6 +2334,14 @@ stock SendErrorMessage(playerid, str[])
     new astr[128];
 	format(astr, sizeof(astr), "> [ERROR] %s", str);
     SendClientMessage(playerid, COLOR_GRAY, astr);
+    return 1;
+}
+
+stock SendInfoMessage(playerid, str[])
+{
+    new astr[128];
+	format(astr, sizeof(astr), "[INFO] %s", str);
+    SendClientMessage(playerid, COLOR_LBLUE, astr);
     return 1;
 }
 
@@ -5734,7 +5746,7 @@ CMD:inventory(playerid, params[])
 	new str[128], dialog[1000];
 	if(Inventory[playerid][PhoneStatus] > 0)
 	{
-		format(str, sizeof(str), "Mobile Phone (%d)\n", Inventory[playerid][PhoneStatus]);
+		format(str, sizeof(str), "Mobile Phone (Status:%d)\n", Inventory[playerid][PhoneStatus]);
 		strcat(dialog, str, sizeof(dialog));
 	}
 	if(Inventory[playerid][VehicleRadio] > 0)
@@ -5770,7 +5782,7 @@ public GiveInventoryItem(playerid, item, quantity)
 			Inventory[playerid][PhoneStatus] = 1;
 			mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET PhoneStatus = %d, PhoneNumber = %d WHERE SQLID = %i LIMIT 1", Inventory[playerid][PhoneStatus], Inventory[playerid][PhoneNumber], PlayerInfo[playerid][SQLID]);
 			mysql_tquery(SQL_CONNECTION, query);
-			SendClientMessage(playerid, COLOR_LIGHTGRAY, "[Item] A phone has been added to your inventory.");
+			SendInfoMessage(playerid, "A phone has been added to your inventory.");
 			return 1;
 		}
 		else
@@ -5784,8 +5796,8 @@ public GiveInventoryItem(playerid, item, quantity)
 		if(Inventory[playerid][VehicleRadio] >= 99) return SendErrorMessage(playerid, "You cannot buy anymore of this item.");
 		Inventory[playerid][VehicleRadio] += quantity;
 		MYSQL_Update_Account(playerid, "VehicleRadio", Inventory[playerid][VehicleRadio]);
-		format(str, sizeof(str), "[Item] You have had %d (vehicle) sound system(s) added to your inventory, you now have a total of %d on you.", quantity, Inventory[playerid][VehicleRadio]);
-		SendClientMessage(playerid, COLOR_LIGHTGRAY, str);
+		format(str, sizeof(str), "You have had %d (vehicle) sound system(s) added to your inventory, you now have a total of %d on you.", quantity, Inventory[playerid][VehicleRadio]);
+		SendInfoMessage(playerid, str);
 		return 1;
 	}
 
@@ -5795,17 +5807,17 @@ public GiveInventoryItem(playerid, item, quantity)
 		Inventory[playerid][Radio] += quantity;
 		Inventory[playerid][RadioFreq] = 1000;
 		MYSQL_Update_Account(playerid, "Radio", Inventory[playerid][Radio]);
-		format(str, sizeof(str), "[Item] %d radio has been added to your inventory and tuned to 1000 MHz, for more help refer to /rhelp.", quantity);
-		SendClientMessage(playerid, COLOR_LIGHTGRAY, str);
+		format(str, sizeof(str), "%d radio has been added to your inventory and tuned to 1000 MHz, for more help refer to /rhelp.", quantity);
+		SendInfoMessage(playerid, str);
 		return 1;
 
 	}
 	else if(item == SCREWDRIVER)
 	{
-		if(Inventory[playerid][Screwdriver] >= 5) return SendErrorMessage(playerid, "You cannot buy anymore of this item.");
+		if(Inventory[playerid][Screwdriver] >= 10) return SendErrorMessage(playerid, "You cannot buy anymore of this item.");
 		Inventory[playerid][Screwdriver] += quantity;
 		MYSQL_Update_Account(playerid, "Screwdriver", Inventory[playerid][Screwdriver]);
-		format(str, sizeof(str), "[Item] %d screwdriver(s) has been added to your inventory.", quantity);
+		format(str, sizeof(str), "%d screwdriver has been added to your inventory.", quantity);
 		SendClientMessage(playerid, COLOR_LIGHTGRAY, str);
 		return 1;
 
@@ -5857,11 +5869,22 @@ public TakeInventoryItem(playerid, item, quantity)
 
 	if(item == VRADIO)
 	{
-		if(Inventory[playerid][VehicleRadio] <= 0) return SendErrorMessage(playerid, "Item cannot be taken.");
+		if(Inventory[playerid][VehicleRadio] <= 0) return SendErrorMessage(playerid, "Item couldn't be taken.");
 		Inventory[playerid][VehicleRadio] -= quantity;
 		MYSQL_Update_Account(playerid, "VehicleRadio", Inventory[playerid][VehicleRadio]);
 
-		format(str, sizeof(str), "[Item] You have had %d (vehicle) sound system(s) taken from your inventory, you now have a total of %d on you.", quantity, Inventory[playerid][VehicleRadio]);
+		format(str, sizeof(str), "[INFO] You have had %d (vehicle) sound system(s) taken from your inventory, you now have a total of %d on you.", quantity, Inventory[playerid][VehicleRadio]);
+		SendClientMessage(playerid, COLOR_LIGHTGRAY, str);
+		return 1;
+
+	}
+	else if(item == SCREWDRIVER)
+	{
+		if(Inventory[playerid][Screwdriver] <= 0) return SendErrorMessage(playerid, "Item couldn't be taken.");
+		Inventory[playerid][Screwdriver] -= quantity;
+		MYSQL_Update_Account(playerid, "Screwdriver", Inventory[playerid][Screwdriver]);
+
+		format(str, sizeof(str), "[INFO] %d screwdriver has been taken from your inventory, you have %d left.", quantity, Inventory[playerid][Screwdriver]);
 		SendClientMessage(playerid, COLOR_LIGHTGRAY, str);
 		return 1;
 
@@ -6333,7 +6356,7 @@ CMD:pm(playerid, params[])
 
 CMD:buyhouse(playerid, params[])
 {
-	new str[128], query[400], option[12], id = InRangeOfHouse(playerid);
+	new str[128], option[12], id = InRangeOfHouse(playerid);
 
 	if(id == 0) 										return SendErrorMessage(playerid, ERROR_LOCATION);
     if(Houses[id][Owner] != 0) 							return SendErrorMessage(playerid, ERROR_OWNER);
@@ -6351,8 +6374,7 @@ CMD:buyhouse(playerid, params[])
 			PlayerInfo[playerid][House] = id;
             Houses[id][Owner] = PlayerInfo[playerid][SQLID];
 
-			mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `Houses` SET Owner = %d WHERE SQLID = %d LIMIT 1",  Houses[id][Owner],Houses[id][SQLID]);
-			mysql_tquery(SQL_CONNECTION, query);
+			MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Owner", Houses[id][Owner]);
 
 			ReloadHouse(id);
 		}
@@ -6369,7 +6391,7 @@ CMD:buyhouse(playerid, params[])
 
 CMD:sellhouse(playerid, params[])
 {
-	new str[128], query[400], id = InRangeOfHouse(playerid);
+	new str[128], id = InRangeOfHouse(playerid);
 	if(id == 0) return SendErrorMessage(playerid, ERROR_LOCATION);
 
     if(Houses[id][Owner] > 0)
@@ -6387,8 +6409,8 @@ CMD:sellhouse(playerid, params[])
 					PlayerInfo[playerid][House] = 0;
 					Houses[id][Owner] = 0;
 
-					mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `Houses` SET Owner = 0 WHERE SQLID = %d LIMIT 1",Houses[id][SQLID]);
-					mysql_tquery(SQL_CONNECTION, query);
+					MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Owner", 0);
+
 			        ReloadHouse(id);
 		        }
 
@@ -6660,6 +6682,15 @@ stock IsPlayerVehicle(vid)
 
 }
 
+stock IsServerVehicle(vid)
+{
+	if(Vehicles[vid][Type] == 2 || Vehicles[vid][Type] == 4 || Vehicles[vid][Type] == 5 || Vehicles[vid][Type] == 6)
+	{
+		return 1;
+	}
+	return 0;
+}
+
 stock IsPlayerVehicleOwner(playerid, vid)
 {
 	if(IsPlayerVehicle(vid) && Vehicles[vid][Owner] == PlayerInfo[playerid][SQLID])
@@ -6682,6 +6713,87 @@ CanDriveVehicle(playerid, vid)
 	}
 	return 0;
 
+}
+
+CanHotwireVehicle(vid)
+{
+	if(IsAdminSpawnedVehicle(vid) || IsPlayerVehicle(vid) && Vehicles[vid][Locked] == 0  || Vehicles[vid][Type] == 6)
+	{
+		if(Engine[vid] != 1)
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
+CMD:hotwire(playerid)
+{
+	new State = GetPlayerState(playerid), vid = GetPlayerVehicleID(playerid);
+
+	if(IsPlayerInAnyVehicle(playerid))
+	{
+		if(State == PLAYER_STATE_DRIVER)
+		{
+			if(CanHotwireVehicle(vid))
+			{
+				if(Inventory[playerid][Screwdriver] > 0)
+				{
+					TakeInventoryItem(playerid, SCREWDRIVER, 1);
+					Hotwire_Stage1(playerid, vid);
+				}
+				else SendErrorMessage(playerid, "You do not have the equipment required to hotwire this vehicle.");
+			}
+			else SendErrorMessage(playerid, "This vehicle cannot be hotwired.");
+		}
+		else SendErrorMessage(playerid, "You need to be in the driver's seat in order to hotwire the vehicle.");
+	}
+	else SendErrorMessage(playerid, "You are not in a vehicle.");
+	return 1;
+}
+
+Hotwire_Stage1(playerid, vid)
+{
+	new str[128];
+   	format(str, sizeof(str), "* %s reaches under the dashboard, ripping away the plastic cover revealing some exposed wiring. *", GetRoleplayName(playerid));
+	SendLocalMessage(playerid, str, Range_Normal, COLOR_RP, COLOR_RP);
+	SetTimerEx("Hotwire_Stage2", 2000, false, "dd", playerid, vid);
+	return 1;
+}
+
+forward Hotwire_Stage2(playerid, vid);
+public Hotwire_Stage2(playerid, vid)
+{
+	new str[128];
+   	format(str, sizeof(str), "* %s uses their screwdriver to pry open the plastic coating of the wires before attempting the hotwire... *", GetRoleplayName(playerid));
+	SendLocalMessage(playerid, str, Range_Normal, COLOR_RP, COLOR_RP);
+	SetTimerEx("Hotwire_Stage3", 2000, false, "dd", playerid, vid);
+	return 1;
+}
+
+forward Hotwire_Stage3(playerid, vid);
+public Hotwire_Stage3(playerid, vid)
+{
+	new str[128], rand = random(10);
+   	format(str, sizeof(str), "* %s touches two wires together in an attempt to start the engine... *", GetRoleplayName(playerid));
+	SendLocalMessage(playerid, str, Range_Normal, COLOR_RP, COLOR_RP);
+	if(rand > 5)
+	{
+		SetTimerEx("Hotwire_Stage4", 2000, false, "dd", playerid, vid);
+	}
+	else SetTimerEx("Hotwire_Stage3", 2000, false, "dd", playerid, vid);
+	return 1;
+}
+
+forward Hotwire_Stage4(playerid, vid);
+public Hotwire_Stage4(playerid, vid)
+{
+	new str[128];
+   	format(str, sizeof(str), "* At last the engine roars into life. *", GetRoleplayName(playerid));
+	SendLocalMessage(playerid, str, Range_Normal, COLOR_RP, COLOR_RP);
+	SendClientMessage(playerid, COLOR_WHITE, "Vehicle hotwired.");
+	Engine_SET(playerid, vid, 1);
+	return 1;
 }
 
 CMD:engine(playerid,params[])
@@ -6870,7 +6982,7 @@ public ReduceFuel(vehicleid)
 			Vehicles[vehicleid][Fuel] --;
 			//printf("To: %d", Vehicles[vehicleid][Fuel]);
 			//printf("Timer: %d", Vehicles[vehicleid][FuelTimer]);
-			if(Vehicles[vehicleid][Type] == 2 || Vehicles[vehicleid][Type] == 4 || Vehicles[vehicleid][Type] == 5)
+			if(Vehicles[vehicleid][Type] == 2 || Vehicles[vehicleid][Type] == 4 || Vehicles[vehicleid][Type] == 5 || Vehicles[vehicleid][Type] == 6)
 			{
 				MYSQL_Update_Interger(Vehicles[vehicleid][SQLID], "ServerVehicles", "Fuel", Vehicles[vehicleid][Fuel]);
 			}
@@ -6909,22 +7021,19 @@ CMD:setfuel(playerid,params[])
 				{
 				    if(State == PLAYER_STATE_DRIVER)
 				    {
-					    new query[128];
 						Vehicles[vehicleid][Fuel] = option;
-						if(Vehicles[vehicleid][Type] == 2 || Vehicles[vehicleid][Type] == 4 || Vehicles[vehicleid][Type] == 5)
+						if(Vehicles[vehicleid][Type] == 2 || Vehicles[vehicleid][Type] == 4 || Vehicles[vehicleid][Type] == 5 || Vehicles[vehicleid][Type] == 6)
 						{
-							mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE ServerVehicles SET Fuel = %d WHERE SQLID = %d LIMIT 1", Vehicles[vehicleid][Fuel], Vehicles[vehicleid][SQLID]);
-							mysql_tquery(SQL_CONNECTION, query);
+							MYSQL_Update_Interger(Vehicles[vehicleid][SQLID], "ServerVehicles", "Fuel", Vehicles[vehicleid][Fuel]);
+
 						}
 						if(Vehicles[vehicleid][Type] == 1)
 						{
-							mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE PlayerVehicles SET Fuel = %d WHERE SQLID = %d LIMIT 1", Vehicles[vehicleid][Fuel], Vehicles[vehicleid][SQLID]);
-							mysql_tquery(SQL_CONNECTION, query);
+							MYSQL_Update_Interger(Vehicles[vehicleid][SQLID], "PlayerVehicles", "Fuel", Vehicles[vehicleid][Fuel]);
 						}
 						if(Vehicles[vehicleid][Type] == 3)
 						{
-							mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE FactionVehicles SET Fuel = %d WHERE SQLID = %d LIMIT 1", Vehicles[vehicleid][Fuel], Vehicles[vehicleid][SQLID]);
-							mysql_tquery(SQL_CONNECTION, query);
+							MYSQL_Update_Interger(Vehicles[vehicleid][SQLID], "FactionVehicles", "Fuel", Vehicles[vehicleid][Fuel]);
 						}
 
 				    }
@@ -8774,9 +8883,21 @@ CMD:give(playerid, params[])
 				return 1;
 			}
 
-			if(!strcmp(item, "Weapon", true))
+			else if(!strcmp(item, "Weapon", true))
 			{
 
+			}
+
+			else if(!strcmp(item, "Screwdriver", true))
+			{
+				if(Inventory[playerid][Screwdriver] >= amount)
+				{
+					TakeInventoryItem(playerid, SCREWDRIVER, amount);
+					GiveInventoryItem(player, SCREWDRIVER, amount);
+
+				}
+				else SendErrorMessage(playerid, "You don't have this item.");
+				return 1;
 			}
 		}
 		else SendErrorMessage(playerid, "You are too far away from this player.");
@@ -9977,7 +10098,7 @@ CMD:createservervehicle(playerid, params[])
 		Vehicles[Vehicle][PosA] = pos[3];
 		Vehicles[Vehicle][Fuel] = 100;
 
-		if(type == 2 || type == 4 || type == 5)
+		if(type >= 2 && type <= 6)
 		{
 			Vehicles[Vehicle][Type] = type;
 		}
@@ -10308,7 +10429,7 @@ CMD:setvehicle(playerid, params[])
 				{
 					new vID = GetPlayerVehicleID(playerid), str[128], query[400];
 
-				    if(Vehicles[vID][Type] == 2 || Vehicles[vID][Type] == 4 || Vehicles[vID][Type] == 5)
+				    if(IsServerVehicle(vID))
 				    {
 
 			     		GetVehiclePos(vID, Vehicles[vID][PosX],Vehicles[vID][PosY],Vehicles[vID][PosZ]);
@@ -10366,7 +10487,7 @@ CMD:setvehicle(playerid, params[])
 					}
 
 
-				    else if(Vehicles[vid][Type] == 2)
+				    else if(IsServerVehicle(vid))
 				    {
 				        Vehicles[vid][Color1] = option2;
                         ChangeVehicleColor(vid,Vehicles[vid][Color1],Vehicles[vid][Color2]);
@@ -10420,7 +10541,7 @@ CMD:setvehicle(playerid, params[])
 					}
 
 
-				    else if(Vehicles[vid][Type] == 2)
+				    else if(IsServerVehicle(vid))
 				    {
 				        Vehicles[vid][Color2] = option2;
                         ChangeVehicleColor(vid,Vehicles[vid][Color2],Vehicles[vid][Color2]);
@@ -10482,7 +10603,7 @@ CMD:setvehicle(playerid, params[])
 				   			MYSQL_Update_Interger(Vehicles[vid][SQLID], "PlayerVehicles", "Model", Vehicles[vid][Model]);
 						}
 
-					    if(Vehicles[vid][Type] == 2)
+					    if(IsServerVehicle(vid))
 					    {
 	                        Vehicles[vid][Model] = option2;
 				     		GetVehiclePos(vid, Vehicles[vid][PosX],Vehicles[vid][PosY],Vehicles[vid][PosZ]);
@@ -11364,15 +11485,15 @@ Dialog:PNC_Main(playerid, response, listitem, inputtext[])
 	else if(listitem == 1) return PoliceNC_VehicleSearch(playerid);
 	else if(listitem == 3)
 	{
-		mysql_tquery(SQL_CONNECTION, "SELECT ID, Time, OfficerName, OfficerRank, Reason, Value, PlayerName FROM `PoliceNationalComputer` WHERE Type = 4 AND Value = 1 ORDER BY ID ASC", "ViewActiveWarrants", "d", playerid);	
+		mysql_tquery(SQL_CONNECTION, "SELECT ID, Time, OfficerName, OfficerRank, Reason, Value, PlayerName FROM `PoliceNationalComputer` WHERE Type = 4 AND Value = 1 ORDER BY ID DESC", "ViewActiveWarrants", "d", playerid);	
 	}
 	else if(listitem == 4)
 	{
-		mysql_tquery(SQL_CONNECTION, "SELECT ID, Incident, Location, Number, IGTime FROM `911 Calls` WHERE Service = 1 ORDER BY ID ASC LIMIT 10", "ViewRecent911", "d", playerid);	
+		mysql_tquery(SQL_CONNECTION, "SELECT ID, Incident, Location, Number, IGTime FROM `911 Calls` WHERE Service = 1 ORDER BY ID DESC LIMIT 10", "ViewRecent911", "d", playerid);	
 	}
 	else if(listitem == 5)
 	{
-		mysql_tquery(SQL_CONNECTION, "SELECT OfficerName, OfficerRank, Reason FROM `PoliceNationalComputer` WHERE Type = 5 ORDER BY Time ASC LIMIT 20", "ViewWeaponLog", "d", playerid);	
+		mysql_tquery(SQL_CONNECTION, "SELECT OfficerName, OfficerRank, Reason FROM `PoliceNationalComputer` WHERE Type = 5 ORDER BY Time DESC LIMIT 20", "ViewWeaponLog", "d", playerid);	
 	}
 	else
 	{
