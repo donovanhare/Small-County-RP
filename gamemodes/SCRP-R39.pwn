@@ -7,6 +7,7 @@
 			|                                       	  | Small County Roleplay |     	         	                                  |
 			|-----------------------------------------------------------------------------------------------------------------------------|
 still broken car
+last question
 /n system
 hotwire
 /sell vehicle
@@ -462,7 +463,8 @@ enum vehicle
 	vDoors,
 	vLights,
 	vTires,
-	Broken
+	Broken,
+	Hotwired
 };
 
 
@@ -620,50 +622,83 @@ enum ems
 	Location[64]
 };
 
+
 native WP_Hash(buffer[], len, const str[]);
 
-//==============================================================================
-//      -- > New(s)
-//==============================================================================
-new Text:InfoBox[MAX_PLAYERS];
-new SQL_CONNECTION;
-new Text:SpeedBox[MAX_PLAYERS];
-new Speedo[MAX_PLAYERS];
+
 //==========================================================================
-new OOCStatus = 0;
-new SkinSelection[MAX_PLAYERS] = 0;
-//==========================================================================
-new Create_New_Biz_ID[MAX_PLAYERS];
+//	Server/Player Variables												  //
 //==========================================================================
 new Server[sver];
+new SQL_CONNECTION;
+new OOCStatus = 0;
+
 new MasterAccount[MAX_PLAYERS][MA_Info];
 new PlayerInfo[MAX_PLAYERS][pinfo];
 new Inventory[MAX_PLAYERS][inv];
 
+new Weapon[MAX_PLAYERS][13];
+new WeaponAmmo[MAX_PLAYERS][13];
+
+new SkinSelection[MAX_PLAYERS] = 0;
+new Create_New_Biz_ID[MAX_PLAYERS];
+//==========================================================================
+
+
+//==========================================================================
+//	Side-Jobs															  //
+//==========================================================================
 new Trucking[MAX_PLAYERS][truck];
 new Taxi[MAX_PLAYERS][taxijob];
 //new Postman[MAX_PLAYERS][postmanjob];
-new EmergencyCall[MAX_PLAYERS][ems];
+new GDL_Test[MAX_PLAYERS];
 new DMV[MAX_PLAYERS][driving];
-new Weapon[MAX_PLAYERS][13];
-new WeaponAmmo[MAX_PLAYERS][13];
-new Biz[MAX_BIZ][business], Total_Biz_Created, bizzid[MAX_PLAYERS];
+//==========================================================================
+
+
+//==========================================================================
+//	Vehicles															  //
+//==========================================================================
 new Vehicles[MAX_VEH][vehicle], Total_Vehicles_Created, Total_FactionVehicles_Created;
-new Icons[MAX_ICONS][icon], Total_Icons_Created;
-new Factions[MAX_FACTIONS][faction], Total_Factions_Created, facid[MAX_PLAYERS];
-new Houses[MAX_HOUSES][house], Total_Houses_Created, houseid[MAX_PLAYERS];
-new Objects[MAX_OBJECTZ][object], Total_Objects_Created;
 new Engine[MAX_VEH], Lights[MAX_VEH], alarm[MAX_VEH], doors[MAX_VEH], bonnet[MAX_VEH], boot[MAX_VEH], objective[MAX_VEH];
+new bool:validvehicle[MAX_VEH];
+//==========================================================================
+
+
+//==========================================================================
+//	Factions															  //
+//==========================================================================
+new Factions[MAX_FACTIONS][faction], Total_Factions_Created, facid[MAX_PLAYERS];
+
+new EmergencyCall[MAX_PLAYERS][ems];
 new EmergencyLights[MAX_VEH];
 new EmergencyState[MAX_VEH];
-new GDL_Test[MAX_PLAYERS];
+//==========================================================================
+
+
+//==========================================================================
+//	Icons & Objects  													  //
+//==========================================================================
+new IconID;
+new Biz[MAX_BIZ][business], Total_Biz_Created, bizzid[MAX_PLAYERS];
+new Icons[MAX_ICONS][icon], Total_Icons_Created;
+new Houses[MAX_HOUSES][house], Total_Houses_Created, houseid[MAX_PLAYERS];
+new Objects[MAX_OBJECTZ][object], Total_Objects_Created;
+//==========================================================================
+
+
+//==========================================================================
+//	Server Clock 														  //
 //==========================================================================
 new Text:Clock;
 new ClockHours;
 new ClockMinutes;
 new ClockSeconds;
-new Text:BlackScreen[MAX_PLAYERS];
-new Text:BlackOutText[MAX_PLAYERS];
+//==========================================================================
+
+
+//==========================================================================
+//	UI  																  //
 //==========================================================================
 new PlayerText:SelectionBox[MAX_PLAYERS];
 new PlayerText:Slot01[MAX_PLAYERS];
@@ -673,26 +708,53 @@ new PlayerText:Slot01_Skin[MAX_PLAYERS];
 new PlayerText:Slot02_Skin[MAX_PLAYERS];
 new PlayerText:Slot03_Skin[MAX_PLAYERS];
 
+new Text:BlackScreen[MAX_PLAYERS];
+new Text:BlackOutText[MAX_PLAYERS];
+
+new InformationBoxTimer[MAX_PLAYERS];
+new Text:InfoBox[MAX_PLAYERS];
+
+new Text:SpeedBox[MAX_PLAYERS];
+new Speedo[MAX_PLAYERS];
+//==========================================================================
+
+
+//==========================================================================
+//	Optimisations														  //
 //==========================================================================
 new bool:PickedUpPickup[MAX_PLAYERS];
 new LastPickup[MAX_PLAYERS];
-new InformationBoxTimer[MAX_PLAYERS];
+new LastCommandTime[MAX_PLAYERS];
+//==========================================================================
+
+//==========================================================================
+//	Dealership  														  //
 //==========================================================================
 new VehicleModel[MAX_PLAYERS];
 new VehiclePrice[MAX_PLAYERS];
-new IconID;
-new bool:validvehicle[MAX_VEH];
+//==========================================================================
 
+
+//==========================================================================
+//	AFK Check   														  //
+//==========================================================================
 new InactivtyCheck[MAX_PLAYERS];
 new Float:InactivtyCheck_X[MAX_PLAYERS];
 new Float:InactivtyCheck_Y[MAX_PLAYERS];
 new Float:InactivtyCheck_Z[MAX_PLAYERS];
-new LastCommandTime[MAX_PLAYERS];
+//==========================================================================
 
 
+//==========================================================================
+//	Animations  														  //
+//==========================================================================
 new LoopAnim[MAX_PLAYERS];
 new LibsPreloaded[MAX_PLAYERS];
 new Text:AnimText[MAX_PLAYERS];
+//==========================================================================
+
+
+
 //new LastQuestion;
 //==========================================================================
 new LetterList[26][] =
@@ -705,7 +767,8 @@ new MusicLinks[][] =
     "http://www.exxxplosivo.com/music/HipHop2004/15%20Rappers%20Delight.mp3", // Sugar Hill Gang - Rapper's Delight
     "http://www.aidia-e.com/mydj/musica/10%20-%20Smooth%20Criminal.mp3", //Michael Jackson - Smooth Criminal
     "http://www.soselettricista.com/musica.mp3", //Barry White - Love's Theme Tune
-	"http://hyra-en-stuga.se/assets/multimedia/02-Barry_White-Can_T_Get_Enough_Of_Your_Love_Babe.mp3" //Barry White - Can't Get Enough of Your Love, Babe
+	"http://hyra-en-stuga.se/assets/multimedia/02-Barry_White-Can_T_Get_Enough_Of_Your_Love_Babe.mp3", //Barry White - Can't Get Enough of Your Love, Babe
+	"https//www.smallcountyrp.com/music/ching.mp3"
 };
 
 new RadioStations[][][] =
@@ -776,13 +839,13 @@ new FactionTypeName[][] =
 
 new Mod_Hydraulics[][] =
 {
-   // {componentid, price, name}
+// {componentid, price, name}
    {1087, 5000, "Hydraulics"}
 };
 
 new Mod_NOS[][] =
 {
-   // {componentid, price, name}
+// {componentid, price, name}
    {1009, 1000, "NOS x2"},
    {1008, 3000, "NOS x5"},
    {1010, 7000, "NOS x10"}
@@ -790,7 +853,7 @@ new Mod_NOS[][] =
 
 new Mod_Wheels[][] =
 {
-   // {componentid, price, name}
+// {componentid, price, name}
    {1073, 5000, "Shadow"},
    {1074, 5000, "Mega"},
    {1075, 5000, "Rimshine"}, 
@@ -1132,8 +1195,6 @@ public MySQLConnect()
 
 	return 1;
 }
-
-
 
 
 
@@ -1697,6 +1758,41 @@ public GetPlayerSQLID(playerid)
 	return 1;
 }
 
+forward CreateHouse(id);
+public CreateHouse(id)
+{
+	new str[128];
+    if(Houses[id][Owner] == 0)
+    {
+		format(str, sizeof(str), ""COL_RED"FOR SALE\n"COL_WHITE"%s\nPrice: $%d \n",Houses[id][Name],Houses[id][Price]);
+		Houses[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
+    	Houses[id][PickupID] = CreateDynamicPickup(1273, 23, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 0, 0, -1, 250);
+
+	}
+	else if(Houses[id][Owner] > 0)
+	{
+	    new query[128];
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT `Username` FROM Accounts WHERE SQLID = %d LIMIT 1", Houses[id][Owner]);
+        mysql_tquery(SQL_CONNECTION, query, "CreateHouseLabel", "i", id);
+
+		Houses[id][PickupID] = CreateDynamicPickup(1273, 23, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 0, 0, -1, 250);
+	}
+	return 1;
+
+}
+
+
+forward CreateHouseLabel(id);
+public CreateHouseLabel(id)
+{
+	new str[128], houseowner[MAX_PLAYER_NAME];
+	cache_get_field_content(0, "Username", houseowner, SQL_CONNECTION, MAX_PLAYER_NAME);
+	format(str, sizeof(str), "%s\n"COL_GRAY"Owner: %s", Houses[id][Name], houseowner);
+  	Houses[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
+	return 1;
+}
+
+
 forward LoadHouses();
 public LoadHouses()
 {
@@ -1719,24 +1815,8 @@ public LoadHouses()
 			Houses[id][Price] = cache_get_field_content_int(id, "Price", SQL_CONNECTION);
 			Houses[id][Safe] = cache_get_field_content_int(id, "Safe", SQL_CONNECTION);
 
-
 	        Total_Houses_Created++;
-	        if(Houses[id][Owner] == 0)
-	        {
-				format(str, sizeof(str), ""COL_RED"FOR SALE\n"COL_WHITE"%s\nPrice: $%s \n",Houses[id][Name], FormatNumber(Houses[id][Price]));
-				Houses[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
-	        	Houses[id][PickupID] = CreateDynamicPickup(1273, 23, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 0, 0, -1, 250);
-
-			}
-			if(Houses[id][Owner] > 0)
-			{
-			    new query2[128];
-				mysql_format(SQL_CONNECTION, query2, sizeof(query2), "SELECT `Username` FROM Accounts WHERE SQLID = %d LIMIT 1", Houses[id][Owner]);
-	            mysql_tquery(SQL_CONNECTION, query2, "CreateHouseLabel", "i", id);
-
-				Houses[id][PickupID] = CreateDynamicPickup(1273, 23, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 0, 0, -1, 250);
-
-			}
+	        CreateHouse(id);
 
 		}
 
@@ -1749,7 +1829,7 @@ public LoadHouses()
 forward LoadHouse(id);
 public LoadHouse(id)
 {
-	new str[128];
+
 	if(cache_num_rows())
     {
 
@@ -1767,41 +1847,18 @@ public LoadHouse(id)
 		Houses[id][Price] = cache_get_field_content_int(0, "Price", SQL_CONNECTION);
 		Houses[id][Safe] = cache_get_field_content_int(0, "Safe", SQL_CONNECTION);
 
-
-        if(Houses[id][Owner] == 0)
-        {
-			format(str, sizeof(str), ""COL_RED"FOR SALE\n"COL_WHITE"%s\nPrice: $%d \n",Houses[id][Name],Houses[id][Price]);
-			Houses[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
-        	Houses[id][PickupID] = CreateDynamicPickup(1273, 23, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 0, 0, -1, 250);
-
-		}
-		if(Houses[id][Owner] > 0)
-		{
-		    new query2[128];
-			mysql_format(SQL_CONNECTION, query2, sizeof(query2), "SELECT `Username` FROM Accounts WHERE SQLID = %d LIMIT 1", Houses[id][Owner]);
-            mysql_tquery(SQL_CONNECTION, query2, "CreateHouseLabel", "i", id);
-
-			Houses[id][PickupID] = CreateDynamicPickup(1273, 23, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 0, 0, -1, 250);
-		}
-		printf("[MYSQL]: House %d has successfully been reload from the database.", id);
+		CreateHouse(id);
 	}
 	else
 	{
 		printf("ERROR: Loading house %d.", id);
+		return 0;
 	}
+	printf("[MYSQL]: House %d has successfully been reload from the database.", id);
 	return 1;
 }
 
 
-forward CreateHouseLabel(id);
-public CreateHouseLabel(id)
-{
-	new str[128], houseowner[MAX_PLAYER_NAME];
-	cache_get_field_content(0, "Username", houseowner, SQL_CONNECTION, MAX_PLAYER_NAME);
-	format(str, sizeof(str), "%s\n"COL_GRAY"Owner: %s", Houses[id][Name], houseowner);
-  	Houses[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
-	return 1;
-}
 
 public OnPlayerDisconnect(playerid, reason)
 {
@@ -2493,6 +2550,7 @@ public OnPlayerUpdate(playerid)
 			SetPlayerVirtualWorld(playerid, PlayerInfo[playerid][VWorld]);
 			SetCameraBehindPlayer(playerid);
 	       	TogglePlayerControllable(playerid, 1);
+
 	       	format(str, sizeof(str), "Thank you for shopping at %s.", Biz[PlayerInfo[playerid][bEntered]][Name]);
 	       	InfoBoxForPlayer(playerid, str);
     	}
@@ -3481,7 +3539,7 @@ new QuizQuestions[][][] = {
 	{"2", "[QUIZ] What is the correct usage of the standard IC chat?", " (A) Hey, how long have you been role-playing on this server? \n (B) Greetings, the name's Donovan, but you may call me Don. \n (C) Woah, what is that name tag hovering over your head and where can I procure one? \n (D) What is the CMD to check which administrator are online at the moment?"},
 	{"4", "[QUIZ] What is the expected way to speak to an administrator when requesting for assistance?", " (A) Uh, where the fuck is my car, you fucking knob? \n (B) I just logged in and I can't seem to see car anywhere, TP it to me this instant. \n (C) This guy in front of me has absolutely no idea how to RP, ban him now. \n (D) Hi, I was wondering if you could possibly TP to me, I appear to be experiencing a bug that requires your attention."},
 	{"4", "[QUIZ] Which of the following is expected of you when playing on this server?", " (A) Act politely in the IC chat, avoid any illegal role-play whatsoever. \n (B) Role-playing with others at all times, as oppose to role-playing passively. \n (C) Logging in with a ping that never exceeds 100 or more. \n (D) Role-playing realistically and to the standards that satisfy that of SC:RP."},
-	{"1", "[QUIZ] What is the threshold in relation to the things you are permitted to role-play?", " (A) Non-existent, with the exception of paedophilia and so long as the actions demonstrated are realistic. \n (B) Illegal role-play - Under no circumstances should such role-play be exercised. \n (C) Passive role-play - Role-play must always involve other parties for it to be regarded as realistic. \n (D) None of the above."},
+	{"1", "[QUIZ] What is the threshold in relation to the things you are permitted to role-play?", " (A) Non-existent, with the exception of pedophilia and so long as the actions demonstrated are realistic. \n (B) Illegal role-play - Under no circumstances should such role-play be exercised. \n (C) Passive role-play - Role-play must always involve other parties for it to be regarded as realistic. \n (D) None of the above."},
 	{"3", "[QUIZ] What is the minimum age to play on this server?", " (A) 18. \n (B) 16. \n (C) There is none, so long as the standards of English and the standards of role-play upholds what is expected on SC:RP. \n (D)  14."}, 
 	{"4", "[QUIZ] Are OOC insults permitted in this community?", " (A) Yes, but only when the opposing party has warranted the particular insult. \n (B) Yes, members who partake in the community must neglect all emotions and simply ignore insults that are thrown towards them. \n (C) No, unless you are conversing with an administrator. \n (D) No, under no circumstances should words of such nature be undertook."}
 };
@@ -3652,7 +3710,7 @@ stock Quiz_Info(playerid, info, section)
 forward LoadBiz();
 public LoadBiz()
 {
-	new str[300], interiorcount[19], query2[500];
+	new interiorcount[19];
 	if(cache_num_rows())
     {
         for(new id = 1; id<cache_num_rows(); id++)
@@ -3681,47 +3739,7 @@ public LoadBiz()
 
 			//Biz[id][World] = interiorcount[Biz[id][Interior]];
 			interiorcount[Biz[id][Interior]]++;
-			if(Biz[id][Owned] == 0)
-		    {
-		        if(Biz[id][Type] == 5)
-		        {
-					format(str, sizeof(str), ""COL_RED" FOR SALE\n\n"COL_ORANGE" %s \n"COL_GRAY"(/buybiz)\n Price: $%s", Biz[id][Name], FormatNumber(Biz[id][Price]));
-		  			Biz[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Biz[id][PosX],Biz[id][PosY],Biz[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
-					Biz[id][PickupID] = CreateDynamicPickup(1275, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
-				}
-				if(Biz[id][Type] != 5)
-				{
-					format(str, sizeof(str), ""COL_RED" FOR SALE\n\n"COL_ORANGE" %s \n"COL_GRAY"(/buybiz)\n Price: $%s", Biz[id][Name], FormatNumber(Biz[id][Price]));
-		  			Biz[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Biz[id][PosX],Biz[id][PosY],Biz[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
-					Biz[id][PickupID] = CreateDynamicPickup(1272, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
-				}
-			}
-			if(Biz[id][Owned] == 1)
-		    {
-				mysql_format(SQL_CONNECTION, query2, sizeof(query2), "SELECT `Username` FROM Accounts WHERE SQLID = %d LIMIT 1", Biz[id][Owner]);
-		        mysql_tquery(SQL_CONNECTION, query2, "CreateBizLabel", "i", id);
-
-		        if(Biz[id][Type] == 5)//clothes shop
-		        {
-					Biz[id][PickupID] = CreateDynamicPickup(1275, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
-				}
-				if(Biz[id][Type] != 5)
-				{
-					Biz[id][PickupID] = CreateDynamicPickup(1272, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
-				}
-			}
-			if(Biz[id][Owned] == 2)//bank
-		    {
-				format(str, sizeof(str), ""COL_WHITE" %s ", Biz[id][Name]);
-				Biz[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Biz[id][PosX],Biz[id][PosY],Biz[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
-				Biz[id][PickupID] = CreateDynamicPickup(1274, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
-			}
-			if(Biz[id][Owned] == 3)//Entrance
-		    {
-				format(str, sizeof(str), ""COL_WHITE" %s ", Biz[id][Name]);
-				Biz[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Biz[id][PosX],Biz[id][PosY],Biz[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
-				Biz[id][PickupID] = CreateDynamicPickup(1318, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
-			}
+			CreateBusiness(id);
 
 		}
 	}
@@ -3734,7 +3752,7 @@ public LoadBiz()
 forward LoadBusiness(id);
 public LoadBusiness(id)
 {
-	new str[128], query2[128];
+
 	if(cache_num_rows())
     {
 
@@ -3760,47 +3778,7 @@ public LoadBusiness(id)
 		Total_Biz_Created++;
 		printf("[MYSQL]: Business %d has successfully loaded from the database.", id);
 
-		if(Biz[id][Owned] == 0)
-	    {
-	        if(Biz[id][Type] == 5)
-	        {
-				format(str, sizeof(str), ""COL_RED" FOR SALE\n\n"COL_ORANGE" %s \n"COL_GRAY"(/buybiz)\n Price: $%s", Biz[id][Name], FormatNumber(Biz[id][Price]));
-	  			Biz[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Biz[id][PosX],Biz[id][PosY],Biz[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
-				Biz[id][PickupID] = CreateDynamicPickup(1275, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
-			}
-			if(Biz[id][Type] != 5)
-			{
-				format(str, sizeof(str), ""COL_RED" FOR SALE\n\n"COL_ORANGE" %s \n"COL_GRAY"(/buybiz)\n Price: $%s", Biz[id][Name], FormatNumber(Biz[id][Price]));
-	  			Biz[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Biz[id][PosX],Biz[id][PosY],Biz[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
-				Biz[id][PickupID] = CreateDynamicPickup(1272, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
-			}
-		}
-		if(Biz[id][Owned] == 1)
-	    {
-			mysql_format(SQL_CONNECTION, query2, sizeof(query2), "SELECT `Username` FROM Accounts WHERE SQLID = %d LIMIT 1", Biz[id][Owner]);
-	        mysql_tquery(SQL_CONNECTION, query2, "CreateBizLabel", "i", id);
-
-	        if(Biz[id][Type] == 5)//clothes shop
-	        {
-				Biz[id][PickupID] = CreateDynamicPickup(1275, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
-			}
-			if(Biz[id][Type] != 5)
-			{
-				Biz[id][PickupID] = CreateDynamicPickup(1272, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
-			}
-		}
-		if(Biz[id][Owned] == 2)//bank
-	    {
-			format(str, sizeof(str), ""COL_WHITE" %s ", Biz[id][Name]);
-			Biz[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Biz[id][PosX],Biz[id][PosY],Biz[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
-			Biz[id][PickupID] = CreateDynamicPickup(1274, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
-		}
-		if(Biz[id][Owned] == 3)//Entrance
-	    {
-			format(str, sizeof(str), ""COL_WHITE" %s ", Biz[id][Name]);
-			Biz[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Biz[id][PosX],Biz[id][PosY],Biz[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
-			Biz[id][PickupID] = CreateDynamicPickup(1318, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
-		}
+		CreateBusiness(id);
 	}
 	else
 	{
@@ -3808,6 +3786,55 @@ public LoadBusiness(id)
 	}
 	return 1;
 }
+
+forward CreateBusiness(id);
+public CreateBusiness(id)
+{
+	new str[128], query[128];
+	if(Biz[id][Owned] == 0)
+    {
+        if(Biz[id][Type] == 5)
+        {
+			format(str, sizeof(str), ""COL_RED" FOR SALE\n\n"COL_ORANGE" %s \n"COL_GRAY"(/buybiz)\n Price: $%s", Biz[id][Name], FormatNumber(Biz[id][Price]));
+  			Biz[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Biz[id][PosX],Biz[id][PosY],Biz[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
+			Biz[id][PickupID] = CreateDynamicPickup(1275, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
+		}
+		if(Biz[id][Type] != 5)
+		{
+			format(str, sizeof(str), ""COL_RED" FOR SALE\n\n"COL_ORANGE" %s \n"COL_GRAY"(/buybiz)\n Price: $%s", Biz[id][Name], FormatNumber(Biz[id][Price]));
+  			Biz[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Biz[id][PosX],Biz[id][PosY],Biz[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
+			Biz[id][PickupID] = CreateDynamicPickup(1272, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
+		}
+	}
+	if(Biz[id][Owned] == 1)
+    {
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT `Username` FROM Accounts WHERE SQLID = %d LIMIT 1", Biz[id][Owner]);
+        mysql_tquery(SQL_CONNECTION, query, "CreateBizLabel", "i", id);
+
+        if(Biz[id][Type] == 5)//clothes shop
+        {
+			Biz[id][PickupID] = CreateDynamicPickup(1275, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
+		}
+		if(Biz[id][Type] != 5)
+		{
+			Biz[id][PickupID] = CreateDynamicPickup(1272, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
+		}
+	}
+	if(Biz[id][Owned] == 2)//bank
+    {
+		format(str, sizeof(str), ""COL_WHITE" %s ", Biz[id][Name]);
+		Biz[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Biz[id][PosX],Biz[id][PosY],Biz[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
+		Biz[id][PickupID] = CreateDynamicPickup(1274, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
+	}
+	if(Biz[id][Owned] == 3)//Entrance
+    {
+		format(str, sizeof(str), ""COL_WHITE" %s ", Biz[id][Name]);
+		Biz[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Biz[id][PosX],Biz[id][PosY],Biz[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
+		Biz[id][PickupID] = CreateDynamicPickup(1318, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
+	}
+	return 1;
+}
+
 
 forward UpdateBizLabel(id);
 public UpdateBizLabel(id)
@@ -4371,7 +4398,7 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 				else if(Icons[i][Type] == 12) return InformationBox(playerid, "~g~DMV~n~~w~ The driving test cost $1000 to take. To proceed use the command ~y~/dmv~w~.");				
 				else if(Icons[i][Type] == 13) return InformationBox(playerid, "~y~Lockers~n~~w~ To access the locker please use ~y~/locker~w~.");
 				else if(Icons[i][Type] == 14) return InformationBox(playerid, "~p~Vehicle Modification Center~n~~w~ Mechanics can perform vehicle modifications to personal vehicles here using the command ~y~/vmods~w~.");
-				else if(Icons[i][Type] == 15) return InformationBox(playerid, "~b~Faction Weapon Cache~n~~w~ Faction weapons can be bought and equiped here using the command ~y~/weaponcache~w~.~n~~r~WARNING~w~:It is against the rules to distribute faction weapons.");
+				else if(Icons[i][Type] == 15) return InformationBox(playerid, "~b~Faction Weapon Cache~n~~w~ Faction weapons can be bought and equipped here using the command ~y~/weaponcache~w~.~n~~r~WARNING~w~:It is against the rules to distribute faction weapons.");
 			}
 		}
 	}
@@ -4809,6 +4836,7 @@ ResetVehicleVariables(id)
 	Vehicles[id][Hydraulics] = 0;
 	Vehicles[id][Wheels] = 0;
 	Vehicles[id][Broken] = 0;
+	Vehicles[id][Hotwired] = 0;
 	return 1;
 }
 
@@ -5154,7 +5182,7 @@ stock IsVehicleTaxi(vID)
 
 CMD:v(playerid, params[])
 {
-    new vehicleid[20], color1, color2;
+    new vehicleid[20], color1, color2, str[128];
     if(MasterAccount[playerid][Admin] > 0)
 	{
 	    if(!sscanf(params, "s[20]dd", vehicleid, color1, color2))
@@ -5186,8 +5214,8 @@ CMD:v(playerid, params[])
 				Engine_SET(playerid, makecar, 1);
 				SetVehicleParamsEx(makecar,Engine[makecar],1,alarm[makecar],doors[makecar],bonnet[makecar],boot[makecar],objective[makecar]);
 				//Lights_TOGGLE(playerid, makecar);
-
-		        SendClientMessage(playerid, COLOR_YELLOW, "You have successfully spawned a vehicle.");
+				format(str, sizeof(str), "You have successfully spawned a %s.", VehicleNames[vID-400]);
+		        SendClientMessage(playerid, COLOR_YELLOW, str);
 		        return 1;
         	}
 	        
@@ -5198,7 +5226,7 @@ CMD:v(playerid, params[])
 	        if(vID == INVALID_VEHICLE_ID)
 	        {
 	            vID = strval(vehicleid);
-	            if(!(399 < vID < 612)) return SendErrorMessage(playerid, "That is not a valid car name/id!");
+	            if(!(399 < vID < 612)) return SendErrorMessage(playerid, "That is not a valid vehicle name/id!");
 	        }
 	        if(MasterAccount[playerid][Admin] != 6 && Restricted_Vehicle(vID)) return SendErrorMessage(playerid, ERROR_OPTION);
         	if(Total_Vehicles_Created < MAX_VEHICLES)
@@ -5220,7 +5248,9 @@ CMD:v(playerid, params[])
 				Engine_SET(playerid, makecar, 1);
 				SetVehicleParamsEx(makecar,Engine[makecar],1,alarm[makecar],doors[makecar],bonnet[makecar],boot[makecar],objective[makecar]);
 				//Lights_TOGGLE(playerid, makecar);
-		        SendClientMessage(playerid, COLOR_YELLOW, "You have successfully spawned a vehicle.");
+				format(str, sizeof(str), "You have successfully spawned a %s.", VehicleNames[vID-400]);
+		        SendClientMessage(playerid, COLOR_YELLOW, str);
+
 		        return 1;
 	        }
 	    }
@@ -5773,15 +5803,15 @@ CMD:inventory(playerid, params[])
 forward GiveInventoryItem(playerid, item, quantity);
 public GiveInventoryItem(playerid, item, quantity)
 {
-	new query[128], str[128];
+	new str[128];
 	if(item == PHONE)
 	{
 	    if(Inventory[playerid][PhoneStatus] == 0)
 	    {
 			Inventory[playerid][PhoneNumber] = 100000 + random(8999999);
 			Inventory[playerid][PhoneStatus] = 1;
-			mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET PhoneStatus = %d, PhoneNumber = %d WHERE SQLID = %i LIMIT 1", Inventory[playerid][PhoneStatus], Inventory[playerid][PhoneNumber], PlayerInfo[playerid][SQLID]);
-			mysql_tquery(SQL_CONNECTION, query);
+			MYSQL_Update_Account(playerid, "PhoneStatus", Inventory[playerid][PhoneStatus]);
+			MYSQL_Update_Account(playerid, "PhoneNumber",Inventory[playerid][PhoneNumber]);
 			SendInfoMessage(playerid, "A phone has been added to your inventory.");
 			return 1;
 		}
@@ -6156,7 +6186,7 @@ public OnPlayerText(playerid, text[])
 					SendFactionMessage(fid, COLOR_CORNFLOWERBLUE, str);
 					Inventory[playerid][PhoneEmergency] = 0;
 
-					new query[300], calltime[12];
+					new query[600], calltime[12];
 					format(calltime, sizeof(calltime), "%02d:%02d:%02d", ClockHours, ClockMinutes, ClockSeconds);
 				    mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO `911 Calls` (Timestamp, Caller, Incident, Location, Service, Number, IGTime) VALUES( %d, %d, '%e', '%e', %d, %d, '%e')", gettime(), PlayerInfo[playerid][SQLID], EmergencyCall[playerid][Incident], EmergencyCall[playerid][Location], EmergencyCall[playerid][Service], Inventory[playerid][PhoneNumber], calltime);
 					mysql_tquery(SQL_CONNECTION, query);
@@ -6793,6 +6823,7 @@ public Hotwire_Stage4(playerid, vid)
 	SendLocalMessage(playerid, str, Range_Normal, COLOR_RP, COLOR_RP);
 	SendClientMessage(playerid, COLOR_WHITE, "Vehicle hotwired.");
 	Engine_SET(playerid, vid, 1);
+	Vehicles[vid][Hotwired] = 1;
 	return 1;
 }
 
@@ -6825,6 +6856,34 @@ CMD:engine(playerid,params[])
 	return 1;
 }
 ALTCMD:e->engine;
+
+
+CMD:stall(playerid,params[])
+{
+	new State = GetPlayerState(playerid), vid = GetPlayerVehicleID(playerid);
+	if(IsPlayerInAnyVehicle(playerid))
+	{
+	    if(State == PLAYER_STATE_DRIVER)
+	    {
+	    	if(Engine[vid] == 1)
+	    	{
+		    	new str[128];
+		    	format(str, sizeof(str), "* The vehicle's engine would cut out. It would appear that %s stalled it. *", GetRoleplayName(playerid));
+				SendLocalMessage(playerid, str, Range_Normal, COLOR_RP, COLOR_RP);
+			    Engine_SET(playerid, vid, 0);
+			}
+	    }
+	    else
+	    {
+			SendClientMessage(playerid, COLOR_GRAY, "You have to be the driver of a vehicle to use this command.");
+	    }
+	}
+	else
+	{
+	    SendErrorMessage(playerid, ERROR_VEHICLE);
+	}
+	return 1;
+}
 
 stock Engine_TOGGLE(playerid, vid)
 {
@@ -14374,7 +14433,7 @@ stock FWeapons_Main(playerid)
 
  	cache_delete(result);
 
-	Dialog_Show(playerid, FWeaponsMain, DIALOG_STYLE_LIST, "Faction Manager", str, "Select", "Close");
+	Dialog_Show(playerid, FWeaponsMain, DIALOG_STYLE_LIST, "Faction Weapons", str, "Select", "Close");
 	return 1;
 }
 
@@ -14394,6 +14453,7 @@ Dialog:FWeaponsMain(playerid, response, listitem, inputtext[])
 		if(listitem == 0)
 		{
 			FWeapons_Buy(playerid);
+			return 1;
 		}
 	}
 
@@ -14415,6 +14475,7 @@ Dialog:FWeaponsMain(playerid, response, listitem, inputtext[])
 			format(str, sizeof(str), "Weapon OUT at %d:%d - %s with %d rounds.", ClockHours, ClockMinutes, WeaponNameList[Weap], Ammo);
 			Add_PoliceNationalComputer(0, playerid, PNC_WLOG, str, 0);
 		}
+		SendInfoMessage(playerid, "Weapon equipped.");
 
 	}
 	else SendErrorMessage(playerid, "Weapon not found.");
@@ -14429,7 +14490,7 @@ stock BuyFactionWeapon(playerid, weap, ammo)
     mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO FactionWeapons (Weapon, Ammo, Faction, Status) VALUES(%d, %d, %d, 1)", weap, ammo, PlayerInfo[playerid][Faction]);
 	mysql_tquery(SQL_CONNECTION, query);
 
-	SendClientMessage(playerid, COLOR_SKYBLUE, "Weapon successfully purchased.");
+	SendInfoMessage(playerid, "Weapon successfully purchased.");
 	return 1;
 }
 
@@ -14465,7 +14526,6 @@ Dialog:FWeaponsBuy(playerid, response, listitem, inputtext[])
 	{
 		BuyFactionWeapon(playerid, 34, 20);
 	}
-	SendClientMessage(playerid, COLOR_SKYBLUE, "Weapon equiped.");
     return 1;
 }
 
