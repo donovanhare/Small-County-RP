@@ -12,7 +12,7 @@ last question
 hotwire
 /sell vehicle
 - Faction Skins
-- Faction Weapons
+- Faction Weapons (buy on internet? given order number have to try different post offices to recieve
 - Faction Pay
 - batton hit instead of taser?
 - need equipment in order 2 hotwire vehicle 1 use onnly
@@ -826,6 +826,7 @@ new AdminNames[][] =
 	"Head Administrator",
 	"Server Owner"
 };
+
 
 new FactionTypeName[][] =
 {
@@ -1796,7 +1797,7 @@ public CreateHouseLabel(id)
 forward LoadHouses();
 public LoadHouses()
 {
-	new str[128];
+
 	if(cache_num_rows())
     {
         for(new id = 1; id<cache_num_rows(); id++)
@@ -4380,6 +4381,17 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 			}
 		}
 
+	 	for(i = 0; i < MAX_HOUSES; i++)
+	    {
+	        if(pickupid == Houses[i][PickupID])
+	        {
+			    new str[128];
+			    format(str, sizeof(str), "~g~ %s ~n~ ~w~ Use /enter to enter this house.", Houses[i][Name]);
+			    InformationBox(playerid, str);
+			    return 1;
+			}
+		}
+
 		for(i = 0; i < MAX_ICONS; i++)
 		{
 			if(pickupid == Icons[i][PickupID])
@@ -5523,7 +5535,7 @@ CMD:enter(playerid)
 		}
 		else
 		{
-			format(str, sizeof(str), "* %s attempts to open the business's door.*", GetRoleplayName(playerid));
+			format(str, sizeof(str), "* %s attempts to open the door of the business.*", GetRoleplayName(playerid));
 			SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 
 			format(str, sizeof(str), "* As the door is locked, it doesn't open. ((%s))",GetRoleplayName(playerid));
@@ -6585,58 +6597,66 @@ CMD:sellbiz(playerid, params[])
 
 CMD:key(playerid, params[])
 {
-	new str[128];
-    for(new id; id < MAX_HOUSES; id++)
-	{
-	    if(IsPlayerInRangeOfPoint(playerid, 2.0, Houses[id][PosX], Houses[id][PosY], Houses[id][PosZ]))
-     	{
-     	    if(PlayerInfo[playerid][House] == id)
-     	    {
-     	        if(Houses[id][Locked] == 0)
-     	        {
-             		format(str, sizeof(str), "* %s places the key in the door, locking it.*", GetRoleplayName(playerid), str);
-					SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
-					Houses[id][Locked] = 1;
-					MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Locked", 1);
-					return 1;
-     	        }
-     	        else
-     	        {
-     	            format(str, sizeof(str), "* %s places the key in the door, unlocking it.*", GetRoleplayName(playerid), str);
-					SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
-					Houses[id][Locked] = 0;
-					MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Locked", 0);
-					return 1;
-     	        }
-     	    }
-     	}
-    }
-    for(new id; id < MAX_BIZ; id++)
-	{
-	    if(IsPlayerInRangeOfPoint(playerid, 2.0, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ]))
-     	{
-     	    if(PlayerInfo[playerid][Business] == id || PlayerInfo[playerid][Business2] == id)
-     	    {
-     	        if(Biz[id][Locked] == 0)
-     	        {
-             		format(str, sizeof(str), "* %s places the key in the door, locking it.*", GetRoleplayName(playerid), str);
-					SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
-					Biz[id][Locked] = 1;
-					MYSQL_Update_Interger(Houses[id][SQLID], "Biz", "Locked", 1);
-					return 1;
-     	        }
-     	        else
-     	        {
-     	            format(str, sizeof(str), "* %s places the key in the door, unlocking it.*", GetRoleplayName(playerid), str);
-					SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
-					MYSQL_Update_Interger(Houses[id][SQLID], "Biz", "Locked", 1);
-					Biz[id][Locked] = 0;
-					return 1;
-     	        }
-     	    }
-     	}
-    }
-	return 1;
+	new str[128], id = GetNearestVehicle(playerid, 5.0);
+	if(id != INVALID_VEHICLE_ID)
+	{ 
+		if(Vehicles[id][Locked] == 0)
+		{
+			SetVehicleParamsEx(id, Engine[id], Lights[id], alarm[id], doors[id], bonnet[id], boot[id], objective[id]);
+
+		}
+		return 1;
+	}
+
+	id = InRangeOfHouse(playerid);
+    if(id != 0)
+ 	{
+ 	    if(PlayerInfo[playerid][House] == id)
+ 	    {
+ 	        if(Houses[id][Locked] == 0)
+ 	        {
+         		format(str, sizeof(str), "* %s places the key in the door, locking it.*", GetRoleplayName(playerid), str);
+				SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
+				Houses[id][Locked] = 1;
+				MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Locked", 1);
+				return 1;
+ 	        }
+ 	        else
+ 	        {
+ 	            format(str, sizeof(str), "* %s places the key in the door, unlocking it.*", GetRoleplayName(playerid), str);
+				SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
+				Houses[id][Locked] = 0;
+				MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Locked", 0);
+				return 1;
+ 	        }
+ 	    }
+ 	}
+    
+    id = InRangeOfBiz(playerid);
+    if(id != 0)
+ 	{
+ 	    if(PlayerInfo[playerid][Business] == id || PlayerInfo[playerid][Business2] == id)
+ 	    {
+ 	        if(Biz[id][Locked] == 0)
+ 	        {
+         		format(str, sizeof(str), "* %s places the key in the door, locking it.*", GetRoleplayName(playerid), str);
+				SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
+				Biz[id][Locked] = 1;
+				MYSQL_Update_Interger(Houses[id][SQLID], "Biz", "Locked", 1);
+				return 1;
+ 	        }
+ 	        else
+ 	        {
+ 	            format(str, sizeof(str), "* %s places the key in the door, unlocking it.*", GetRoleplayName(playerid), str);
+				SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
+				MYSQL_Update_Interger(Houses[id][SQLID], "Biz", "Locked", 1);
+				Biz[id][Locked] = 0;
+				return 1;
+ 	        }
+ 	    }
+ 	}
+
+	return 0;
 }
 
 forward CalculateVehicleSpeed(vehicleid, MPH);
@@ -9207,19 +9227,35 @@ CMD:getv(playerid, params[])
 
 CMD:adminduty(playerid, params[])
 {
+	new str[128], option[24];
 	if(MasterAccount[playerid][Admin] > 0)
 	{
+		if(sscanf(params, "s[12]", option)) return SendClientMessage(playerid, COLOR_GRAY, "/adminduty [on/off]");
 		if(PlayerInfo[playerid][AdminDuty] == 0)
 		{
-			PlayerInfo[playerid][AdminDuty] = 1;
-			SendClientMessage(playerid, COLOR_YELLOW, "You are now on admin duty.");
-			SetPlayerColor(playerid, COLOR_GREEN);
+			if(!strcmp(option, "on", true))
+			{
+				PlayerInfo[playerid][AdminDuty] = 1;
+				for (new i = 0; i < MAX_PLAYERS; ++i)
+				{
+					if(PlayerInfo[i][LoggedIn] == 1)
+					{
+						format(str, sizeof(str), "%s %s is now on admin duty, feel free to request their help.", AdminNames[MasterAccount[playerid][Admin]][0], GetRoleplayName(playerid));
+						SendInfoMessage(i, str);
+					}
+				}
+				SendClientMessage(playerid, COLOR_YELLOW, "You are now on admin duty.");
+				SetPlayerColor(playerid, COLOR_GREEN);
+			}
 		}
 		else if(PlayerInfo[playerid][AdminDuty] == 1)
 		{
-		    PlayerInfo[playerid][AdminDuty] = 0;
-		    SendClientMessage(playerid, COLOR_YELLOW, "You are now off admin duty.");
-		    SetPlayerColor(playerid, COLOR_WHITE);
+			if(!strcmp(option, "off", true))
+			{
+			    PlayerInfo[playerid][AdminDuty] = 0;
+			    SendClientMessage(playerid, COLOR_YELLOW, "You are now off admin duty.");
+			    SetPlayerColor(playerid, COLOR_WHITE);
+			}
 		}
 	}
 	else
@@ -9228,6 +9264,7 @@ CMD:adminduty(playerid, params[])
 	}
 	return 1;
 }
+ALTCMD:aduty->adminduty;
 
 CMD:deleteicon(playerid, params[])
 {
@@ -10378,7 +10415,14 @@ CMD:admins(playerid, params[])
 		{
 		    if(MasterAccount[player][Admin] > 0)
 	  		{
-		    	format(str, sizeof(str), "%s(lvl:%d): %s", AdminNames[MasterAccount[player][Admin]][0], MasterAccount[player][Admin], GetRoleplayName(player));
+	  			if(PlayerInfo[player][AdminDuty] == 0) 
+	  			{
+	  				format(str, sizeof(str), "%s (Off Duty): %s", AdminNames[MasterAccount[player][Admin]][0],  GetRoleplayName(player));
+  				}
+  				else 
+				{
+					format(str, sizeof(str), "%s (Administrating): %s", AdminNames[MasterAccount[player][Admin]][0], GetRoleplayName(player));
+				}
 				SendClientMessage(playerid, COLOR_GRAY, str);
 		    }
 	    }
@@ -14465,8 +14509,15 @@ Dialog:FWeaponsMain(playerid, response, listitem, inputtext[])
 
 	if(cache_num_rows())
 	{
+		new w, a;
 		new Weap = cache_get_field_content_int(0, "Weapon", SQL_CONNECTION);
 		new Ammo = cache_get_field_content_int(0, "Ammo", SQL_CONNECTION);
+		GetPlayerWeaponData(playerid, GetWeaponSlot(Weap), w, a);
+		if(w != 0) 
+		{
+			SendErrorMessage(playerid, "Weapon of this type already equipped.");
+			return 0;
+		}
 		GivePlayerGun(playerid, Weap, Ammo);
 		MYSQL_Update_Interger(strval(WeapSQLID), "FactionWeapons", "Status", 0);
 
@@ -14528,6 +14579,142 @@ Dialog:FWeaponsBuy(playerid, response, listitem, inputtext[])
 	}
     return 1;
 }
+
+
+
+CMD:internet(playerid,params[])
+{
+	WebPortal(playerid);
+	return 1;
+}
+
+stock WebPortal(playerid)
+{
+    Dialog_Show(playerid, Internet, DIALOG_STYLE_INPUT, "San Andreas Internet Portal","Welcome to the San Andreas Internet Portal.\n\nPlease enter a web-URL:","Enter","Close");
+	return 1;
+}
+
+Dialog:WebPortal(playerid, response, listitem, inputtext[])
+{
+	WebPortal(playerid);
+	return 1;
+}
+
+Dialog:Internet(playerid, response, listitem, inputtext[])
+{
+	if(!response) return 0;
+	if(!strcmp(inputtext, "www.legalweapons.com", true)) Website_LegalWeapons(playerid);
+	else if(!strcmp(inputtext, "www.legalweapons.com/buy", true)) Website_LegalWeapons_Buy1(playerid); 
+
+
+	else if(!strcmp(inputtext, "www.sheriffdeparment.com/pnc", true))
+	{
+		if(IsLawEnforcement(playerid))
+		{
+			PoliceNationalComputer(playerid);
+		}
+		else WebError(playerid, 401, inputtext);
+	}
+
+	else WebError(playerid, 404, inputtext);
+		
+    return 1;
+}
+
+stock WebError(playerid, type, url[])
+{
+	new str[128], estr[128];
+	if(type == 404) format(estr, sizeof(estr), "ERROR 404: The requested page/file was not found.");
+	else if(type == 401) format(estr, sizeof(estr), "ERROR 401: You are not authorised to view this content.");
+	else if(type == 402) format(estr, sizeof(estr), "ERROR 402: Transaction Failure.");
+
+	format(str, sizeof(str), "http://%s/", url);
+
+	Dialog_Show(playerid, Error, DIALOG_STYLE_MSGBOX, str, estr,"Close","");
+}
+
+Dialog:Error(playerid, response, listitem, inputtext[])
+{
+	WebPortal(playerid);
+	return 1;
+}
+
+
+stock Website_LegalWeapons(playerid)
+{
+	new str[200], mstr[1000];
+	format(str, sizeof(str), "\t Legal Weapons | The world's number 1 weapon supplier! \n\n\n");
+	strcat(mstr, str, sizeof(mstr));
+	format(str, sizeof(str), "Are you looking for a gun, knife or even explosives? \n\n");
+	strcat(mstr, str, sizeof(mstr));
+	format(str, sizeof(str), "Well you're in the right place, here at Legal Weapons we supply the world's legitimate leaders \n");
+	strcat(mstr, str, sizeof(mstr));
+	format(str, sizeof(str), "and civilians with all their lethal weapon needs*. If you are in LAW ENFORCEMENT then I'm sorry\n");
+	strcat(mstr, str, sizeof(mstr));
+	format(str, sizeof(str), "to inform you that we're out of stock :-(. As for anyone else, please proceed to the buying section\n");
+	strcat(mstr, str, sizeof(mstr));
+	format(str, sizeof(str), "of the website!\n\n\n");
+	strcat(mstr, str, sizeof(mstr));
+	format(str, sizeof(str), "*Legal Weapons in no way condones the selling of illegal weapons.");
+	strcat(mstr, str, sizeof(mstr));
+
+
+    Dialog_Show(playerid, WebPortal, DIALOG_STYLE_MSGBOX, "http://www.legalweapons.com/", mstr,"Close","");
+	return 1;
+}
+
+
+
+stock Website_LegalWeapons_Buy1(playerid)
+{
+	SendInfoMessage(playerid, "Please note that all purchases are done via direct debit, thus cash will be instantaiously taken from your bank account should you make a purchase.");
+    Dialog_Show(playerid, BuyLegalWeapons, DIALOG_STYLE_LIST, "http://www.legalweapons.com/buy","| ($4000) | Kitchen Knife (for cooking only) | \n| ($25000) | Chainsaw (for cutting down trees) \n| ($7000) | 9mm Tool (handle with extra care) \n| ($12000) | Eagle in a desert \n| ($10000) | Double Barreled BB Gun ","Select","Cancel");
+	return 1;
+}
+
+Dialog:BuyLegalWeapons(playerid, response, listitem, inputtext[])
+{
+	if(!response) return 0;
+	new extractprice[6], weapprice, str[128];
+    strmid(extractprice, inputtext, strfind(inputtext, "$") + 1,  strfind(inputtext, " |"));
+    weapprice = strval(extractprice);
+
+    if(weapprice > PlayerInfo[playerid][Bank])
+    {
+    	WebError(playerid, 402, "www.legalweapons.com/buy");
+    	return 0;
+    }
+    else
+	{
+		PlayerInfo[playerid][Bank] -= weapprice;
+		format(str, sizeof(str), "$%d has been deducted from your bank account. You should recieve more information on your weapon shortly.", weapprice);
+		SendInfoMessage(playerid, str);
+	}
+
+	if(listitem == 0)
+	{
+		GivePlayerGun(playerid, 4, 1);
+	}
+	else if (listitem == 1)
+	{
+		GivePlayerGun(playerid, 9, 1);
+	}
+	else if (listitem == 2)
+	{
+		GivePlayerGun(playerid, 22, 60);
+	}
+	else if (listitem == 3)
+	{
+		GivePlayerGun(playerid, 24, 60);
+	}
+	else if (listitem == 4)
+	{
+		GivePlayerGun(playerid, 25, 40);
+	}
+	WebPortal(playerid);
+	return 1;
+}
+
 
 OnePlayAnim(playerid,animlib[],animname[], Float:Speed, looping, lockx, locky, lockz, lp)
 {
