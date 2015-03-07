@@ -6,45 +6,8 @@
        		|  				   ------------------------------------------------------------------------------------------                 |
 			|                                       	  | Small County Roleplay |     	         	                                  |
 			|-----------------------------------------------------------------------------------------------------------------------------|
-still broken car
-last question
-/n system
-hotwire
-/sell vehicle
-- Faction Skins
-- Faction Weapons (buy on internet? given order number have to try different post offices to recieve
-- Faction Pay
-- batton hit instead of taser?
-- need equipment in order 2 hotwire vehicle 1 use onnly
-SP weapons have to be bought by the command team, they use money from the faction bank but get paid daily and they get lik,e 50% of fines
-the gang weapons got from shipment which takes like 40 mins there is a supplier and a dealer
-/give
-afk
-donator benefit - can play custom links
-donator benefit - custom numberplates
-donator more biz/car/house slots?
-gambling
-help system if no helpers it goes to /n
-repair hack /afix
-QUIZ NEEDS TO BE ON MASTER ACCOUNT SO THAT PROGRESS CAN BE CHECKED / quiz 
-cd player & radio
-blindfold
-check payday
-cellphone texts can be viewed and del and such
-xp gained from jobs, playtime, factions and can be used on donator benefits
-large vehicle dealership for use in jobs
-ringtone
-SELECT * FROM `accounts` WHERE `RegisterIP` LIKE '127%'
-update factions set rank1 = replace(rank1, 'NONE', 'fggt')
-[divbox=white:198e54k9]
-postman
-milkman
-drug addiction taking drug increase timer
 
-health not 100 need food to make that happen
-driving theory 
 
-37.59.111.179
 */
 //==============================================================================
 //          -- > Includes
@@ -57,7 +20,21 @@ driving theory
 #include <streamer>
 #include <easyDialog>
 #include <lookup>
-//#include <fixes>
+#include <YSI\y_hooks>
+
+//==============================================================================
+//          -- > Gamemode Includes
+//==============================================================================	
+#include "../gamemodes/modules/player/animations.pwn"
+
+//#include "../gamemodes/modules/vehicle/accessories/compact_disks.pwn"
+//#include "../gamemodes/modules/vehicle/accessories/radio_stations.pwn"
+
+#include "../gamemodes/modules/server/colours.pwn"
+#include "../gamemodes/modules/server/login_music.pwn"
+
+#define LOG_PATH "/Server Logs/%s.txt"
+
 
 //==============================================================================
 //          -- > Database Information
@@ -66,8 +43,6 @@ driving theory
 #define SQL_USER "Server"
 #define SQL_PASS "7nWvKXZZjL5bHS6T"
 #define SQL_DB "Server01"
-
-#define LOG_PATH "/Server Logs/%s.txt"
 
 //==============================================================================
 //          -- > Message Defines
@@ -133,188 +108,6 @@ driving theory
 #define Range_Normal															20.0
 #define Range_Long																40.0
 #define Range_VLong																100.0	
-//==============================================================================
-//          -- > Colors
-//==============================================================================
-#define COL_WHITE 																"{FFFFFF}"
-#define COL_RED 																"{F81414}"
-#define COL_GREEN 																"{00FF22}"
-#define COL_BLUE 																"{00C0FF}"
-#define COL_LBLUE 																"{D3DCE3}"
-#define COL_ORANGE																"{FFAF00}"
-#define COL_CYAN 																"{00FFEE}"
-#define COL_BLACK																"{0E0101}"
-#define COL_GRAY 																"{C3C3C3}"
-#define COL_DGREEN                                                              "{336633}"
-
-
-#define COLOR_BLUE																0x0000FFFF
-#define COLOR_LGREEN															0x00FF00FF
-#define COLOR_YELLOW															0xFFFF00FF
-#define COLOR_BLACK	    														0x000000FF
-#define COLOR_GRAY	    														0xC0C0C0FF
-#define COLOR_WHITE     														0xFFFFFFFF
-#define COLOR_GREY 																0xAFAFAFAA
-#define COLOR_LBLUE 															0x00C0FFAA
-#define COLOR_MBLUE                                                             0x2E37FEAA
-#define COLOR_DGREEN														    0x007200AA
-#define COLOR_RP	                                                            0xC2A2DAAA
-
-
-#define COLOR_AQUA																 0x00FFFFFF
-#define COLOR_AQUAMARINE														 0x7FFFD4FF
-#define COLOR_AZURE																 0xF0FFFFFF
-#define COLOR_BEIGE																 0xF5F5DCFF
-#define COLOR_BISQUE															 0xFFE4C4FF
-#define COLOR_BLACK																 0x000000FF
-#define COLOR_BLANCHEDALMOND													 0xFFEBCDFF
-#define COLOR_BLUE																 0x0000FFFF
-#define COLOR_BLUEVIOLET														 0x8A2BE2FF
-#define COLOR_BROWN																 0xA52A2AFF
-#define COLOR_BURLYWOOD															 0xDEB887FF
-#define COLOR_BUTTONFACE														 0xF0F0F0FF
-#define COLOR_BUTTONHIGHLIGHT													 0xFFFFFFFF
-#define COLOR_BUTTONSHADOW														 0xA0A0A0FF
-#define COLOR_CADETBLUE															 0x5F9EA0FF
-#define COLOR_CHARTREUSE														 0x7FFF00FF
-#define COLOR_CHOCOLATE															 0xD2691EFF
-#define COLOR_CORAL																 0xFF7F50FF
-#define COLOR_CORNFLOWERBLUE													 0x6495EDFF
-#define COLOR_CORNSILK															 0xFFF8DCFF
-#define COLOR_CRIMSON															 0xDC143CFF
-#define COLOR_CYAN																 0x00FFFFFF
-#define COLOR_DARKBLUE															 0x00008BFF
-#define COLOR_DARKCYAN															 0x008B8BFF
-#define COLOR_DARKGOLDENROD														 0xB8860BFF
-#define COLOR_DARKGRAY															 0xA9A9A9FF
-#define COLOR_DARKGREEN															 0x006400FF
-#define COLOR_DARKKHAKI															 0xBDB76BFF
-#define COLOR_DARKMAGENTA														 0x8B008BFF
-#define COLOR_DARKOLIVEGREEN													 0x556B2FFF
-#define COLOR_DARKORANGE														 0xFF8C00FF
-#define COLOR_DARKORCHID														 0x9932CCFF
-#define COLOR_DARKRED															 0x8B0000FF
-#define COLOR_DARKSALMON														 0xE9967AFF
-#define COLOR_DARKSEAGREEN														 0x8FBC8BFF
-#define COLOR_DARKSLATEBLUE														 0x483D8BFF
-#define COLOR_DARKSLATEGRAY														 0x2F4F4FFF
-#define COLOR_DARKTURQUOISE														 0x00CED1FF
-#define COLOR_DARKVIOLET														 0x9400D3FF
-#define COLOR_DEEPPINK															 0xFF1493FF
-#define COLOR_DEEPSKYBLUE														 0x00BFFFFF
-#define COLOR_DESKTOP															 0x000000FF
-#define COLOR_DIMGRAY															 0x696969FF
-#define COLOR_DODGERBLUE														 0x1E90FFFF
-#define COLOR_FIREBRICK															 0xB22222FF
-#define COLOR_FLORALWHITE														 0xFFFAF0FF
-#define COLOR_FORESTGREEN														 0x228B22FF
-#define COLOR_FUCHSIA															 0xFF00FFFF
-#define COLOR_GAINSBORO															 0xDCDCDCFF
-#define COLOR_GHOSTWHITE														 0xF8F8FFFF
-#define COLOR_GOLD																 0xFFD700FF
-#define COLOR_GOLDENROD															 0xDAA520FF
-#define COLOR_GRAYTEXT															 0x808080FF
-#define COLOR_GREEN										   				 		 0x008000FF
-#define COLOR_GREENYELLOW														 0xADFF2FFF
-#define COLOR_HIGHLIGHT															 0x3399FFFF
-#define COLOR_HIGHLIGHTTEXT														 0xFFFFFFFF
-#define COLOR_HONEYDEW															 0xF0FFF0FF
-#define COLOR_HOTPINK															 0xFF69B4FF
-#define COLOR_HOTTRACK															 0x0066CCFF
-#define COLOR_INDIANRED															 0xCD5C5CFF
-#define COLOR_INDIGO															 0x4B0082FF
-#define COLOR_INFO																 0xFFFFE1FF
-#define COLOR_INFOTEXT															 0x000000FF
-#define COLOR_IVORY																 0xFFFFF0FF
-#define COLOR_KHAKI																 0xF0E68CFF
-#define COLOR_LAVENDER															 0xE6E6FAFF
-#define COLOR_LAVENDERBLUSH														 0xFFF0F5FF
-#define COLOR_LAWNGREEN															 0x7CFC00FF
-#define COLOR_LEMONCHIFFON														 0xFFFACDFF
-#define COLOR_LIGHTBLUE															 0xADD8E6FF
-#define COLOR_LIGHTCORAL														 0xF08080FF
-#define COLOR_LIGHTCYAN															 0xE0FFFFFF
-#define COLOR_LIGHTGOLDENRODYELLOW												 0xFAFAD2FF
-#define COLOR_LIGHTGRAY															 0xD3D3D3FF
-#define COLOR_LIGHTGREEN														 0x90EE90FF
-#define COLOR_LIGHTPINK															 0xFFB6C1FF
-#define COLOR_LIGHTSALMON														 0xFFA07AFF
-#define COLOR_LIGHTSEAGREEN														 0x20B2AAFF
-#define COLOR_LIGHTSKYBLUE														 0x87CEFAFF
-#define COLOR_LIGHTSLATEGRAY													 0x778899FF
-#define COLOR_LIGHTSTEELBLUE													 0xB0C4DEFF
-#define COLOR_LIGHTYELLOW														 0xFFFFE0FF
-#define COLOR_LIME																 0x00FF00FF
-#define COLOR_LIMEGREEN															 0x32CD32FF
-#define COLOR_LINEN																 0xFAF0E6FF
-#define COLOR_MAGENTA															 0xFF00FFFF
-#define COLOR_MAROON															 0x800000FF
-#define COLOR_MEDIUMAQUAMARINE													 0x66CDAAFF
-#define COLOR_MEDIUMBLUE														 0x0000CDFF
-#define COLOR_MEDIUMORCHID														 0xBA55D3FF
-#define COLOR_MEDIUMPURPLE														 0x9370DBFF
-#define COLOR_MEDIUMSEAGREEN													 0x3CB371FF
-#define COLOR_MEDIUMSLATEBLUE													 0x7B68EEFF
-#define COLOR_MEDIUMSPRINGGREEN													 0x00FA9AFF
-#define COLOR_MEDIUMTURQUOISE													 0x48D1CCFF
-#define COLOR_MEDIUMVIOLETRED													 0xC71585FF
-#define COLOR_MIDNIGHTBLUE														 0x191970FF
-#define COLOR_MINTCREAM															 0xF5FFFAFF
-#define COLOR_MISTYROSE															 0xFFE4E1FF
-#define COLOR_MOCCASIN															 0xFFE4B5FF
-#define COLOR_NAVAJOWHITE														 0xFFDEADFF
-#define COLOR_NAVY																 0x000080FF
-#define COLOR_OLDLACE															 0xFDF5E6FF
-#define COLOR_OLIVE																 0x808000FF
-#define COLOR_OLIVEDRAB															 0x6B8E23FF
-#define COLOR_ORANGE															 0xFFA500FF
-#define COLOR_ORANGERED															 0xFF4500FF
-#define COLOR_ORCHID															 0xDA70D6FF
-#define COLOR_PALEGOLDENROD														 0xEEE8AAFF
-#define COLOR_PALEGREEN															 0x98FB98FF
-#define COLOR_PALETURQUOISE														 0xAFEEEEFF
-#define COLOR_PALEVIOLETRED														 0xDB7093FF
-#define COLOR_PAPAYAWHIP														 0xFFEFD5FF
-#define COLOR_PEACHPUFF															 0xFFDAB9FF
-#define COLOR_PERU																 0xCD853FFF
-#define COLOR_PINK																 0xFFC0CBFF
-#define COLOR_PLUM																 0xDDA0DDFF
-#define COLOR_POWDERBLUE														 0xB0E0E6FF
-#define COLOR_PURPLE															 0x800080FF
-#define COLOR_RED																 0xFF0000FF
-#define COLOR_ROSYBROWN															 0xBC8F8FFF
-#define COLOR_ROYALBLUE															 0x4169E1FF
-#define COLOR_SADDLEBROWN														 0x8B4513FF
-#define COLOR_SALMON															 0xFA8072FF
-#define COLOR_SANDYBROWN														 0xF4A460FF
-#define COLOR_SEAGREEN															 0x2E8B57FF
-#define COLOR_SEASHELL															 0xFFF5EEFF
-#define COLOR_SIENNA															 0xA0522DFF
-#define COLOR_SILVER															 0xC0C0C0FF
-#define COLOR_SKYBLUE															 0x87CEEBFF
-#define COLOR_SLATEBLUE															 0x6A5ACDFF
-#define COLOR_SLATEGRAY															 0x708090FF
-#define COLOR_SNOW																 0xFFFAFAFF
-#define COLOR_SPRINGGREEN														 0x00FF7FFF
-#define COLOR_STEELBLUE															 0x4682B4FF
-#define COLOR_TAN																 0xD2B48CFF
-#define COLOR_TEAL																 0x008080FF
-#define COLOR_THISTLE															 0xD8BFD8FF
-#define COLOR_TOMATO															 0xFF6347FF
-#define COLOR_TRANSPARENT														 0xFFFFFF00
-#define COLOR_TURQUOISE															 0x40E0D0FF
-#define COLOR_VIOLET															 0xEE82EEFF
-#define COLOR_WHEAT																 0xF5DEB3FF
-#define COLOR_WHITE																 0xFFFFFFFF
-#define COLOR_WINDOWTEXT														 0x000000FF
-#define COLOR_YELLOW															 0xFFFF00FF
-#define COLOR_YELLOWGREEN														 0x9ACD32FF
-#define STEALTH_ORANGE															 0xFF880000
-#define STEALTH_OLIVE															 0x66660000
-#define STEALTH_GREEN															 0x33DD1100
-#define STEALTH_PINK															 0xFF22EE00
-#define STEALTH_BLUE															 0x0077BB00
-
 
 
 #define TAXI_JOB														  		 1
@@ -342,7 +135,6 @@ enum MA_Info
 	RegisterIP[16],
 	LatestIP[16]
 };
-
 
 
 enum pinfo
@@ -745,30 +537,14 @@ new Float:InactivtyCheck_Z[MAX_PLAYERS];
 //==========================================================================
 
 
-//==========================================================================
-//	Animations  														  //
-//==========================================================================
-new LoopAnim[MAX_PLAYERS];
-new LibsPreloaded[MAX_PLAYERS];
-new Text:AnimText[MAX_PLAYERS];
-//==========================================================================
 
-
-
-//new LastQuestion;
-//==========================================================================
-new LetterList[26][] =
+new CompactDisks[][][] =
 {
-    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
-};
+    {"Barry White - Love's Theme Tune","http://www.soselettricista.com/musica.mp3"},
+    {"Barry White - Can't Get Enough of Your Love, Babe", "http://hyra-en-stuga.se/assets/multimedia/02-Barry_White-Can_T_Get_Enough_Of_Your_Love_Babe.mp3"},
+    {"Sugar Hill Gang - Rappers Delight","http://www.exxxplosivo.com/music/HipHop2004/15%20Rappers%20Delight.mp3"},
+    {"Conscious Daughters - Something To Ride To", "http://a.tumblr.com/tumblr_la7mo9xNWH1qzcg1so1.mp3"}
 
-new MusicLinks[][] =
-{
-    "http://www.exxxplosivo.com/music/HipHop2004/15%20Rappers%20Delight.mp3", // Sugar Hill Gang - Rapper's Delight
-    "http://www.aidia-e.com/mydj/musica/10%20-%20Smooth%20Criminal.mp3", //Michael Jackson - Smooth Criminal
-    "http://www.soselettricista.com/musica.mp3", //Barry White - Love's Theme Tune
-	"http://hyra-en-stuga.se/assets/multimedia/02-Barry_White-Can_T_Get_Enough_Of_Your_Love_Babe.mp3", //Barry White - Can't Get Enough of Your Love, Babe
-	"https//www.smallcountyrp.com/music/ching.mp3"
 };
 
 new RadioStations[][][] =
@@ -783,13 +559,12 @@ new RadioStations[][][] =
 	{"Party Vibe Radio", "http://yp.shoutcast.com/sbin/tunein-station.pls?id=205366"}
 };
 
-new CompactDisks[][][] =
-{
-    {"Barry White - Love's Theme Tune","http://www.soselettricista.com/musica.mp3"},
-    {"Barry White - Can't Get Enough of Your Love, Babe", "http://hyra-en-stuga.se/assets/multimedia/02-Barry_White-Can_T_Get_Enough_Of_Your_Love_Babe.mp3"},
-    {"Sugar Hill Gang - Rappers Delight","http://www.exxxplosivo.com/music/HipHop2004/15%20Rappers%20Delight.mp3"},
-    {"Conscious Daughters - Something To Ride To", "http://a.tumblr.com/tumblr_la7mo9xNWH1qzcg1so1.mp3"}
 
+//new LastQuestion;
+//==========================================================================
+new LetterList[26][] =
+{
+    "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"
 };
 
 
@@ -1055,10 +830,10 @@ new WeaponNameList[][] =
 main()
 {
 	print("------------------------------------------------------------------------------");
-	print("                       Small County Roleplay - Started!						 ");
+	print("|                       Small County Roleplay - Started!						|");
 	print("------------------------------------------------------------------------------");
-
 }
+
 public OnGameModeExit()
 {
 
@@ -1198,7 +973,6 @@ public MySQLConnect()
 }
 
 
-
 public OnPlayerConnect(playerid)
 {
     new str[196];
@@ -1207,9 +981,6 @@ public OnPlayerConnect(playerid)
 
     format(str, 128, "%s has joined the server", GetDatabaseName(playerid));
     SendAdminsMessage(1, COLOR_GRAY, str);
-    
-    new rand = random(sizeof(MusicLinks));
-    PlayAudioStreamForPlayer(playerid, MusicLinks[rand][0]);
 
     CreateSpacer(playerid, 128);
 
@@ -1217,7 +988,6 @@ public OnPlayerConnect(playerid)
 	SetPlayerColor(playerid, COLOR_WHITE);
 
 	SetTimerEx("PlayerConnected", 100, false, "d", playerid);
-
 	return 1;
 }
 
@@ -4625,7 +4395,7 @@ public Load_Account_Vehicles(playerid)
 
 				if(Vehicles[vid][Model] > 399 && Vehicles[vid][Model] < 612)
 				{	
-				    new Vehicle = CreateVehicle(Vehicles[vid][Model], Vehicles[vid][PosX], Vehicles[vid][PosY], Vehicles[vid][PosZ], Vehicles[vid][PosA], Vehicles[vid][Color1], Vehicles[vid][Color2], -1);
+				    new Vehicle = CreateVehicle(Vehicles[vid][Model], Vehicles[vid][PosX], Vehicles[vid][PosY], Vehicles[vid][PosZ]+3, Vehicles[vid][PosA], Vehicles[vid][Color1], Vehicles[vid][Color2], -1);
 
 					Vehicles[Vehicle][SQLID] = Vehicles[vid][SQLID];
 					Vehicles[Vehicle][Type] = 1;
@@ -4860,64 +4630,6 @@ stock IsVehicleSpawned(vehicleid)
 	return 1;
 }
 
-CMD:loadplayervehicles(playerid,params[])
-{
-	new query[300];
-    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT * FROM `PlayerVehicles` WHERE Owner = %d LIMIT 3", PlayerInfo[playerid][SQLID]);
-	mysql_tquery(SQL_CONNECTION, query,"Load_Account_Vehicles", "i", playerid);
-	return 1;
-}
-ALTCMD:loadpv->loadplayervehicles;
-
-CMD:unloadplayerehicles(playerid,params[])
-{
-	Unload_Account_Vehicles(playerid);
-	return 1;
-}
-ALTCMD:unloadpv->unloadplayerehicles;
-
-
-
-CMD:UnloadFactionVehicles(playerid,params[])
-{
-	UnloadFactionVehicles();
-	return 1;
-}
-ALTCMD:unloadfv->UnloadFactionVehicles;
-
-CMD:LoadFactionVehicles(playerid,params[])
-{
-	LoadFactionVehicles();
-	return 1;
-}
-ALTCMD:loadfv->LoadFactionVehicles;
-
-
-
-
-CMD:loadservervehicles(playerid,params[])
-{
-	LoadVehicles();
-	return 1;
-}
-ALTCMD:loadsv->loadservervehicles;
-
-CMD:unloadservervehicles(playerid,params[])
-{
-	UnloadServerVehicles();
-	return 1;
-}
-ALTCMD:unloadsv->unloadservervehicles;
-
-
-CMD:vinfo(playerid,params[])
-{
-	new str[128];
-	new vid = GetPlayerVehicleID(playerid);
-	format(str, sizeof(str), "vSQLID: %d - Type: %d - Owner: %d - PlayerVeh1: %d -  NextFID: %d Faction: %d Rank %d TVC:%d Radio: %d", Vehicles[vid][SQLID], Vehicles[vid][Type], Vehicles[vid][Owner], PlayerInfo[playerid][TotalVehicles], GetFreeVehicleSlot(), Vehicles[vid][Faction], Vehicles[vid][Rank], Total_Vehicles_Created, Vehicles[vid][Radio]);
-	SendClientMessage(playerid, COLOR_GRAY, str);
-	return 1;
-}
 
 CMD:fvreload(playerid,params[])
 {
@@ -5194,9 +4906,10 @@ stock IsVehicleTaxi(vID)
 
 CMD:v(playerid, params[])
 {
-    new vehicleid[20], color1, color2, str[128];
+    new vehicleid[20], color1, color2, str[128], State = GetPlayerState(playerid);
     if(MasterAccount[playerid][Admin] > 0)
 	{
+		if(State == PLAYER_STATE_DRIVER) return SendErrorMessage(playerid, "You are currently driving a vehicle.");
 	    if(!sscanf(params, "s[20]dd", vehicleid, color1, color2))
 	    {
 	        new vID = FindVehicleByNameID(vehicleid);
@@ -5483,10 +5196,18 @@ public SetPlayerPosEx(playerid, Float:X, Float:Y, Float:Z, Int, vWorld)
 {
 	TogglePlayerControllable(playerid, 0);
 	SetTimerEx("UnfreezePlayer", 1500, false, "d", playerid);
-	SetPlayerPos(playerid, X, Y, Z);
+	SetPlayerPos(playerid, X, Y, Z-5);
     SetPlayerInterior(playerid, Int);
 	SetPlayerVirtualWorld(playerid, vWorld);
+	SetTimerEx("Move_Player", 1000, false, "dfff", playerid, X, Y, Z);
 	PickedUpPickup[playerid] = false;
+	return 1;
+}
+
+forward Move_Player(playerid, Float:X, Float:Y, Float:Z);
+public Move_Player(playerid, Float:X, Float:Y, Float:Z)
+{
+	SetPlayerPos(playerid, X, Y, Z);
 	return 1;
 }
 
@@ -8442,7 +8163,7 @@ CMD:vmusic(playerid, params[])
 	{
 		if(Vehicles[vid][Radio] == 1)
 		{
-			if(IsPlayerVehicle(vid) && GetPlayerState(playerid) == PLAYER_STATE_DRIVER)
+			if(IsPlayerVehicle(vid))
 			{
 				RadioSystem_MainMenu(playerid);
 			}
@@ -9225,15 +8946,41 @@ CMD:getv(playerid, params[])
 	return 1;
 }
 
+CMD:admins(playerid, params[])
+{
+	new str[128];
+	SendClientMessage(playerid, COLOR_GREEN, "Administrators:");
+	for(new player = 0; player < MAX_PLAYERS; player++)
+	{
+		if(IsPlayerConnected(player))
+		{
+		    if(MasterAccount[player][Admin] > 0)
+	  		{
+	  			if(PlayerInfo[player][AdminDuty] == 0) 
+	  			{
+	  				format(str, sizeof(str), "%s (Off Duty): %s", AdminNames[MasterAccount[player][Admin]][0],  GetRoleplayName(player));
+  				}
+  				else 
+				{
+					format(str, sizeof(str), "%s (Administrating): %s", AdminNames[MasterAccount[player][Admin]][0], GetRoleplayName(player));
+				}
+				SendClientMessage(playerid, COLOR_GRAY, str);
+		    }
+	    }
+
+	}
+	return 1;
+}
+
 CMD:adminduty(playerid, params[])
 {
 	new str[128], option[24];
 	if(MasterAccount[playerid][Admin] > 0)
 	{
 		if(sscanf(params, "s[12]", option)) return SendClientMessage(playerid, COLOR_GRAY, "/adminduty [on/off]");
-		if(PlayerInfo[playerid][AdminDuty] == 0)
+		if(!strcmp(option, "on", true))
 		{
-			if(!strcmp(option, "on", true))
+			if(PlayerInfo[playerid][AdminDuty] == 0)
 			{
 				PlayerInfo[playerid][AdminDuty] = 1;
 				for (new i = 0; i < MAX_PLAYERS; ++i)
@@ -9247,15 +8994,17 @@ CMD:adminduty(playerid, params[])
 				SendClientMessage(playerid, COLOR_YELLOW, "You are now on admin duty.");
 				SetPlayerColor(playerid, COLOR_GREEN);
 			}
+			else SendErrorMessage(playerid, "You are already on admin duty!");
 		}
-		else if(PlayerInfo[playerid][AdminDuty] == 1)
+		else if(!strcmp(option, "off", true))
 		{
-			if(!strcmp(option, "off", true))
+			if(PlayerInfo[playerid][AdminDuty] == 1)
 			{
 			    PlayerInfo[playerid][AdminDuty] = 0;
 			    SendClientMessage(playerid, COLOR_YELLOW, "You are now off admin duty.");
 			    SetPlayerColor(playerid, COLOR_WHITE);
 			}
+			else SendErrorMessage(playerid, "You are not on admin duty.");
 		}
 	}
 	else
@@ -9265,6 +9014,24 @@ CMD:adminduty(playerid, params[])
 	return 1;
 }
 ALTCMD:aduty->adminduty;
+
+
+new reportcount = 0;
+CMD:report(playerid, params[])
+{
+	new str[250], pid, info[200];
+	if(sscanf(params, "us[200]", pid, info)) return SendClientMessage(playerid, COLOR_GRAY, "/report [playerid] [reason]");
+	if(pid == playerid) return SendErrorMessage(playerid, "You cannot report yourself!");
+	if(IsPlayerConnected(pid))
+	{
+		reportcount++;
+		format(str, sizeof(str), "(#%d) Report from: [%s] | Report on: [%s] | Reason:[%s]", reportcount, GetRoleplayName(playerid), GetRoleplayName(pid), info);
+		SendAdminsMessage(1, COLOR_YELLOW, str);//log
+	}
+	else SendErrorMessage(playerid, "Player not connected.");
+	return 1;
+}
+
 
 CMD:deleteicon(playerid, params[])
 {
@@ -10405,31 +10172,6 @@ stock IsVehicleOccupied(carid)
 	return 0;
 }
 
-CMD:admins(playerid, params[])
-{
-	new str[128];
-	SendClientMessage(playerid, COLOR_GREEN, "Administrators:");
-	for(new player = 0; player < MAX_PLAYERS; player++)
-	{
-		if(IsPlayerConnected(player))
-		{
-		    if(MasterAccount[player][Admin] > 0)
-	  		{
-	  			if(PlayerInfo[player][AdminDuty] == 0) 
-	  			{
-	  				format(str, sizeof(str), "%s (Off Duty): %s", AdminNames[MasterAccount[player][Admin]][0],  GetRoleplayName(player));
-  				}
-  				else 
-				{
-					format(str, sizeof(str), "%s (Administrating): %s", AdminNames[MasterAccount[player][Admin]][0], GetRoleplayName(player));
-				}
-				SendClientMessage(playerid, COLOR_GRAY, str);
-		    }
-	    }
-
-	}
-	return 1;
-}
 
 CMD:savecar(playerid, params[])
 {
@@ -14716,468 +14458,7 @@ Dialog:BuyLegalWeapons(playerid, response, listitem, inputtext[])
 }
 
 
-OnePlayAnim(playerid,animlib[],animname[], Float:Speed, looping, lockx, locky, lockz, lp)
-{
-	ApplyAnimation(playerid, animlib, animname, Speed, looping, lockx, locky, lockz, lp);
-}
 
-
-LoopingAnim(playerid,animlib[],animname[], Float:Speed, looping, lockx, locky, lockz, lp)
-{
-    LoopAnim[playerid] = 1;
-    ApplyAnimation(playerid, animlib, animname, Speed, looping, lockx, locky, lockz, lp);
-    TextDrawShowForPlayer(playerid,AnimText[playerid]);
-}
-
-StopLoopingAnim(playerid)
-{
-	LoopAnim[playerid] = 0;
-    ApplyAnimation(playerid, "CARRY", "crry_prtial", 4.0, 0, 0, 0, 0, 0);
-}
-
-
-PreloadAnimLib(playerid, animlib[])
-{
-	ApplyAnimation(playerid,animlib,"null",0.0,0,0,0,0,0);
-}
-
-
-CMD:animlist(playerid, params[])
-{
-    Line(playerid);
-    SendClientMessage(playerid,0x061FF9FF,"/handsup - /bomb - /getarrested - /handsup - /laugh - /lookout - /aim - /sup - /smokecig");
-    SendClientMessage(playerid,0x061FF9FF,"/crossarms - /hide - /vomit - /wave - /scratch - /hitch - /getarrested - /clear");
-    SendClientMessage(playerid,0x061FF9FF,"/deal - /crack - /drunk - /smoke - /groundsit - /sit - /chat - /fucku - /push - /lowbodypush");
-    SendClientMessage(playerid,0xFFFF79FF,"/shouting - /chant - /frisked - /exhausted - /injured - /slapass - /dealstance - /bat");
-    SendClientMessage(playerid,0xFFFF79FF,"/fall - /fallback - /injured - /akick - /push - /lowbodypush - /handsup - /bomb - /drunk - /laugh");
-    SendClientMessage(playerid,0xFFFF79FF," /basket - /headbutt - /medic - /spraycan - /robman - /taichi - /lookout - /kiss - /cellin - /cellout - /crossarms");
-    SendClientMessage(playerid,0xFFFF79FF,"/deal - /crack - /groundsit - /chat - /dance - /fucku - /strip - /hide - /vomit - /eat - /chairsit - /reload");
-    SendClientMessage(playerid,0xE80000FF,"/lifejump - /exhaust - /leftslap - /carlock - /hoodfrisked - /lightcig - /tapcig - /box - /chant - /finger - /rollfall");
-    SendClientMessage(playerid,0xE80000FF,"/shouting - /knife - /cop - /elbow - /kneekick - /airkick - /gkick - /gpunch - /fstance - /lowthrow - /highthrow - /kostomach");
-    SendClientMessage(playerid,0xE80000FF,"/pee - /lean - /chairsit - /run - /groundsit - /relax - /fall - /fallback - /reload - /knife - /basket - /lay - /lay2 - /koface");
-    return 1;
-}
-
-
-CMD:lifejump(playerid, params[])
-{
-	LoopingAnim(playerid,"PED","EV_dive",4.0,0,1,1,1,0);
-	return 1;
-}
-CMD:robman(playerid, params[])
-{
-    LoopingAnim(playerid, "SHOP", "ROB_Loop_Threat", 4.0, 1, 0, 0, 0, 0); // Rob
-	return 1;
-}
-CMD:exhaust(playerid, params[])
-{
-	LoopingAnim(playerid,"PED","IDLE_tired",3.0,1,0,0,0,0);
-    return 1;
-}
-CMD:carlock(playerid, params[])
-{
-	OnePlayAnim(playerid,"PED","CAR_doorlocked_LHS",4.0,0,0,0,0,0);
-    return 1;
-}
-CMD:hoodfrisked(playerid, params[])
-{
-    LoopingAnim(playerid,"POLICE","crm_drgbst_01",4.0,0,1,1,1,0);
-    return 1;
-}
-CMD:lightcig(playerid, params[])
-{
-    OnePlayAnim(playerid,"SMOKING","M_smk_in",3.0,0,0,0,0,0);
-    return 1;
-}
-CMD:tapcig(playerid, params[])
-{
-    OnePlayAnim(playerid,"SMOKING","M_smk_tap",3.0,0,0,0,0,0);
-    return 1;
-}
-CMD:bat(playerid, params[])
-{
-    LoopingAnim(playerid,"BASEBALL","Bat_IDLE",4.0,1,1,1,1,0);
-    return 1;
-}
-CMD:lean(playerid, params[])
-{
-    new option;
-    if(sscanf(params, "d", option)) return SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /lean [1-2]");
-	switch (option)
-	{
-    	case 1: LoopingAnim(playerid,"GANGS","leanIDLE",4.0,0,1,1,1,0);
-    	case 2: LoopingAnim(playerid,"MISC","Plyrlean_loop",4.0,0,1,1,1,0);
-    	default: SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /lean [1-2]");
-	}
-	return 1;
-}
-CMD:clear(playerid, params[])
-{
-	 //ClearAnimations(playerid);
-	 ApplyAnimation(playerid, "CARRY", "crry_prtial", 1.0, 0, 0, 0, 0, 0);
-     return 1;
-}
-CMD:strip(playerid, params[])
-{
-    new option;
-    if(sscanf(params, "d", option)) return SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /strip [1-7]");
-	switch (option)
-	{
-    	case 1: LoopingAnim(playerid,"STRIP", "strip_A", 4.1, 1, 1, 1, 1, 1 );
-    	case 2: LoopingAnim(playerid,"STRIP", "strip_B", 4.1, 1, 1, 1, 1, 1 );
-    	case 3: LoopingAnim(playerid,"STRIP", "strip_C", 4.1, 1, 1, 1, 1, 1 );
-    	case 4: LoopingAnim(playerid,"STRIP", "strip_D", 4.1, 1, 1, 1, 1, 1 );
-    	case 5: LoopingAnim(playerid,"STRIP", "strip_E", 4.1, 1, 1, 1, 1, 1 );
-    	case 6: LoopingAnim(playerid,"STRIP", "strip_F", 4.1, 1, 1, 1, 1, 1 );
-    	case 7: LoopingAnim(playerid,"STRIP", "strip_G", 4.1, 1, 1, 1, 1, 1 );
-    	default: SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /strip [1-7]");
-	}
-	return 1;
-}
-
-CMD:box(playerid, params[])
-{
-    LoopingAnim(playerid,"GYMNASIUM","GYMshadowbox",4.0,1,1,1,1,0);
-    return 1;
-}
-CMD:lowthrow(playerid, params[])
-{
-    OnePlayAnim(playerid,"GRENADE","WEAPON_throwu",3.0,0,0,0,0,0);
-    return 1;
-}
-CMD:highthrow(playerid, params[])
-{
-    OnePlayAnim(playerid,"GRENADE","WEAPON_throw",4.0,0,0,0,0,0);
-    return 1;
-}
-CMD:leftslap(playerid, params[])
-{
-    OnePlayAnim(playerid,"PED","BIKE_elbowL",4.0,0,0,0,0,0);
-    return 1;
-}
-CMD:fall(playerid, params[])
-{
-    LoopingAnim(playerid,"PED","KO_skid_front",4.1,0,1,1,1,0);
-    return 1;
-}
-CMD:fallback(playerid, params[])
-{
-    LoopingAnim(playerid, "PED","FLOOR_hit_f", 4.0, 1, 0, 0, 0, 0);
-    return 1;
-}
-CMD:rap(playerid, params[])
-{
-	new option;
-    if(sscanf(params, "d", option)) return SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /rap [1-4]");
-    switch (option)
-    {
-	    case 1: LoopingAnim(playerid,"RAPPING","RAP_A_Loop",4.0,1,0,0,0,0);
-    	case 2: LoopingAnim(playerid,"RAPPING","RAP_C_Loop",4.0,1,0,0,0,0);
-    	case 3: LoopingAnim(playerid,"GANGS","prtial_gngtlkD",4.0,1,0,0,0,0);
-    	case 4: LoopingAnim(playerid,"GANGS","prtial_gngtlkH",4.0,1,0,0,1,1);
-    	default: SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /rap [1-4]");
-	}
-	return 1;
-}
-CMD:push(playerid, params[])
-{
-    OnePlayAnim(playerid,"GANGS","shake_cara",4.0,0,0,0,0,0);
-    return 1;
-}
-CMD:akick(playerid, params[])
-{
-    OnePlayAnim(playerid,"POLICE","Door_Kick",4.0,0,0,0,0,0);
-    return 1;
-}
-CMD:lowbodypush(playerid, params[])
-{
-    OnePlayAnim(playerid,"GANGS","shake_carSH",4.0,0,0,0,0,0);
-    return 1;
-}
-CMD:spraycan(playerid, params[])
-{
-    OnePlayAnim(playerid,"SPRAYCAN","spraycan_full",4.0,0,0,0,0,0);
-    return 1;
-}
-CMD:headbutt(playerid, params[])
-{
-    OnePlayAnim(playerid,"WAYFARER","WF_Fwd",4.0,0,0,0,0,0);
-    return 1;
-}
-CMD:piss(playerid, params[])
-{
-    SetPlayerSpecialAction(playerid, 68);
-    return 1;
-}
-    
-CMD:pee(playerid, params[])
-{
-    SetPlayerSpecialAction(playerid, 68);
-    return 1;
-}
-CMD:koface(playerid, params[])
-{
-    LoopingAnim(playerid,"PED","KO_shot_face",4.0,0,1,1,1,0);
-    return 1;
-}
-CMD:kostomach(playerid, params[])
-{
-    LoopingAnim(playerid,"PED","KO_shot_stom",4.0,0,1,1,1,0);
-    return 1;
-}
-CMD:rollfall(playerid, params[])
-{
-    LoopingAnim(playerid,"PED","BIKE_fallR",4.0,0,1,1,1,0);
-    return 1;
-}
-CMD:lay2(playerid, params[])
-{
-    LoopingAnim(playerid,"SUNBATHE","Lay_Bac_in",3.0,0,1,1,1,0);
-    return 1;
-}
-CMD:hitch(playerid, params[])
-{
-    LoopingAnim(playerid,"MISC","Hiker_Pose", 4.0, 1, 0, 0, 0, 0);
-    return 1;
-}
-CMD:beach(playerid, params[])
-{
-    LoopingAnim(playerid,"BEACH","SitnWait_loop_W",4.1,0,1,1,1,1);
-    return 1;
-}
-	
-CMD:medic(playerid, params[])
-{
-    LoopingAnim(playerid,"MEDIC","CPR",4.1,0,1,1,1,1);
-    return 1;
-}
-CMD:scratch(playerid, params[])
-{
-	LoopingAnim(playerid,"MISC","Scratchballs_01", 4.0, 1, 0, 0, 0, 0);
-	return 1;
-}
-CMD:sit(playerid, params[])
-{
-	LoopingAnim(playerid,"PED","SEAT_idle", 4.0, 1, 0, 0, 0, 0);
-	return 1;
-}
-CMD:cellout(playerid, params[])
-{
-    SetPlayerSpecialAction(playerid,SPECIAL_ACTION_STOPUSECELLPHONE);
-    return 1;
-}
-CMD:drunk(playerid, params[])
-{
-	LoopingAnim(playerid,"PED","WALK_DRUNK",4.0,1,1,1,1,0);
-	return 1;
-}
-CMD:bomb(playerid, params[])
-{
-	ClearAnimations(playerid);
-	OnePlayAnim(playerid, "BOMBER", "BOM_Plant", 4.0, 0, 0, 0, 0, 0);
-	return 1;
-}
-CMD:getarrested(playerid, params[])
-{
-    LoopingAnim(playerid,"ped", "ARRESTgun", 4.0, 0, 1, 1, 1, -1); 
-    return 1;
-}
-CMD:laugh(playerid, params[])
-{
-    OnePlayAnim(playerid, "RAPPING", "Laugh_01", 4.0, 0, 0, 0, 0, 0); 
-    return 1;
-}
-CMD:lookout(playerid, params[])
-{
-    OnePlayAnim(playerid, "SHOP", "ROB_Shifty", 4.0, 0, 0, 0, 0, 0);
-    return 1;
-}
-CMD:aim(playerid, params[])
-{
-    LoopingAnim(playerid, "SHOP", "ROB_Loop_Threat", 4.0, 1, 0, 0, 0, 0); 
-    return 1;
-}
-CMD:crossarms(playerid, params[])
-{
-    LoopingAnim(playerid, "COP_AMBIENT", "Coplook_loop", 4.0, 0, 1, 1, 1, -1); 
-    return 1;
-}
-CMD:lay(playerid, params[])
-{
-    LoopingAnim(playerid,"BEACH", "bather", 4.0, 1, 0, 0, 0, 0); 
-    return 1;
-}
-CMD:hide(playerid, params[])
-{
-    LoopingAnim(playerid, "ped", "cower", 3.0, 1, 0, 0, 0, 0); 
-    return 1;
-}
-CMD:vomit(playerid, params[])
-{
-    OnePlayAnim(playerid, "FOOD", "EAT_Vomit_P", 3.0, 0, 0, 0, 0, 0);
-    return 1;
-}
-CMD:eat(playerid, params[])
-{
-      OnePlayAnim(playerid, "FOOD", "EAT_Burger", 3.0, 0, 0, 0, 0, 0); // Eat Burger
-	  return 1;
-}
-CMD:wave(playerid, params[])
-{
-    LoopingAnim(playerid, "ON_LOOKERS", "wave_loop", 4.0, 1, 0, 0, 0, 0); 
-    return 1;
-}
-CMD:smokecig(playerid, params[])
-{
-	new option;
-    if(sscanf(params, "d", option)) return SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /smokecig [1-4]");
-    switch (option)
-    {
-    	case 1: LoopingAnim(playerid,"SMOKING", "M_smklean_loop", 4.0, 1, 0, 0, 0, 0); // male
-    	case 2: LoopingAnim(playerid,"SMOKING", "F_smklean_loop", 4.0, 1, 0, 0, 0, 0); //female
-    	case 3: LoopingAnim(playerid,"SMOKING","M_smkstnd_loop", 4.0, 1, 0, 0, 0, 0); // standing-fucked
-    	case 4: LoopingAnim(playerid,"SMOKING","M_smk_out", 4.0, 1, 0, 0, 0, 0); // standing
-    	default: SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /smokecig [1-4]");
-	}
-	return 1;
-}
-CMD:shouting(playerid, params[])
-{
-    LoopingAnim(playerid,"RIOT","RIOT_shout",4.0,1,0,0,0,0);
-    return 1;
-}
-CMD:chant(playerid, params[])
-{
-    LoopingAnim(playerid,"RIOT","RIOT_CHANT",4.0,1,1,1,1,0);
-    return 1;
-}
-CMD:frisked(playerid, params[])
-{
-    LoopingAnim(playerid,"POLICE","crm_drgbst_01",4.0,0,1,1,1,0);
-    return 1;
-}
-CMD:exhausted(playerid, params[])
-{
-    LoopingAnim(playerid,"PED","IDLE_tired",3.0,1,0,0,0,0);
-    return 1;
-}
-CMD:injured(playerid, params[])
-{
-    LoopingAnim(playerid, "SWEET", "Sweet_injuredloop", 4.0, 1, 0, 0, 0, 0);
-    return 1;
-}
-CMD:slapass(playerid, params[])
-{
-    OnePlayAnim(playerid, "SWEET", "sweet_ass_slap", 4.0, 0, 0, 0, 0, 0);
-    return 1;
-}
-CMD:deal(playerid, params[])
-{
-    OnePlayAnim(playerid, "DEALER", "DEALER_DEAL", 4.0, 0, 0, 0, 0, 0); 
-    return 1;
-}
-CMD:dealstance(playerid, params[])
-{
-    LoopingAnim(playerid,"DEALER","DEALER_IDLE",4.0,1,0,0,0,0);
-    return 1;
-}
-CMD:crack(playerid, params[])
-{
-    LoopingAnim(playerid, "CRACK", "crckdeth2", 4.0, 1, 0, 0, 0, 0); 
-    return 1;
-}
-CMD:wank(playerid, params[])
-{
-    LoopingAnim(playerid,"PAULNMAC", "wank_loop", 1.800001, 1, 0, 0, 1, 600);
-    return 1;
-}
-CMD:groundsit(playerid, params[])
-{
-    LoopingAnim(playerid,"BEACH", "ParkSit_M_loop", 4.0, 1, 0, 0, 0, 0); 
-    return 1;
-}
- 
-CMD:rocky(playerid, params[])
-{
-    LoopingAnim(playerid,"GYMNASIUM", "GYMshadowbox", 1.800001, 1, 0, 0, 1, 600);
-    return 1;
-}
-CMD:chairsit(playerid, params[])
-{
-    LoopingAnim(playerid,"BAR","dnk_stndF_loop",4.0,1,0,0,0,0);
-    return 1;
-}
-CMD:chat(playerid, params[])
-{
-    OnePlayAnim(playerid,"PED","IDLE_CHAT",4.0,0,0,0,0,0);
-    return 1;
-}
-CMD:fucku(playerid, params[])
-{
-    OnePlayAnim(playerid,"PED","fucku",4.0,0,0,0,0,0);
-    return 1;
-}
-CMD:taichi(playerid, params[])
-{
-    LoopingAnim(playerid,"PARK","Tai_Chi_Loop",4.0,1,0,0,0,0);
-    return 1;
-}
-CMD:sleep(playerid, params[])
-{
-    LoopingAnim(playerid,"CRACK", "crckdeth2", 1.800001, 1, 0, 0, 1, 600);
-    return 1;
-}
-	
-CMD:relax(playerid, params[])
-{
-    LoopingAnim(playerid,"BEACH", "bather", 4.0, 1, 0, 0, 0, 0);
-    return 1;
-}
-CMD:knife(playerid, params[])
-{
-	new option;
-    if(sscanf(params, "d", option)) return SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /knife [1-4]");
-    switch (option)
-    {
-    	    case 1: LoopingAnim(playerid,"KNIFE","KILL_Knife_Ped_Damage",4.0,0,1,1,1,0);
-        	case 2: LoopingAnim(playerid,"KNIFE","KILL_Knife_Ped_Die",4.0,0,1,1,1,0);
-        	case 3: OnePlayAnim(playerid,"KNIFE","KILL_Knife_Player",4.0,0,0,0,0,0);
-        	case 4: LoopingAnim(playerid,"KNIFE","KILL_Partial",4.0,0,1,1,1,1);
-        	default: SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /knife [1-4]");
-	}
-	return 1;
-}
-CMD:basket(playerid, params[])
-{
-	new option;
-    if(sscanf(params, "d", option)) return SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /basket [1-6]");
-    switch (option)
-    {
-    	case 1: LoopingAnim(playerid,"BSKTBALL","BBALL_idleloop",4.0,1,0,0,0,0);
-    	case 2: OnePlayAnim(playerid,"BSKTBALL","BBALL_Jump_Shot",4.0,0,0,0,0,0);
-    	case 3: OnePlayAnim(playerid,"BSKTBALL","BBALL_pickup",4.0,0,0,0,0,0);
-    	case 4: LoopingAnim(playerid,"BSKTBALL","BBALL_run",4.1,1,1,1,1,1);
-    	case 5: LoopingAnim(playerid,"BSKTBALL","BBALL_def_loop",4.0,1,0,0,0,0);
-    	case 6: LoopingAnim(playerid,"BSKTBALL","BBALL_Dnk",4.0,1,0,0,0,0);
-    	default: SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /basket [1-6]");
-	}
-	return 1;
-}
-CMD:dance(playerid, params[])
-{
-    new option;
-    if(sscanf(params, "d", option)) return SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /dance [1-4]");
-    switch (option)
-    {
-        case 1: SetPlayerSpecialAction(playerid,SPECIAL_ACTION_DANCE1);
-        case 2: SetPlayerSpecialAction(playerid,SPECIAL_ACTION_DANCE1);
-        case 3: SetPlayerSpecialAction(playerid,SPECIAL_ACTION_DANCE1);
-        case 4: SetPlayerSpecialAction(playerid,SPECIAL_ACTION_DANCE1);
-        default: SendClientMessage(playerid,0xEFEFF7AA,"USAGE: /dance [1-4]");
-	}
-
-	return 1;
-}
 /*
 Dialog:(playerid, response, listitem, inputtext[])
 {
