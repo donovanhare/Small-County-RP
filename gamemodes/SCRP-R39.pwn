@@ -25,205 +25,48 @@
 //==============================================================================
 //          -- > Gamemode Includes
 //==============================================================================	
-#include "../gamemodes/modules/player/animations.pwn"
 
-//#include "../gamemodes/modules/vehicle/accessories/compact_disks.pwn"
-//#include "../gamemodes/modules/vehicle/accessories/radio_stations.pwn"
+#include "/modules/server/defines/colours.pwn"
+#include "/modules/server/defines/error_msgs.pwn"
+#include "/modules/server/defines/limits.pwn"
+#include "/modules/server/defines/random.pwn"
 
-#include "../gamemodes/modules/server/colours.pwn"
-#include "../gamemodes/modules/server/login_music.pwn"
+#include "/modules/server/sql/connection.pwn"
+#include "/modules/server/sql/functions.pwn"
+#include "/modules/server/sql/load_settings.pwn"
 
-#define LOG_PATH "/Server Logs/%s.txt"
 
-
-//==============================================================================
-//          -- > Database Information
-//==============================================================================
-#define SQL_HOST "127.0.0.1"
-#define SQL_USER "Server"
-#define SQL_PASS "7nWvKXZZjL5bHS6T"
-#define SQL_DB "Server01"
+#include "/modules/server/features/login_music.pwn"
 
 //==============================================================================
-//          -- > Message Defines
-//==============================================================================
-#define ERROR_LOGGEDIN															"You are not logged in, mate."
-#define ERROR_ADMIN 															"You don't have access to this command."
-#define ERROR_SPAM_TIME															"This command cannot be performed at this point in time."
-#define ERROR_LOCATION															"This command cannot be performed at this location."
-#define ERROR_MONEY																"Insufficient funds."
-#define ERROR_ADMINLEVEL														"This cannot be performed on a higher level administrator."
-#define ERROR_INVALIDPLAYER														"Invalid player specified."
-#define ERROR_VEHICLE															"You must be in a vehicle to perform this command."
-#define ERROR_FACTION 															"You don't have access to this command."
-#define ERROR_VALUE																"You cannot use that value at this point in time."
-#define ERROR_OPTION															"Not a valid option."
-#define ERROR_DIALOG															"The dialog has been closed."
-#define ERROR_RANK																"Not a high enough rank."
-#define ERROR_MUTED																"You are muted, you cannot talk."
-#define ERROR_OWNED																"You already own an item of this type."
-#define ERROR_OWNER																"This item is already owned."
-#define ERROR_NOTOWNED															"You do not own this item."
-#define ERROR_JOB																"You don't have the job required to do this."
-#define ERROR_CONNECTED															"The player that you are requesting isn't connected."
-//==============================================================================
-#define PAYDAY_STANDARD                                                         250
-#define PAYDAY_FACTION	                                                        300
-#define PAYDAY_DONATOR	                                                        2500
-#define PAYDAY_ADMIN	                                                        3750
-#define PAYDAY_XP_STANDARD                                                      1
-#define PAYDAY_XP_BIZ                                                           2
-#define PAYDAY_XP_FACTION                                                       1
-//==============================================================================
+
+#include "/modules/player/account/join/login.pwn"
+
+#include "/modules/player/account/character.pwn"
+#include "/modules/player/account/master_acc.pwn"
+#include "/modules/player/account/character_functions.pwn"
 
 
-#define ALTCMD:%1->%2; \
-    CMD:%1(playerid, params[]) \
-    return cmd_%2(playerid, params);
+#include "/modules/player/inventory/inv.pwn"
 
-#define ALTCMD2:%1->%2; \
-    CMD:%1(playerid) \
-    return cmd_%2(playerid);
+#include "/modules/player/chats/functions.pwn"
+#include "/modules/player/chats/commands.pwn"
 
-
-#define SECONDS(%0)             (%0*1000)
-#define MINUTES(%0)             (%0*SECONDS(60))
-#define HOURS(%0)               (%0*MINUTES(60))
-
-// PRESSED(keys)
-#define PRESSED(%0) \
-	(((newkeys & (%0)) == (%0)) && ((oldkeys & (%0)) != (%0)))
+#include "modules/player/commands/animations.pwn"
 
 //==============================================================================
-#define MAX_VEH                                                      			200
-#define MAX_FACTIONS                                                            10
-#define MAX_HOUSES                                                              100
-#define MAX_BIZ                                                                 100
-#define MAX_ICONS                                                               50
-#define MAX_OBJECTZ                                                             5000
-#define MAX_JOBS                                                                5
-//==============================================================================
-#define Range_VShort                                                            4.0
-#define Range_Short 															15.0
-#define Range_Normal															20.0
-#define Range_Long																40.0
-#define Range_VLong																100.0	
+
+#include "modules/business/functions.pwn"
+
+//#include "/modules/vehicle/accessories/compact_disks.pwn"
+//#include "/modules/vehicle/accessories/radio_stations.pwn"
 
 
-#define TAXI_JOB														  		 1
-#define MECHANIC_JOB													  		 2
 
-#define PNC_JAIL																 1
-#define PNC_CHARGE																 2
-#define PNC_FINES																 3
-#define PNC_WARRANT																 4
-#define PNC_WLOG																 5
-//==============================================================================
 //          -- > Enums
 //==============================================================================
-enum MA_Info
-{
-	SQLID,
-	Name[32],
-	Account01,
-	Account02,
-	Account03,
-	Admin,
-	Name01[32],
-	Name02[32],
-	Name03[32],
-	RegisterIP[16],
-	LatestIP[16]
-};
 
 
-enum pinfo
-{
-	SQLID,
- 	Username[32],
-	LoggedIn,
-	LoginAttempts,
-	Tutorial,
-	Level,
-	XP,
-	Cash,
-	Admin,
-	AdminDuty,
-	Skin,
-	Float:PosX,
-	Float:PosY,
-	Float:PosZ,
-	VWorld,
-	Interior,
-	Age,
-	Gender,
-	Kicks,
-	Muted,
-	Faction,
-	Rank,
-	Job,
-	House,
-	Business,
-	Business2,
-	Float:Health,
-	Float:Armour,
-	bEntered,
-	hEntered,
-	TotalVehicles,
-	Bank,
-	Dealership,
-	RegisterIP[16],
-	LatestIP[16],
-	NewID,
-	NewVehicle,
-	ExemptIP,
-    TotalTimePlayed,
-    OnlinePeriod,
-    IsSpec,
-    QuizProgress,
-    ClothesSelection,
-    Payday,
-    LastOnline,
-    DrivingTest,
-    DeleteingObject,
-    TruckingCompleted,
-    TruckCoolDown,
-    InHospital,
-    MovableObject,
-    FactionOffer,
-    Cuffed,
-    Spawn,
-    Jail,
-    PNC,
-    Weapons[104],
-    Duty,
-    Uniform
-};
-
-
-enum business
-{
-	SQLID,
-	Name[32],
-	Float:PosX,
-	Float:PosY,
-	Float:PosZ,
-	Interior,
-	World,
-	Float:InteriorX,
-	Float:InteriorY,
-	Float:InteriorZ,
-	Text3D: LabelID,
-	PickupID,
-	Owned,
-	Price,
-	Payout,
-	Safe,
-	Type,
-	EntranceFee,
-	Locked,
-	Owner
-};
 
 
 enum vehicle
@@ -305,16 +148,6 @@ enum house
 	Safe
 };
 
-enum sver
-{
-	ID,
-	Name[32],
-	Version[16],
-	Locked,
-	Password[32],
-	Weather
-};
-
 enum icon
 {
 	SQLID,
@@ -394,17 +227,6 @@ enum driving
 	MDL
 };
 
-enum inv
-{
-	PhoneNumber,
-	PhoneStatus,
-	PhoneCaller,
-	PhoneEmergency,
-    VehicleRadio,
-    Radio,
-    RadioFreq,
-    Screwdriver
-};
 
 
 enum ems
@@ -421,19 +243,13 @@ native WP_Hash(buffer[], len, const str[]);
 //==========================================================================
 //	Server/Player Variables												  //
 //==========================================================================
-new Server[sver];
-new SQL_CONNECTION;
 new OOCStatus = 0;
-
-new MasterAccount[MAX_PLAYERS][MA_Info];
-new PlayerInfo[MAX_PLAYERS][pinfo];
-new Inventory[MAX_PLAYERS][inv];
 
 new Weapon[MAX_PLAYERS][13];
 new WeaponAmmo[MAX_PLAYERS][13];
 
 new SkinSelection[MAX_PLAYERS] = 0;
-new Create_New_Biz_ID[MAX_PLAYERS];
+
 //==========================================================================
 
 
@@ -472,7 +288,6 @@ new EmergencyState[MAX_VEH];
 //	Icons & Objects  													  //
 //==========================================================================
 new IconID;
-new Biz[MAX_BIZ][business], Total_Biz_Created, bizzid[MAX_PLAYERS];
 new Icons[MAX_ICONS][icon], Total_Icons_Created;
 new Houses[MAX_HOUSES][house], Total_Houses_Created, houseid[MAX_PLAYERS];
 new Objects[MAX_OBJECTZ][object], Total_Objects_Created;
@@ -841,7 +656,6 @@ public OnGameModeExit()
 	return 1;
 }
 
-
 public OnGameModeInit()
 {
     MySQLConnect();
@@ -859,7 +673,7 @@ public OnGameModeInit()
 
     mysql_tquery(SQL_CONNECTION, "SELECT * FROM `Houses` ORDER BY SQLID ASC", "LoadHouses");
 
-	mysql_tquery(SQL_CONNECTION, "SELECT * FROM `Biz` ORDER BY SQLID ASC", "LoadBiz");
+    Fetch_Businesses();
 
 	mysql_tquery(SQL_CONNECTION, "SELECT * FROM `Objects`", "LoadObjects");
 
@@ -945,51 +759,10 @@ public OnGameModeInit()
 		TextDrawSetShadow(BlackOutText[i], 0);
 
 	}
-
 	return 1;
 }
 
 
-forward MySQLConnect();
-public MySQLConnect()
-{
-	SQL_CONNECTION = mysql_connect(SQL_HOST, SQL_USER, SQL_DB, SQL_PASS);
-	mysql_log(LOG_ALL);
-    if(mysql_errno(SQL_CONNECTION) == 0)
-    {
-		mysql_log(LOG_ERROR | LOG_WARNING | LOG_DEBUG);
-		printf("------------------------------------------------------------------------------");
-    	printf("[MYSQL]: Connection to `%s`@'%s' succesful!", SQL_DB, SQL_HOST);
-		printf("------------------------------------------------------------------------------");
-	}
-	else
-	{
-		printf("------------------------------------------------------------------------------");
-	    printf("[MYSQL]: ERROR: Connection to `%s`@'%s' failed!", SQL_DB, SQL_HOST);
-		printf("------------------------------------------------------------------------------");
-	}
-
-	return 1;
-}
-
-
-public OnPlayerConnect(playerid)
-{
-    new str[196];
-    ResetMasterAccountVariables(playerid);
-	NameCheck(playerid);
-
-    format(str, 128, "%s has joined the server", GetDatabaseName(playerid));
-    SendAdminsMessage(1, COLOR_GRAY, str);
-
-    CreateSpacer(playerid, 128);
-
-	TogglePlayerSpectating(playerid, 1);
-	SetPlayerColor(playerid, COLOR_WHITE);
-
-	SetTimerEx("PlayerConnected", 100, false, "d", playerid);
-	return 1;
-}
 
 public OnLookupComplete(playerid)
 {
@@ -1002,45 +775,23 @@ public OnLookupComplete(playerid)
 	}
 }
 
-forward LoadSettings(id);
-public LoadSettings(id)
+
+public OnPlayerConnect(playerid)
 {
-	if(cache_num_rows())
-    {
-    	
-    	Server[ID] = cache_get_field_content_int(0, "ID", SQL_CONNECTION);
-  		cache_get_field_content(0, "Name", Server[Name], SQL_CONNECTION, 32);
-  		cache_get_field_content(0, "Version", Server[Version], SQL_CONNECTION, 16);
-		Server[Locked] = cache_get_field_content_int(0, "Locked", SQL_CONNECTION);
-		cache_get_field_content(0, "Password", Server[Password], SQL_CONNECTION, 16);
-		Server[Weather] = cache_get_field_content_int(0, "Weather", SQL_CONNECTION);
+    new str[196];
+    ResetMasterAccountVariables(playerid);
+	NameCheck(playerid);
 
-		new str[128];
-		if(Server[Locked] == 1)
-		{
-			
-			format(str, sizeof(str), "password %s", Server[Password]);
-			SendRconCommand(str);
-		}
-		else if(Server[Locked] == 0)
-		{
-			SendRconCommand("password ");
-		}
-		format(str, sizeof(str), "hostname %s", Server[Name]);
-		SendRconCommand(str);
+    format(str, 128, "%s has joined the server", GetDatabaseName(playerid));
+    SendAdminsMessage(1, COLOR_GRAY, str);
 
-		format(str, sizeof(str), "gamemodetext %s", Server[Version]);
-		SendRconCommand(str);
+    
 
-		printf("[MYSQL]: Server Settings Loaded.", id);
-	}
-	else
-	{
-		print("ERROR: Loading Settings");
-	}
-	return 1;
+	TogglePlayerSpectating(playerid, 1);
+	SetPlayerColor(playerid, COLOR_WHITE);
+
+	SetTimerEx("PlayerConnected", 100, false, "d", playerid);
 }
-
 
 
 
@@ -1049,17 +800,14 @@ public PlayerConnected(playerid)
 {
 	if(IsPlayerConnected(playerid))
 	{
-		new query[400], str[128];
+		new str[128];
 		format(str, sizeof(str), "%s [%s]", Server[Name], Server[Version]);
 		SendClientMessage(playerid, COLOR_ORANGE, str);
 		format(str, 128, "Welcome to the server, %s.", GetDatabaseName(playerid));
 	    SendClientMessage(playerid, COLOR_WHITE, str);
-	    
-		ResetPlayerVariables(playerid);
+		
 		SetPlayerCameraLookAt(playerid, -193.2323, 1098.5872, 19.5938);
 	    InterpolateCameraPos(playerid, -463.8441, 1098.2235, 23.3950, 176.2551, 1093.3696, 38.7697, 100000, CAMERA_MOVE);
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT SQLID FROM `MasterAccounts` WHERE MA_Name = '%e' LIMIT 1", GetDatabaseName(playerid));
-	    mysql_tquery(SQL_CONNECTION, query, "ShowPlayerLogin", "i", playerid);
 	    InfoBoxForPlayer(playerid, "== ~y~[Small County Roleplay]~w~ ==~n~Welcome to Small County Roleplay!");
 	}
 
@@ -1251,7 +999,7 @@ public Select_MasterAccount(playerid)
 {
 	new query[400];
 	PlayerInfo[playerid][LoggedIn] = 0;
-	ResetPlayerVariables(playerid);
+	Reset_PlayerInfo(playerid);
     mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT SQLID, MA_Account01, MA_Account02, MA_Account03, MA_Admin FROM MasterAccounts WHERE SQLID = %d LIMIT 1", MasterAccount[playerid][SQLID]);
 	mysql_tquery(SQL_CONNECTION, query, "Load_MasterAccount", "i", playerid);
 
@@ -1291,7 +1039,8 @@ public DisplayCharacters(playerid)
     {
     	new str[128];
 
-    	ResetPlayerVariables(playerid);
+    	Reset_PlayerInfo(playerid);
+
     	SelectionBox[playerid] = CreatePlayerTextDraw(playerid, 320.000000, 143.000000, "~n~Characters~n~~n~~n~~n~~n~~n~~n~~n~~n~~n~~n~");
 	    PlayerTextDrawAlignment(playerid, SelectionBox[playerid], 2);
 	    PlayerTextDrawBackgroundColor(playerid, SelectionBox[playerid], 255);
@@ -1536,7 +1285,7 @@ public CreateHouse(id)
     if(Houses[id][Owner] == 0)
     {
 		format(str, sizeof(str), ""COL_RED"FOR SALE\n"COL_WHITE"%s\nPrice: $%d \n",Houses[id][Name],Houses[id][Price]);
-		Houses[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
+		Houses[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, -1, -1, -1, 10.0);
     	Houses[id][PickupID] = CreateDynamicPickup(1273, 23, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 0, 0, -1, 250);
 
 	}
@@ -1559,7 +1308,7 @@ public CreateHouseLabel(id)
 	new str[128], houseowner[MAX_PLAYER_NAME];
 	cache_get_field_content(0, "Username", houseowner, SQL_CONNECTION, MAX_PLAYER_NAME);
 	format(str, sizeof(str), "%s\n"COL_GRAY"Owner: %s", Houses[id][Name], houseowner);
-  	Houses[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
+  	Houses[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, -1, -1, -1, 10.0);
 	return 1;
 }
 
@@ -1695,32 +1444,6 @@ public FixKick(playerid)
 	return 1;
 }
 
-public OnQueryError(errorid, error[], callback[], query[], connectionHandle)
-{
-	switch(errorid)
-	{
-		case CR_SERVER_GONE_ERROR:
-		{
-			printf("Lost connection to server, trying reconnect...");
-			mysql_reconnect(connectionHandle);
-		}
-		case ER_SYNTAX_ERROR:
-		{
-			printf("[MYSQL]: SYNTAX ERROR: %s",query);
-		}
-	}
-	new str[400];
-	format(str, sizeof(str), "[MYSQL ERROR]: ID: %d", errorid);
-	SendAdminsMessage(6, COLOR_RED, str);
-	print(str);
-	format(str, sizeof(str), "[MYSQL ERROR]: Error: %s", error);
-	SendAdminsMessage(6, COLOR_RED, str);
-	print(str);
-	format(str, sizeof(str), "[MYSQL ERROR]: Query: %s", query);
-	SendAdminsMessage(6, COLOR_RED, str);
-	print(str);
-	return 1;
-}
 
 stock Log(playerid, string[])
 {
@@ -1923,9 +1646,9 @@ public GivePayday(playerid)
 	SendClientMessage(playerid, COLOR_YELLOW, "------PAYDAY------");
 
 //Business Payout
-	if(PlayerInfo[playerid][Business] > 0)
+	if(PlayerInfo[playerid][Business_1] > 0)
 	{
-		format(bizincome, sizeof(bizincome), "Amount added to your business safe = $%d.", Biz[PlayerInfo[playerid][Business]][Payout]);
+		format(bizincome, sizeof(bizincome), "Amount added to your business safe = $%d.", Business[PlayerInfo[playerid][Business_1]][Payout]);
 		SendClientMessage(playerid, COLOR_YELLOW, bizincome);
 		
 		GivePlayerXP(playerid, PAYDAY_XP_BIZ);
@@ -1933,12 +1656,12 @@ public GivePayday(playerid)
 		format(bizincome, sizeof(bizincome), "You have received %d XP for owning a business.", PAYDAY_XP_BIZ);
 		SendClientMessage(playerid, COLOR_GRAY, bizincome);
 
-		Biz[PlayerInfo[playerid][Business]][Safe] += Biz[PlayerInfo[playerid][Business]][Payout];
+		Business[PlayerInfo[playerid][Business_1]][Safe] += Business[PlayerInfo[playerid][Business_1]][Payout];
 	}
 
-	if(PlayerInfo[playerid][Business2] > 0)
+	if(PlayerInfo[playerid][Business_2] > 0)
 	{
-		format(bizincome, sizeof(bizincome), "Amount added to your second business' safe = $%d.", Biz[PlayerInfo[playerid][Business2]][Payout]);
+		format(bizincome, sizeof(bizincome), "Amount added to your second business' safe = $%d.", Business[PlayerInfo[playerid][Business_2]][Payout]);
 		SendClientMessage(playerid, COLOR_YELLOW, bizincome);
 		
 		GivePlayerXP(playerid, PAYDAY_XP_BIZ);
@@ -1946,7 +1669,7 @@ public GivePayday(playerid)
 		format(bizincome, sizeof(bizincome), "You have received %d XP for owning a business.", PAYDAY_XP_BIZ);
 		SendClientMessage(playerid, COLOR_GRAY, bizincome);
 
-		Biz[PlayerInfo[playerid][Business2]][Safe] += Biz[PlayerInfo[playerid][Business2]][Payout];
+		Business[PlayerInfo[playerid][Business_2]][Safe] += Business[PlayerInfo[playerid][Business_2]][Payout];
 	}
 
 //No faction Payout
@@ -2005,74 +1728,17 @@ stock CreateSpacer(playerid, lines)
 	}
 	return 1;
 }
-stock ResetMasterAccountVariables(playerid)
+
+MYSQL_Update_Account(playerid, option1[], option2)
 {
-	MasterAccount[playerid][SQLID] = 0;
-	MasterAccount[playerid][Account01] = 0;
-	MasterAccount[playerid][Account02] = 0;
-	MasterAccount[playerid][Account03] = 0;
-	MasterAccount[playerid][Admin] = 0;
+	new query[128];
+    mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET %e = %d WHERE SQLID = %d LIMIT 1", option1, option2, PlayerInfo[playerid][SQLID]);
+	mysql_tquery(SQL_CONNECTION, query);
 	return 1;
 }
 
-stock ResetPlayerVariables(playerid)
+Reset_PlayerInfo(playerid)
 {
-	PlayerInfo[playerid][SQLID] = 0;
-	//PlayerInfo[playerid][Username] = 0
-	PlayerInfo[playerid][LoggedIn] = 0;
-	PlayerInfo[playerid][LoginAttempts] = 0;
-	PlayerInfo[playerid][Tutorial] = 0;
-	PlayerInfo[playerid][Level] = 0;
-	PlayerInfo[playerid][XP] = 0;
-	PlayerInfo[playerid][Cash] = 0;
-	PlayerInfo[playerid][AdminDuty] = 0;
-	PlayerInfo[playerid][Skin] = 0;
-	PlayerInfo[playerid][PosX] = 0;
-	PlayerInfo[playerid][PosY] = 0;
-	PlayerInfo[playerid][PosZ] = 0;
-	PlayerInfo[playerid][VWorld] = 0;
-	PlayerInfo[playerid][Interior] = 0;
-	PlayerInfo[playerid][Age] = 0;
-	PlayerInfo[playerid][Gender] = 0;
-	PlayerInfo[playerid][Kicks] = 0;
-	PlayerInfo[playerid][Muted] = 0;
-	PlayerInfo[playerid][Faction] = 0;
-	PlayerInfo[playerid][Rank] = 0;
-	PlayerInfo[playerid][Job] = 0;
-	PlayerInfo[playerid][House] = 0;
-	PlayerInfo[playerid][Business] = 0;
-	PlayerInfo[playerid][Business2] = 0;
-	PlayerInfo[playerid][Health] = 0;
-	PlayerInfo[playerid][Armour] = 0;
-	PlayerInfo[playerid][bEntered] = 0;
-	PlayerInfo[playerid][hEntered] = 0;
-	PlayerInfo[playerid][TotalVehicles] = 0;
-	PlayerInfo[playerid][Bank] = 0;
-	PlayerInfo[playerid][Dealership] = 0;
-	PlayerInfo[playerid][RegisterIP] = 0;
-	PlayerInfo[playerid][LatestIP] = 0;
-	PlayerInfo[playerid][NewID] = 0;
-	PlayerInfo[playerid][NewVehicle] = 0;
-	PlayerInfo[playerid][ExemptIP] = 0;
-    PlayerInfo[playerid][TotalTimePlayed] = 0;
-    PlayerInfo[playerid][OnlinePeriod] = 0;
- 	PlayerInfo[playerid][IsSpec] = -1;
- 	PlayerInfo[playerid][QuizProgress] = 0;
- 	PlayerInfo[playerid][ClothesSelection] = 0;
- 	PlayerInfo[playerid][Payday] = 0;
- 	PlayerInfo[playerid][LastOnline] = 0;
- 	PlayerInfo[playerid][DeleteingObject] = 0;
- 	PlayerInfo[playerid][TruckingCompleted] = 0;
- 	PlayerInfo[playerid][TruckCoolDown] = 0;
- 	PlayerInfo[playerid][InHospital] = 0;
-  	PlayerInfo[playerid][MovableObject] = 0;
-  	PlayerInfo[playerid][FactionOffer] = 0;
-  	PlayerInfo[playerid][Cuffed] = 0;
-  	PlayerInfo[playerid][Jail] = 0;
-  	PlayerInfo[playerid][PNC] = 0;
-  	PlayerInfo[playerid][Duty] = 0;
-  	PlayerInfo[playerid][Uniform] = 0;
-
  	Inventory[playerid][PhoneStatus] = 0;
  	Inventory[playerid][PhoneCaller] = -1;
  	Inventory[playerid][PhoneNumber] = 0;
@@ -2121,73 +1787,6 @@ stock GetPlayerID(const name[])
 }
 
 
-stock SendLocalMessage(playerid, msg[], Float:MessageRange, Range1color, Range2color)
-{
-	new Float: PlayerX, Float: PlayerY, Float: PlayerZ;
-	GetPlayerPos(playerid, PlayerX, PlayerY, PlayerZ);
-	for(new i = 0; i < MAX_PLAYERS; i++ )
-    {
-		if(IsPlayerInRangeOfPoint(i, MessageRange, PlayerX, PlayerY,PlayerZ))
-        {
-		    SendClientMessage(i, Range1color, msg);
-		}
-		else if(IsPlayerInRangeOfPoint(i, MessageRange/2.0, PlayerX, PlayerY,PlayerZ))
-        {
-		    SendClientMessage(i, Range2color, msg);
-		}
-	}
-	return 1;
-}
-
-stock SendPunishmentMessage(str[])
-{
-	for(new i = 0; i < MAX_PLAYERS; i++)
-    {
-        if(IsPlayerConnected(i))
-        {
-            if(PlayerInfo[i][LoggedIn] > 0)
-            {
-                new astr[128];
-				format(astr, sizeof(astr), "[PUNISHMENT] %s", str);
-			    SendClientMessage(i, COLOR_ORANGERED, astr);
-			 }
-		}
-	}
-    return 1;
-}
-
-
-stock SendErrorMessage(playerid, str[])
-{
-    new astr[128];
-	format(astr, sizeof(astr), "> [ERROR] %s", str);
-    SendClientMessage(playerid, COLOR_GRAY, astr);
-    return 1;
-}
-
-stock SendInfoMessage(playerid, str[])
-{
-    new astr[128];
-	format(astr, sizeof(astr), "[INFO] %s", str);
-    SendClientMessage(playerid, COLOR_LBLUE, astr);
-    return 1;
-}
-
-stock SendAdminsMessage(level, color, str[])
-{
-    for(new i = 0; i < MAX_PLAYERS; i++)
-    {
-        if(IsPlayerConnected(i))
-        {
-			new astr[128];
-            if(MasterAccount[i][Admin] >= level)
-            {
-				format(astr, sizeof(astr), "[Admin Msg] %s", str);
-                SendClientMessage(i, color, astr);
-            }
-        }
-    }
-}
 
 stock NameCheck(playerid)
 {
@@ -2322,7 +1921,7 @@ public OnPlayerUpdate(playerid)
 			SetCameraBehindPlayer(playerid);
 	       	TogglePlayerControllable(playerid, 1);
 
-	       	format(str, sizeof(str), "Thank you for shopping at %s.", Biz[PlayerInfo[playerid][bEntered]][Name]);
+	       	format(str, sizeof(str), "Thank you for shopping at %s.", Business[PlayerInfo[playerid][bEntered]][Name]);
 	       	InfoBoxForPlayer(playerid, str);
     	}
         else if(lr == KEY_LEFT)
@@ -2997,20 +2596,20 @@ public Load_Account(playerid)
 
 	for(new b = 1; b < MAX_BIZ; b++)
 	{
-	    if(Biz[b][Owner] == PlayerInfo[playerid][SQLID])
+	    if(Business[b][Owner] == PlayerInfo[playerid][SQLID])
 	    {
-	        PlayerInfo[playerid][Business] = b;
+	        PlayerInfo[playerid][Business_1] = b;
 	        break;
 	    }
 	}
 
-	if(PlayerInfo[playerid][Business] > 0)
+	if(PlayerInfo[playerid][Business_1] > 0)
 	{
 		for(new b = 1; b < MAX_BIZ; b++)
 		{
-		    if(Biz[b][Owner] == PlayerInfo[playerid][SQLID] && b != PlayerInfo[playerid][Business])
+		    if(Business[b][Owner] == PlayerInfo[playerid][SQLID] && b != PlayerInfo[playerid][Business_1])
 		    {
-		        PlayerInfo[playerid][Business2] = b;
+		        PlayerInfo[playerid][Business_2] = b;
 		        break;
 		    }
 		}
@@ -3137,7 +2736,7 @@ public PlayerSpawnIn(playerid)
 
 	else if(PlayerInfo[playerid][Spawn] == 3)
 	{
-		if(PlayerInfo[playerid][Business] > 0) SetPlayerPosEx(playerid, Biz[PlayerInfo[playerid][Business]][PosX], Biz[PlayerInfo[playerid][Business]][PosY], Biz[PlayerInfo[playerid][Business]][PosZ], 0 ,0);
+		if(PlayerInfo[playerid][Business_1] > 0) SetPlayerPosEx(playerid, Business[PlayerInfo[playerid][Business_1]][PosX], Business[PlayerInfo[playerid][Business_1]][PosY], Business[PlayerInfo[playerid][Business_1]][PosZ], 0 ,0);
 		else
 		{
 			SendErrorMessage(playerid, "Couldn't spawn at business.");
@@ -3147,7 +2746,7 @@ public PlayerSpawnIn(playerid)
 
 	else if(PlayerInfo[playerid][Spawn] == 4)
 	{
-		if(PlayerInfo[playerid][Business2] > 0) SetPlayerPosEx(playerid, Biz[PlayerInfo[playerid][Business2]][PosX], Biz[PlayerInfo[playerid][Business2]][PosY], Biz[PlayerInfo[playerid][Business2]][PosZ], 0 ,0);
+		if(PlayerInfo[playerid][Business_2] > 0) SetPlayerPosEx(playerid, Business[PlayerInfo[playerid][Business_2]][PosX], Business[PlayerInfo[playerid][Business_2]][PosY], Business[PlayerInfo[playerid][Business_2]][PosZ], 0 ,0);
 		else
 		{
 			SendErrorMessage(playerid, "Couldn't spawn at business.");
@@ -3192,14 +2791,14 @@ CMD:changespawn(playerid, params[])
 	 	format(str, sizeof(str), "(2) %s\n", Houses[PlayerInfo[playerid][House]][Name]);
 	    strcat(dialog, str, sizeof(dialog));
 	}
-	if(PlayerInfo[playerid][Business])
+	if(PlayerInfo[playerid][Business_1])
 	{
-	 	format(str, sizeof(str), "(3) %s\n", Biz[PlayerInfo[playerid][Business]][Name]);
+	 	format(str, sizeof(str), "(3) %s\n", Business[PlayerInfo[playerid][Business_1]][Name]);
 	    strcat(dialog, str, sizeof(dialog));
 	}
-	if(PlayerInfo[playerid][Business2])
+	if(PlayerInfo[playerid][Business_2])
 	{
-	 	format(str, sizeof(str), "(4) %s\n", Biz[PlayerInfo[playerid][Business2]][Name]);
+	 	format(str, sizeof(str), "(4) %s\n", Business[PlayerInfo[playerid][Business_2]][Name]);
 	    strcat(dialog, str, sizeof(dialog));
 	}
  	format(str, sizeof(str), "(5) Faction Spawn");
@@ -3360,8 +2959,8 @@ stock Quiz(playerid, section)
 
 		Dialog_Show(playerid, QUIZ2, DIALOG_STYLE_LIST, QuizQuestions[rand][1], QuizQuestions[rand][2],"Select","");
 
-		SendClientSplitMessage(playerid, COLOR_SLATEGRAY, QuizQuestions[rand][1]);
-		SendClientSplitMessage(playerid, COLOR_WHITE, QuizQuestions[rand][2]);
+		SendSplitMessage(playerid, COLOR_SLATEGRAY, QuizQuestions[rand][1]);
+		SendSplitMessage(playerid, COLOR_WHITE, QuizQuestions[rand][2]);
 	}
 	return 1;
 }
@@ -3477,162 +3076,6 @@ stock Quiz_Info(playerid, info, section)
 }
 
 
-
-forward LoadBiz();
-public LoadBiz()
-{
-	new interiorcount[19];
-	if(cache_num_rows())
-    {
-        for(new id = 1; id<cache_num_rows(); id++)
-        {
-
-			Biz[id][SQLID] = cache_get_field_content_int(id, "SQLID", SQL_CONNECTION);
-    		cache_get_field_content(id, "Name", Biz[id][Name], SQL_CONNECTION, 32);
-			Biz[id][PosX] = cache_get_field_content_float(id, "PosX", SQL_CONNECTION);
-			Biz[id][PosY] = cache_get_field_content_float(id, "PosY", SQL_CONNECTION);
-			Biz[id][PosZ] = cache_get_field_content_float(id, "PosZ", SQL_CONNECTION);
-			Biz[id][Interior] = cache_get_field_content_int(id, "Interior", SQL_CONNECTION);
-			Biz[id][World] = cache_get_field_content_int(id, "World", SQL_CONNECTION);
-			Biz[id][InteriorX] = cache_get_field_content_float(id, "InteriorX", SQL_CONNECTION);
-			Biz[id][InteriorY] = cache_get_field_content_float(id, "InteriorY", SQL_CONNECTION);
-			Biz[id][InteriorZ] = cache_get_field_content_float(id, "InteriorZ", SQL_CONNECTION);
-			Biz[id][Owned] = cache_get_field_content_int(id, "Owned", SQL_CONNECTION);
-			Biz[id][Owner] = cache_get_field_content_int(id, "Owner", SQL_CONNECTION);
-			Biz[id][Price] = cache_get_field_content_int(id, "Price", SQL_CONNECTION);
-			Biz[id][Payout] = cache_get_field_content_int(id, "Payout", SQL_CONNECTION);
-			Biz[id][Safe] = cache_get_field_content_int(id, "Safe", SQL_CONNECTION);
-			Biz[id][Type] = cache_get_field_content_int(id, "Type", SQL_CONNECTION);
-			Biz[id][EntranceFee] = cache_get_field_content_int(id, "EntranceFee", SQL_CONNECTION);
-			Biz[id][Locked] = cache_get_field_content_int(id, "Locked", SQL_CONNECTION);
-
-			Total_Biz_Created++;
-
-			//Biz[id][World] = interiorcount[Biz[id][Interior]];
-			interiorcount[Biz[id][Interior]]++;
-			CreateBusiness(id);
-
-		}
-	}
-
-	//mysql_close(SQL_CONNECTION2);
-	printf("[MYSQL]: %d Businesses have been successfully loaded from the database.", Total_Biz_Created);
-	return 1;
-}
-
-forward LoadBusiness(id);
-public LoadBusiness(id)
-{
-
-	if(cache_num_rows())
-    {
-
-		Biz[id][SQLID] = cache_get_field_content_int(0, "SQLID", SQL_CONNECTION);
-		cache_get_field_content(0, "Name", Biz[id][Name], SQL_CONNECTION, 32);
-		Biz[id][PosX] = cache_get_field_content_float(0, "PosX", SQL_CONNECTION);
-		Biz[id][PosY] = cache_get_field_content_float(0, "PosY", SQL_CONNECTION);
-		Biz[id][PosZ] = cache_get_field_content_float(0, "PosZ", SQL_CONNECTION);
-		Biz[id][Interior] = cache_get_field_content_int(0, "Interior", SQL_CONNECTION);
-		Biz[id][World] = cache_get_field_content_int(0, "World", SQL_CONNECTION);
-		Biz[id][InteriorX] = cache_get_field_content_float(0, "InteriorX", SQL_CONNECTION);
-		Biz[id][InteriorY] = cache_get_field_content_float(0, "InteriorY", SQL_CONNECTION);
-		Biz[id][InteriorZ] = cache_get_field_content_float(0, "InteriorZ", SQL_CONNECTION);
-		Biz[id][Owned] = cache_get_field_content_int(0, "Owned", SQL_CONNECTION);
-		Biz[id][Owner] = cache_get_field_content_int(0, "Owner", SQL_CONNECTION);
-		Biz[id][Price] = cache_get_field_content_int(0, "Price", SQL_CONNECTION);
-		Biz[id][Payout] = cache_get_field_content_int(0, "Payout", SQL_CONNECTION);
-		Biz[id][Safe] = cache_get_field_content_int(0, "Safe", SQL_CONNECTION);
-		Biz[id][Type] = cache_get_field_content_int(0, "Type", SQL_CONNECTION);
-		Biz[id][EntranceFee] = cache_get_field_content_int(0, "EntranceFee", SQL_CONNECTION);
-		Biz[id][Locked] = cache_get_field_content_int(0, "Locked", SQL_CONNECTION);
-
-		Total_Biz_Created++;
-		printf("[MYSQL]: Business %d has successfully loaded from the database.", id);
-
-		CreateBusiness(id);
-	}
-	else
-	{
-		printf("ERROR: Loading business %d.", id);
-	}
-	return 1;
-}
-
-forward CreateBusiness(id);
-public CreateBusiness(id)
-{
-	new str[128], query[128];
-	if(Biz[id][Owned] == 0)
-    {
-        if(Biz[id][Type] == 5)
-        {
-			format(str, sizeof(str), ""COL_RED" FOR SALE\n\n"COL_ORANGE" %s \n"COL_GRAY"(/buybiz)\n Price: $%s", Biz[id][Name], FormatNumber(Biz[id][Price]));
-  			Biz[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Biz[id][PosX],Biz[id][PosY],Biz[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
-			Biz[id][PickupID] = CreateDynamicPickup(1275, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
-		}
-		if(Biz[id][Type] != 5)
-		{
-			format(str, sizeof(str), ""COL_RED" FOR SALE\n\n"COL_ORANGE" %s \n"COL_GRAY"(/buybiz)\n Price: $%s", Biz[id][Name], FormatNumber(Biz[id][Price]));
-  			Biz[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Biz[id][PosX],Biz[id][PosY],Biz[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
-			Biz[id][PickupID] = CreateDynamicPickup(1272, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
-		}
-	}
-	if(Biz[id][Owned] == 1)
-    {
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT `Username` FROM Accounts WHERE SQLID = %d LIMIT 1", Biz[id][Owner]);
-        mysql_tquery(SQL_CONNECTION, query, "CreateBizLabel", "i", id);
-
-        if(Biz[id][Type] == 5)//clothes shop
-        {
-			Biz[id][PickupID] = CreateDynamicPickup(1275, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
-		}
-		if(Biz[id][Type] != 5)
-		{
-			Biz[id][PickupID] = CreateDynamicPickup(1272, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
-		}
-	}
-	if(Biz[id][Owned] == 2)//bank
-    {
-		format(str, sizeof(str), ""COL_WHITE" %s ", Biz[id][Name]);
-		Biz[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Biz[id][PosX],Biz[id][PosY],Biz[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
-		Biz[id][PickupID] = CreateDynamicPickup(1274, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
-	}
-	if(Biz[id][Owned] == 3)//Entrance
-    {
-		format(str, sizeof(str), ""COL_WHITE" %s ", Biz[id][Name]);
-		Biz[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Biz[id][PosX],Biz[id][PosY],Biz[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
-		Biz[id][PickupID] = CreateDynamicPickup(1318, 23, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0, -1, 250);
-	}
-	return 1;
-}
-
-
-forward UpdateBizLabel(id);
-public UpdateBizLabel(id)
-{
-	new str[128];
-	if(Biz[id][Owned] == 0)
-	{
-		format(str, sizeof(str), ""COL_RED" FOR SALE\n\n"COL_ORANGE" %s \n"COL_GRAY"(/buybiz)\n Price: $%s", Biz[id][Name], FormatNumber(Biz[id][Price]));
-	}
-	if(Biz[id][Owned] == 1)
-	{
-		new OwnerName[MAX_PLAYER_NAME];
-		cache_get_field_content(0, "Username", OwnerName, SQL_CONNECTION, MAX_PLAYER_NAME);
-		format(str, sizeof(str), ""COL_ORANGE" %s \n"COL_GRAY" Owner: %s \n Payout: $%s \n Entrance Fee: $%s", Biz[id][Name], OwnerName, FormatNumber(Biz[id][Payout]), FormatNumber(Biz[id][EntranceFee]));
-	}
-	UpdateDynamic3DTextLabelText(Biz[id][LabelID], COLOR_WHITE, str);
-	return 1;
-}
-forward CreateBizLabel(id);
-public CreateBizLabel(id)
-{
-	new str[128], OwnerName[MAX_PLAYER_NAME];
-	cache_get_field_content(0, "Username", OwnerName, SQL_CONNECTION, MAX_PLAYER_NAME);
-	format(str, sizeof(str), ""COL_ORANGE" %s \n"COL_GRAY" Owner: %s \n Payout: $%s \n Entrance Fee: $%s", Biz[id][Name], OwnerName, FormatNumber(Biz[id][Payout]), FormatNumber(Biz[id][EntranceFee]));
-	Biz[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Biz[id][PosX],Biz[id][PosY],Biz[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
-	return 1;
-}
 
 forward LoadObjects();
 public LoadObjects()
@@ -4055,7 +3498,7 @@ public LoadIcons()
 	        if(Icons[i][Type] >= 1)
 	        {
 				format(str, sizeof(str), "%s", Icons[i][Name]);
-	  			Icons[i][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Icons[i][PosX],Icons[i][PosY],Icons[i][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
+	  			Icons[i][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Icons[i][PosX],Icons[i][PosY],Icons[i][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, -1, -1, -1, 10.0);
 				Icons[i][PickupID] = CreateDynamicPickup(Icons[i][Icon], 23, Icons[i][PosX], Icons[i][PosY], Icons[i][PosZ], Icons[i][World], Icons[i][Interior], -1, 250);
 			}
 			if(Icons[i][Faction] > 0)
@@ -4090,7 +3533,7 @@ public LoadIcon(id)
         if(Icons[id][Type] >= 1)
         {
 			format(str, sizeof(str), "%s", Icons[id][Name]);
-  			Icons[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Icons[id][PosX],Icons[id][PosY],Icons[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 0, -1, -1, -1, 10.0);
+  			Icons[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Icons[id][PosX],Icons[id][PosY],Icons[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, -1, -1, -1, 10.0);
 			Icons[id][PickupID] = CreateDynamicPickup(Icons[id][Icon], 23, Icons[id][PosX], Icons[id][PosY], Icons[id][PosZ], Icons[id][World], Icons[id][Interior], -1, 250);
 		}
 		
@@ -4142,10 +3585,10 @@ public OnPlayerPickUpDynamicPickup(playerid, pickupid)
 		new i;
 	 	for(i = 0; i < MAX_BIZ; i++)
 	    {
-	        if(pickupid == Biz[i][PickupID])
+	        if(pickupid == Business[i][PickupID])
 	        {
 			    new str[128];
-			    format(str, sizeof(str), "~b~ %s ~n~ ~w~ Use /enter to enter this establishment.", Biz[i][Name]);
+			    format(str, sizeof(str), "~b~ %s ~n~ ~w~ Use /enter to enter this establishment.", Business[i][Name]);
 			    InformationBox(playerid, str);
 			    return 1;
 			}
@@ -4679,10 +4122,10 @@ stock ReloadBiz()
 	for(new id = 0; id < MAX_BIZ; id++)
 	{
             Total_Biz_Created = 0;
-        	DestroyDynamic3DTextLabel(Biz[id][LabelID]);
-        	DestroyDynamicPickup(Biz[id][PickupID]);
+        	DestroyDynamic3DTextLabel(Business[id][LabelID]);
+        	DestroyDynamicPickup(Business[id][PickupID]);
 	}
-	mysql_tquery(SQL_CONNECTION, "SELECT * FROM `Biz` ORDER BY SQLID ASC", "LoadBiz");
+	Fetch_Businesses();
 	return 1;
 }
 
@@ -4710,18 +4153,6 @@ stock ReloadHouse(id)
 	return 1;
 }
 
-stock ReloadBusiness(id)
-{
-	new query[128];
-	Total_Biz_Created --;
-	DestroyDynamic3DTextLabel(Biz[id][LabelID]);
-	DestroyDynamicPickup(Biz[id][PickupID]);
-
-	mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT * FROM `Biz` WHERE SQLID = %d LIMIT 1", Biz[id][SQLID]);
-	mysql_tquery(SQL_CONNECTION, query, "LoadBusiness", "d", id);
-	return 1;
-}
-
 stock ReloadIcon(id)
 {
 	new query[128];
@@ -4729,7 +4160,7 @@ stock ReloadIcon(id)
 	DestroyDynamic3DTextLabel(Icons[id][LabelID]);
 	DestroyDynamicPickup(Icons[id][PickupID]);
 
-	mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT * FROM `Icons` WHERE SQLID = %d LIMIT 1", Biz[id][SQLID]);
+	mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT * FROM `Icons` WHERE SQLID = %d LIMIT 1", Business[id][SQLID]);
 	mysql_tquery(SQL_CONNECTION, query, "LoadIcon", "d", id);
 	return 1;
 }
@@ -4740,8 +4171,8 @@ public AddBusinessMoney(id, amount)
 {
 	if(id > 0)
 	{
-		Biz[id][Safe] += amount;
-        MYSQL_Update_Interger(Biz[id][SQLID], "Biz", "Safe", Biz[id][Safe]);
+		Business[id][Safe] += amount;
+        MYSQL_Update_Interger(Business[id][SQLID], "Biz", "Safe", Business[id][Safe]);
 		return 1;
 	}
 	return 0;
@@ -5169,7 +4600,7 @@ CMD:fhelp(playerid, params[])
 
 CMD:bhelp(playerid, params[])
 {
-	if(PlayerInfo[playerid][Business] > 0 || PlayerInfo[playerid][Business2] > 2)
+	if(PlayerInfo[playerid][Business_1] > 0 || PlayerInfo[playerid][Business_2] > 2)
 	{
 		SendClientMessage(playerid, COLOR_YELLOW, "Business Commands:");
 		SendClientMessage(playerid, COLOR_WHITE, "/entrancefee /checksafe /safeget /safestore /lock");
@@ -5217,24 +4648,24 @@ CMD:enter(playerid)
 	if(GetPlayerVehicleID(playerid)) return SendErrorMessage(playerid, "Cannot be done when you are in a vehicle.");
 	if(bID > 0)
 	{
-        if(Biz[bID][Locked] == 0)
+        if(Business[bID][Locked] == 0)
 		{
-		    if(Biz[bID][Owned] == 1)
+		    if(Business[bID][Owned] == 1)
 		    {
  				
-	            if(Biz[bID][EntranceFee] <= PlayerInfo[playerid][Cash])
+	            if(Business[bID][EntranceFee] <= PlayerInfo[playerid][Cash])
 	            {
 
-					AddBusinessMoney(bID, Biz[bID][EntranceFee]);
-	            	GivePlayerMoneyEx(playerid, -Biz[bID][EntranceFee]);
+					AddBusinessMoney(bID, Business[bID][EntranceFee]);
+	            	GivePlayerMoneyEx(playerid, -Business[bID][EntranceFee]);
 
-					format(str, sizeof(str), "Welcome to the %s.", Biz[bID][Name]);
-					if(Biz[bID][Owned] != 3) SendClientMessage(playerid, COLOR_WHITE, str);
+					format(str, sizeof(str), "Welcome to the %s.", Business[bID][Name]);
+					if(Business[bID][Owned] != 3) SendClientMessage(playerid, COLOR_WHITE, str);
 
-					SetPlayerPosEx(playerid, Biz[bID][InteriorX], Biz[bID][InteriorY], Biz[bID][InteriorZ], Biz[bID][Interior], Biz[bID][World]);
+					SetPlayerPosEx(playerid, Business[bID][InteriorX], Business[bID][InteriorY], Business[bID][InteriorZ], Business[bID][Interior], Business[bID][World]);
 
 
-					if(bID == PlayerInfo[playerid][Business] || bID == PlayerInfo[playerid][Business2])
+					if(bID == PlayerInfo[playerid][Business_1] || bID == PlayerInfo[playerid][Business_2])
 					{
 						SendClientMessage(playerid, COLOR_YELLOW, "You appear to own this business, for a list of commands use /bhelp!");
 					}
@@ -5248,9 +4679,9 @@ CMD:enter(playerid)
 			else
 			{
 
-				SetPlayerPosEx(playerid, Biz[bID][InteriorX], Biz[bID][InteriorY], Biz[bID][InteriorZ], Biz[bID][Interior], Biz[bID][World]);
+				SetPlayerPosEx(playerid, Business[bID][InteriorX], Business[bID][InteriorY], Business[bID][InteriorZ], Business[bID][Interior], Business[bID][World]);
 				PlayerInfo[playerid][bEntered] = bID;
-				format(str, sizeof(str), "Welcome to the %s.", Biz[bID][Name]);
+				format(str, sizeof(str), "Welcome to the %s.", Business[bID][Name]);
 				SendClientMessage(playerid, COLOR_WHITE, str);
 			}
 		}
@@ -5311,9 +4742,9 @@ CMD:exit(playerid)
     }
 
 
-    if(IsPlayerInRangeOfPoint(playerid, 5.0, Biz[bID][InteriorX], Biz[bID][InteriorY], Biz[bID][InteriorZ]) && GetPlayerVirtualWorld(playerid) == Biz[bID][World])
+    if(IsPlayerInRangeOfPoint(playerid, 5.0, Business[bID][InteriorX], Business[bID][InteriorY], Business[bID][InteriorZ]) && GetPlayerVirtualWorld(playerid) == Business[bID][World])
     {
-        SetPlayerPosEx(playerid, Biz[bID][PosX], Biz[bID][PosY], Biz[bID][PosZ], 0, 0);
+        SetPlayerPosEx(playerid, Business[bID][PosX], Business[bID][PosY], Business[bID][PosZ], 0, 0);
         PlayerInfo[playerid][bEntered] = 0;
     }
 
@@ -5379,7 +4810,7 @@ CMD:stats(playerid, params[])
 	SendClientMessage(playerid, COLOR_GRAY, str);
 	format(str, sizeof(str), "> Faction: [%s] \t|\t Rank: [%s(%d)]", fac, GetPlayerRank(playerid), PlayerInfo[playerid][Rank]);
 	SendClientMessage(playerid, COLOR_GRAY, str);
-	format(str, sizeof(str), "> Business: [%s] \t|\t House: [%s] Business2 [%s]", Biz[PlayerInfo[playerid][Business]][Name], Houses[PlayerInfo[playerid][House]][Name], Biz[PlayerInfo[playerid][Business2]][Name]);
+	format(str, sizeof(str), "> Business: [%s] \t|\t House: [%s] Business_2 [%s]", Business[PlayerInfo[playerid][Business_1]][Name], Houses[PlayerInfo[playerid][House]][Name], Business[PlayerInfo[playerid][Business_2]][Name]);
 	SendClientMessage(playerid, COLOR_GRAY, str);
 	format(str, sizeof(str), "> Vehicles: [%d] \t|\t Job: [%s] \t|\t TotalTimePlayed: [%d]", PlayerInfo[playerid][TotalVehicles], JobNames[PlayerInfo[playerid][Job]][0], PlayerInfo[playerid][TotalTimePlayed]);
 	SendClientMessage(playerid, COLOR_GRAY, str);
@@ -5448,11 +4879,11 @@ CMD:buy(playerid, params[])
 {
 	if(PlayerInfo[playerid][bEntered] > 0)
 	{
-		if(Biz[PlayerInfo[playerid][bEntered]][Type]== 1)//Convenience Store
+		if(Business[PlayerInfo[playerid][bEntered]][Type]== 1)//Convenience Store
 		{
 			new CheckOut[600], StoreName[64], str[64];
 
-			format(StoreName, sizeof(StoreName), "%s", Biz[PlayerInfo[playerid][bEntered]][Name]);
+			format(StoreName, sizeof(StoreName), "%s", Business[PlayerInfo[playerid][bEntered]][Name]);
 
 			for (new i = 0; i < sizeof(GeneralStore); ++i)
 			{
@@ -5462,11 +4893,11 @@ CMD:buy(playerid, params[])
 
 			Dialog_Show(playerid, GENERALSTORE, DIALOG_STYLE_LIST, StoreName, CheckOut, "Buy","Cancel");
 		}
-		if(Biz[PlayerInfo[playerid][bEntered]][Type]== 6)//Diner
+		if(Business[PlayerInfo[playerid][bEntered]][Type]== 6)//Diner
 		{
 			Dialog_Show(playerid, DINER, DIALOG_STYLE_LIST, "Diner's Menu", "-Starters-\n\n Salad \n Garlic Bread \n\n-Main Course-\n Burger \n Chips \n Chicken Nuggets \n Hotdog \n\n-Desserts-\n Icecream \n Brownie", "View","Cancel");
 		}
-		if(Biz[PlayerInfo[playerid][bEntered]][Type]== 5)//Clothes
+		if(Business[PlayerInfo[playerid][bEntered]][Type]== 5)//Clothes
 		{
 			if(PlayerInfo[playerid][Cash] >= 250)
 			{
@@ -5660,37 +5091,7 @@ public TakeInventoryItem(playerid, item, quantity)
 	return 1;
 }
 
-#define SPLITLENGTH 118
 
-stock SendSplitMessage(playerid, color, final[])
-{
-    #pragma unused playerid, color
-    new buffer[SPLITLENGTH+5];
-    new len = strlen(final);
-    if(len>SPLITLENGTH)
-    {
-        new times = (len/SPLITLENGTH);
-        for(new i = 0; i < times+1; i++)
-        {
-            strdel(buffer, 0, SPLITLENGTH+5);
-            if(len-(i*SPLITLENGTH)>SPLITLENGTH)
-            {
-                strmid(buffer, final, SPLITLENGTH*i, SPLITLENGTH*(i+1));
-                format(buffer, sizeof(buffer), "%s ...", buffer);
-            }
-            else
-            {
-                strmid(buffer, final, SPLITLENGTH*i, len);
-            }
-            SendClientMessageToAll(color, buffer);
-        }
-    }
-    else
-    {
-    	//if == 1 - normal if = 2 asay
-        SendClientMessageToAll(color, final);
-    }
-}
 
 stock FormatNumber(Float:amount)
 {
@@ -5712,103 +5113,8 @@ stock FormatNumber(Float:amount)
 	return str;
 }
 
-stock SendClientSplitMessage(playerid, color, final[])
-{
-    #pragma unused playerid, color
-    new buffer[SPLITLENGTH+5];
-    new len = strlen(final);
-    if(len>SPLITLENGTH)
-    {
-        new times = (len/SPLITLENGTH);
-        for(new i = 0; i < times+1; i++)
-        {
-            strdel(buffer, 0, SPLITLENGTH+5);
-            if(len-(i*SPLITLENGTH)>SPLITLENGTH)
-            {
-                strmid(buffer, final, SPLITLENGTH*i, SPLITLENGTH*(i+1));
-                format(buffer, sizeof(buffer), "%s ...", buffer);
-            }
-            else
-            {
-                strmid(buffer, final, SPLITLENGTH*i, len);
-            }
-            SendClientMessage(playerid, color, buffer);
-        }
-    }
-    else
-    {
-    	//if == 1 - normal if = 2 asay
-        SendClientMessage(playerid, color, final);
-    }
-}
-
-stock SendLocalSplitMessage(playerid, Float:distance, Range1color, Range2color, msg[])
-{
-    //new splitmsg[SPLITLENGTH+5];
-    new splitmsg[200];
-    new msglen = strlen(msg);
-    if(msglen > SPLITLENGTH)
-    {
-        new times = (msglen/SPLITLENGTH);
-        for(new i = 0; i < times + 1; i++)
-        {
-            strdel(splitmsg, 0, SPLITLENGTH+5);
-            if(msglen-(i * SPLITLENGTH) > SPLITLENGTH)
-            {
-                strmid(splitmsg, msg, SPLITLENGTH * i, SPLITLENGTH * (i + 1));
-                format(splitmsg, sizeof(splitmsg), "%s ...", splitmsg);
-            }
-            else strmid(splitmsg, msg, SPLITLENGTH*i, msglen);
-         
-			SendLocalMessage(playerid, splitmsg, distance, Range1color, Range2color);
-        }
-    }
-    else SendLocalMessage(playerid, msg, distance, Range1color, Range2color);
-    
-    return 1;
-}
 
 
-stock SendSplitMessageToAll(playerid, color, msg[])
-{
-    #pragma unused playerid, color
-    new splitmsg[SPLITLENGTH+5];
-    new msglen = strlen(msg);
-    if(msglen > SPLITLENGTH)
-    {
-        new times = (msglen/SPLITLENGTH);
-        for(new i = 0; i < times+1; i++)
-        {
-            strdel(splitmsg, 0, SPLITLENGTH+5);
-            if(msglen-(i*SPLITLENGTH)>SPLITLENGTH)
-            {
-                strmid(splitmsg, msg, SPLITLENGTH*i, SPLITLENGTH*(i+1));
-                format(splitmsg, sizeof(splitmsg), "%s ...", splitmsg);
-            }
-            else
-            {
-                strmid(splitmsg, msg, SPLITLENGTH*i, msglen);
-            }
-
-            for (new id = 0; id < MAX_PLAYERS; ++id)
-            {
-				if(!IsPlayerConnected(id)) continue;
-				if(!PlayerInfo[id][LoggedIn]) continue;
-				SendClientMessage(id, color, splitmsg);  
-            }
-        }
-    }
-    else
-    {
-	    for (new i = 0; i < MAX_PLAYERS; ++i)
-	    {
-			if(!IsPlayerConnected(i)) continue;
-			if(!PlayerInfo[i][LoggedIn]) continue;
-			SendClientMessage(i, color, msg);
-	    }
-    }
-    return 1;
-}
 
 CMD:ooc(playerid, params[])
 {
@@ -5841,8 +5147,12 @@ CMD:announcement(playerid, params[])
 		if(sscanf(params, "s[200]", str)) return SendClientMessage(playerid, COLOR_GRAY, "/announcement [message]");
 
 		format(str, sizeof(str), "[Announcement] %s: %s", GetRoleplayName(playerid), str);
-		SendSplitMessageToAll(playerid, COLOR_VIOLET, str);
-		SetPlayerChatBubble(playerid, str, COLOR_VIOLET, 20.0, 7000);
+		for (new i = 0; i < MAX_PLAYERS; ++i)
+		{
+			if(PlayerInfo[i][LoggedIn] == 1) SendSplitMessage(i, COLOR_VIOLET, str);
+		}
+
+		SetPlayerChatBubble(playerid, str, COLOR_VIOLET, 20.0, SECONDS(7));
 	}
 	else SendErrorMessage(playerid, ERROR_ADMIN);
 	return 1;
@@ -5855,267 +5165,75 @@ ALTCMD:announce->announcement;
 public OnPlayerText(playerid, text[])
 {
 	new str[600];
-	if(PlayerInfo[playerid][LoggedIn] == 1)
+	if(PlayerInfo[playerid][LoggedIn] != 1) return SendErrorMessage(playerid, ERROR_LOGGEDIN);
+	if(PlayerInfo[playerid][Muted] != 0) return InfoBoxForPlayer(playerid, "~r~You have been muted - you cannot speak.");
+
+	LastCommandTime[playerid] = gettime();
+	Log(playerid, text);
+
+    if(Inventory[playerid][PhoneStatus] == 4)
 	{
-		LastCommandTime[playerid] = gettime();
-		if(PlayerInfo[playerid][Muted] == 0)
+
+	    format(str, sizeof(str), "[Phone] %s says: %s",GetRoleplayName(playerid), text);
+		SendSplitMessage(Inventory[playerid][PhoneCaller], COLOR_WHITE, str);
+		SendLocalMessage(playerid, str, Range_Normal, COLOR_WHITE, COLOR_GRAY);
+		SetPlayerChatBubble(playerid, text, COLOR_WHITE, Range_Normal, SECONDS(7));
+
+		if(Inventory[playerid][PhoneEmergency] == 1)
 		{
-		    if(Inventory[playerid][PhoneStatus] != 4)
-		    {
-			    format(str, sizeof(str), "%s says: %s",GetRoleplayName(playerid), text);
-				SendLocalSplitMessage(playerid, Range_Normal, COLOR_WHITE, COLOR_GRAY, str);
-				SetPlayerChatBubble(playerid, text, COLOR_WHITE, Range_Normal, 7000);
+			if(strfind(text, "Police", true) != -1 || strfind(text, "Cops", true) != -1 || strfind(text, "sheriff", true) != -1 || strfind(text, "SD", true) != -1)
+			{
+				EmergencyCall[playerid][Service] = 1;
+				Inventory[playerid][PhoneEmergency] = 2;
+				SendClientMessage(playerid, COLOR_WHITE, "[Phone] Operator: Okay, you've requested the Sheriff's Department. Could you please give me more information on the incident?");
+			}
+			else if(strfind(text, "Medic", true) != -1)
+			{
+				EmergencyCall[playerid][Service] = 3;
+				Inventory[playerid][PhoneEmergency] = 2;
+				SendClientMessage(playerid, COLOR_WHITE, "[Phone] Operator: Okay, you've requested an Ambulance. Could you please give me more information on the incident?");
+			}
+			else if(strfind(text, "Fire", true) != -1)
+			{
+				EmergencyCall[playerid][Service] = 3;
+				Inventory[playerid][PhoneEmergency] = 2;
+				SendClientMessage(playerid, COLOR_WHITE, "[Phone] Operator: Okay, you've requested the Fire Department. Could you please give me more information on the incident?");
 			}
 			else
 			{
-
-			    format(str, sizeof(str), "[Phone] %s says: %s",GetRoleplayName(playerid), text);
-				SendClientSplitMessage(Inventory[playerid][PhoneCaller], COLOR_WHITE, str);
-				SendLocalSplitMessage(playerid, Range_Normal, COLOR_WHITE, COLOR_GRAY, str);
-				SetPlayerChatBubble(playerid, text, COLOR_WHITE, Range_Normal, 7000);
-
-				if(Inventory[playerid][PhoneEmergency] == 1)
-				{
-					if(strfind(text, "Police", true) != -1 || strfind(text, "Cops", true) != -1 || strfind(text, "sheriff", true) != -1 || strfind(text, "SD", true) != -1)
-					{
-						EmergencyCall[playerid][Service] = 1;
-						Inventory[playerid][PhoneEmergency] = 2;
-						SendClientMessage(playerid, COLOR_WHITE, "[Phone] Operator: Okay, you've requested the Sheriff's Department. Could you please give me more information on the incident?");
-					}
-					else if(strfind(text, "Medic", true) != -1)
-					{
-						EmergencyCall[playerid][Service] = 3;
-						Inventory[playerid][PhoneEmergency] = 2;
-						SendClientMessage(playerid, COLOR_WHITE, "[Phone] Operator: Okay, you've requested an Ambulance. Could you please give me more information on the incident?");
-					}
-					else if(strfind(text, "Fire", true) != -1)
-					{
-						EmergencyCall[playerid][Service] = 3;
-						Inventory[playerid][PhoneEmergency] = 2;
-						SendClientMessage(playerid, COLOR_WHITE, "[Phone] Operator: Okay, you've requested the Fire Department. Could you please give me more information on the incident?");
-					}
-					else
-					{
-						SendClientMessage(playerid, COLOR_WHITE, "[Phone] Operator: Sorry, I didn't quite get that could you rephrase that?");
-					}
-				}
-				else if(Inventory[playerid][PhoneEmergency] == 2)
-				{
-					format(EmergencyCall[playerid][Incident], 128, "%s", text);
-					SendClientMessage(playerid, COLOR_WHITE, "[Phone] Operator: Thank you. Lastly could you tell me where the incident has taken place?");
-					Inventory[playerid][PhoneEmergency] = 3;
-				}
-				else if(Inventory[playerid][PhoneEmergency] == 3)
-				{
-					new fid = EmergencyCall[playerid][Service];
-					format(EmergencyCall[playerid][Location], 128, "%s", text);
-					SendClientMessage(playerid, COLOR_WHITE, "[Phone] Operator: Thank you. I've passed all of the information to the respective department, they should be at your location soon.");
-					EndCall(playerid);
-					format(str, 128, "[911 Call] Call from: %d", Inventory[playerid][PhoneNumber]);
-					SendFactionMessage(fid, COLOR_CORNFLOWERBLUE, str);
-					format(str, 128, "[911 Call] Incident description: %s", EmergencyCall[playerid][Incident]);
-					SendFactionMessage(fid, COLOR_CORNFLOWERBLUE, str);
-					format(str, 128, "[911 Call] Incident location: %s", EmergencyCall[playerid][Location]);
-					SendFactionMessage(fid, COLOR_CORNFLOWERBLUE, str);
-					Inventory[playerid][PhoneEmergency] = 0;
-
-					new query[600], calltime[12];
-					format(calltime, sizeof(calltime), "%02d:%02d:%02d", ClockHours, ClockMinutes, ClockSeconds);
-				    mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO `911 Calls` (Timestamp, Caller, Incident, Location, Service, Number, IGTime) VALUES( %d, %d, '%e', '%e', %d, %d, '%e')", gettime(), PlayerInfo[playerid][SQLID], EmergencyCall[playerid][Incident], EmergencyCall[playerid][Location], EmergencyCall[playerid][Service], Inventory[playerid][PhoneNumber], calltime);
-					mysql_tquery(SQL_CONNECTION, query);
-				}
+				SendClientMessage(playerid, COLOR_WHITE, "[Phone] Operator: Sorry, I didn't quite get that could you rephrase that?");
 			}
-			Log(playerid, text);
-				
 		}
-		else
+		else if(Inventory[playerid][PhoneEmergency] == 2)
 		{
-		    InfoBoxForPlayer(playerid, "~r~You have been muted - you cannot speak.");
+			format(EmergencyCall[playerid][Incident], 128, "%s", text);
+			SendClientMessage(playerid, COLOR_WHITE, "[Phone] Operator: Thank you. Lastly could you tell me where the incident has taken place?");
+			Inventory[playerid][PhoneEmergency] = 3;
+		}
+		else if(Inventory[playerid][PhoneEmergency] == 3)
+		{
+			new fid = EmergencyCall[playerid][Service];
+			format(EmergencyCall[playerid][Location], 128, "%s", text);
+			SendClientMessage(playerid, COLOR_WHITE, "[Phone] Operator: Thank you. I've passed all of the information to the respective department, they should be at your location soon.");
+			EndCall(playerid);
+			format(str, 128, "[911 Call] Call from: %d", Inventory[playerid][PhoneNumber]);
+			SendFactionMessage(fid, COLOR_CORNFLOWERBLUE, str);
+			format(str, 128, "[911 Call] Incident description: %s", EmergencyCall[playerid][Incident]);
+			SendFactionMessage(fid, COLOR_CORNFLOWERBLUE, str);
+			format(str, 128, "[911 Call] Incident location: %s", EmergencyCall[playerid][Location]);
+			SendFactionMessage(fid, COLOR_CORNFLOWERBLUE, str);
+			Inventory[playerid][PhoneEmergency] = 0;
+
+			new query[600], calltime[12];
+			format(calltime, sizeof(calltime), "%02d:%02d:%02d", ClockHours, ClockMinutes, ClockSeconds);
+		    mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO `911 Calls` (Timestamp, Caller, Incident, Location, Service, Number, IGTime) VALUES( %d, %d, '%e', '%e', %d, %d, '%e')", gettime(), PlayerInfo[playerid][SQLID], EmergencyCall[playerid][Incident], EmergencyCall[playerid][Location], EmergencyCall[playerid][Service], Inventory[playerid][PhoneNumber], calltime);
+			mysql_tquery(SQL_CONNECTION, query);
 		}
 	}
-	else
-	{
-		SendErrorMessage(playerid, ERROR_LOGGEDIN);
-	}
+
 	return 0;
-}
-
-
-
-CMD:b(playerid, params[])
-{
-	new str[200];
-	if(sscanf(params, "s[200]", str)) return SendClientMessage(playerid, COLOR_GRAY, "/b [message]");
-	if(PlayerInfo[playerid][Muted] == 0)
-	{
-		format(str, sizeof(str), "(( %s: %s ))", GetRoleplayName(playerid), str);
-		SendLocalSplitMessage(playerid, Range_Normal, COLOR_LBLUE, COLOR_LBLUE, str);
-		SetPlayerChatBubble(playerid, str, COLOR_LBLUE, Range_Normal, 7000);
-	}
-    else
-    {
-    	InfoBoxForPlayer(playerid, "Your muted, you can't send messages.\n If you think this is incorrect,\n Make an appeal on the forums.");
-    }
-	return 1;
-}
-
-CMD:me(playerid, params[])
-{
-	new str[200];
-	if(sscanf(params, "s[200]", str)) return SendClientMessage(playerid, COLOR_GRAY, "/me [message]");
-	if(PlayerInfo[playerid][Muted] == 0)
-	{
-		format(str, sizeof(str), "%s %s", GetRoleplayName(playerid), str);
-		SendLocalSplitMessage(playerid, Range_Normal, COLOR_RP, COLOR_RP, str);
-		SetPlayerChatBubble(playerid, str, COLOR_RP, Range_Normal, 7000);
-	}
-	else
-	{
-	    InfoBoxForPlayer(playerid, ERROR_MUTED);
-	}
-	return 1;
-}
-
-CMD:ame(playerid, params[])
-{
-	new str[200];
-	if(sscanf(params, "s[200]", str)) return SendClientMessage(playerid, COLOR_GRAY, "/ame [message]");
-	if(PlayerInfo[playerid][Muted] == 0)
-	{
-		format(str, sizeof(str), "* %s %s *", GetRoleplayName(playerid), str);
-		SetPlayerChatBubble(playerid, str, COLOR_RP, Range_Short, 7000);
-		SendClientMessage(playerid, COLOR_RP, str);
-	}
-	else
-	{
-	    InfoBoxForPlayer(playerid, ERROR_MUTED);
-	}
-	return 1;
-}
-
-CMD:a(playerid, params[])
-{
-	new str[200];
-	if(MasterAccount[playerid][Admin] > 0)
-	{
-		if(sscanf(params, "s[200]", str)) return SendClientMessage(playerid, COLOR_GRAY, "/a [text]");
-		format(str, sizeof(str), "%s: %s", GetRoleplayName(playerid), str);
-		SendAdminsMessage(1, COLOR_TURQUOISE, str);
-	}
-	else
-	{
-		SendErrorMessage(playerid, ERROR_ADMIN);
-	}
-	return 1;
-}
-
-CMD:do(playerid, params[])
-{
-	new str[200];
-   	if(sscanf(params, "s[200]", str)) return SendClientMessage(playerid, COLOR_GRAY, "/do [text]");
-   	if(PlayerInfo[playerid][Muted] == 0)
-   	{
-		format(str, sizeof(str), "%s ((%s))", str, GetRoleplayName(playerid));
-		SendLocalSplitMessage(playerid, Range_Normal, COLOR_RP, COLOR_RP, str);
-	}
-	else
-	{
-	    InfoBoxForPlayer(playerid, ERROR_MUTED);
-	}
-	return 1;
-}
-
-CMD:shout(playerid, params[])
-{
-	new str[200], msg[200];
-   	if(sscanf(params, "s[200]", msg)) return SendClientMessage(playerid, COLOR_GRAY, "/(s)hout [text]");
-   	if(PlayerInfo[playerid][Muted] == 0)
-   	{
-		if(Inventory[playerid][PhoneStatus] != 4)
-		{
-		    format(str, sizeof(str), "%s shouts: %s!", GetRoleplayName(playerid), msg);
-			SendLocalSplitMessage(playerid, Range_Long, COLOR_ORANGE, COLOR_ORANGE, str);
-			SetPlayerChatBubble(playerid, str, COLOR_ORANGE, Range_Long, 7000);
-		}
-		else
-		{
-		    format(str, sizeof(str), "%s shouts: %s!", GetRoleplayName(playerid), msg);
-			SendClientSplitMessage(Inventory[playerid][PhoneCaller], COLOR_ORANGE, msg);
-			SendLocalSplitMessage(playerid, Range_Long, COLOR_ORANGE, COLOR_ORANGE, str);
-			SetPlayerChatBubble(playerid, str, COLOR_ORANGE, Range_Long, 7000);
-		}
-	}
-	else
-	{
-	    InfoBoxForPlayer(playerid, ERROR_MUTED);
-	}
-	return 1;
-}
-ALTCMD:s->shout;
-
-CMD:low(playerid, params[])
-{
-	new str[168], msg[200];
-    if(sscanf(params, "s[200]", msg)) return SendClientMessage(playerid, COLOR_GRAY, "/(l)ow [text]");
-    if(PlayerInfo[playerid][Muted] == 0)
-    {
-    	format(str, sizeof(str), "[LOW] %s: %s", GetRoleplayName(playerid), msg);
-		SendLocalSplitMessage(playerid, Range_VShort, COLOR_GRAY, COLOR_GRAY, str);
-		SetPlayerChatBubble(playerid, "* Speaks quietly. *", COLOR_RP, Range_VShort, 4000);
-	}
-	else
-	{
-	    InfoBoxForPlayer(playerid, ERROR_MUTED);
-	}
-	return 1;
-}
-ALTCMD:l->low;
-
-CMD:whisper(playerid, params[])
-{
-	new str[200], msg[200], pID;
-	if(sscanf(params, "us[200]", pID,msg)) return SendClientMessage(playerid, COLOR_GRAY, "/whisper [playerid] [message]");
-	if(PlayerInfo[playerid][Muted] == 0)
-	{
-	    if(IsInRangeOfPlayer(playerid, pID, 5))
-	    {
-	        format(str, sizeof(str), "%s whispers: %s", GetRoleplayName(playerid), msg);
-	        SendClientSplitMessage(pID, COLOR_WHITE, str);
-	        format(str, sizeof(str), "* %s whispers something to %s. *", GetRoleplayName(playerid), GetRoleplayName(pID));
-	        SendLocalSplitMessage(playerid, Range_Short, COLOR_RP, COLOR_RP, str);
-	        SetPlayerChatBubble(playerid, str, COLOR_RP, Range_Short, 7000);
-	    }
-	    else
-	    {
-			InfoBoxForPlayer(playerid, "You are too far away from this player.");
-	    }
-	}
-	else
-	{
-	    InfoBoxForPlayer(playerid, ERROR_MUTED);
-	}
-	return 1;
-}
-ALTCMD:w->whisper;
-
-CMD:pm(playerid, params[])
-{
-	new pID, pmmsg[200], str[200];
-    if(sscanf(params, "us[200]", pID, pmmsg)) return SendClientMessage(playerid, COLOR_GRAY, "/pm [playerid] [message]");
-    if(PlayerInfo[playerid][Muted] == 0)
-    {
-    	format(str, sizeof(str), "[PM from [%d] %s]: %s", playerid, GetRoleplayName(playerid), pmmsg);
-		SendClientSplitMessage(pID, COLOR_YELLOW, str);
-
-		format(str, sizeof(str), "[PM to [%d] %s]: %s", pID, GetRoleplayName(pID), pmmsg);
-		SendClientSplitMessage(playerid, COLOR_YELLOW, str);
-	}
-	else
-	{
-	    SendClientMessage(playerid, COLOR_RED,ERROR_MUTED);
-	}
- 	return 1;
-}
+	
+}	
 
 CMD:buyhouse(playerid, params[])
 {
@@ -6195,43 +5313,43 @@ CMD:buybiz(playerid, params[])
 	new str[128], query[400], id = InRangeOfBiz(playerid);
 	if(InRangeOfBiz(playerid) > 0)
 	{
- 	    if(Biz[id][Owned] == 0)
+ 	    if(Business[id][Owned] == 0)
  	    {
- 	        if(PlayerInfo[playerid][Business] == 0 || PlayerInfo[playerid][Business2] == 0)
+ 	        if(PlayerInfo[playerid][Business_1] == 0 || PlayerInfo[playerid][Business_2] == 0)
  	        {
-     	        if(Biz[id][Price] <= PlayerInfo[playerid][Cash])
+     	        if(Business[id][Price] <= PlayerInfo[playerid][Cash])
 				{
 				    new option[12];
 					if(sscanf(params, "s[12]", option)) return SendClientMessage(playerid, COLOR_LBLUE, "Are you sure that you want to buy this business? (/buybiz [confirm/decline])");
 					{
 						if(!strcmp(option, "confirm", true))
 						{
-							format(str, sizeof(str), "> You have bought this biz(ID:%d)!", Biz[id][SQLID]);
+							format(str, sizeof(str), "> You have bought this biz(ID:%d)!", Business[id][SQLID]);
 						    SendClientMessage(playerid, COLOR_LBLUE, str);
 
-						    GivePlayerMoneyEx(playerid, -Biz[id][Price]);
+						    GivePlayerMoneyEx(playerid, -Business[id][Price]);
 
-						    if(PlayerInfo[playerid][Business] == 0)
+						    if(PlayerInfo[playerid][Business_1] == 0)
 					    	{
-					    		PlayerInfo[playerid][Business] = id;
+					    		PlayerInfo[playerid][Business_1] = id;
 					    	}
-					    	else if(PlayerInfo[playerid][Business2] == 0)
+					    	else if(PlayerInfo[playerid][Business_2] == 0)
 					    	{
-				    			PlayerInfo[playerid][Business2] = id;
+				    			PlayerInfo[playerid][Business_2] = id;
 					    	}
 					    	else return SendErrorMessage(playerid, "You already own two businesses!");
 							
 
-							Biz[id][Owned] = 1;
-							Biz[id][Owner] = PlayerInfo[playerid][SQLID];
+							Business[id][Owned] = 1;
+							Business[id][Owner] = PlayerInfo[playerid][SQLID];
 
-							mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `Biz` SET Owner = %d, Owned = %d WHERE SQLID = %d LIMIT 1",  Biz[id][Owner],Biz[id][Owned],Biz[id][SQLID]);
+							mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `Biz` SET Owner = %d, Owned = %d WHERE SQLID = %d LIMIT 1",  Business[id][Owner],Business[id][Owned],Business[id][SQLID]);
 							mysql_tquery(SQL_CONNECTION, query);
 							
-							mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT `Username` FROM Accounts WHERE SQLID = %d LIMIT 1", Biz[id][Owner]);
-		        			mysql_tquery(SQL_CONNECTION, query, "UpdateBizLabel", "i", id);
+							mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT `Username` FROM Accounts WHERE SQLID = %d LIMIT 1", Business[id][Owner]);
+		        			mysql_tquery(SQL_CONNECTION, query, "Update_Business_Label", "i", id);
 
-							ReloadBusiness(id);
+							Reload_Business(id);
 						}
 					}
 					if(!strcmp(option, "decline", true))
@@ -6266,9 +5384,9 @@ CMD:sellbiz(playerid, params[])
 	new id = InRangeOfBiz(playerid);
 	if(id > 0)
 	{
-    	if(Biz[id][Owned] == 1)
+    	if(Business[id][Owned] == 1)
  	    {
- 	        if(PlayerInfo[playerid][Business] == id || PlayerInfo[playerid][Business2] == id)
+ 	        if(PlayerInfo[playerid][Business_1] == id || PlayerInfo[playerid][Business_2] == id)
 			{
 			    new option[12];
 				if(sscanf(params, "s[12]", option)) return SendClientMessage(playerid, COLOR_LBLUE, "Are you sure that you want to sell your business? (/sellbiz [confirm/decline])");
@@ -6277,26 +5395,26 @@ CMD:sellbiz(playerid, params[])
 					{
 						new str[128], query[400], SalePrice;
 
-					    SalePrice = Biz[id][Price] / 2 + 1000;
+					    SalePrice = Business[id][Price] / 2 + 1000;
 					    GivePlayerMoneyEx(playerid, SalePrice);
-					    format(str, sizeof(str), "> You have sold your business(ID:%d) for $%d!", Biz[id][SQLID], SalePrice);
+					    format(str, sizeof(str), "> You have sold your business(ID:%d) for $%d!", Business[id][SQLID], SalePrice);
 					    SendClientMessage(playerid, COLOR_LBLUE, str);
 
-					    if(PlayerInfo[playerid][Business] == id) PlayerInfo[playerid][Business] = 0;
-					    else if(PlayerInfo[playerid][Business2] == id) PlayerInfo[playerid][Business2] = 0;
+					    if(PlayerInfo[playerid][Business_1] == id) PlayerInfo[playerid][Business_1] = 0;
+					    else if(PlayerInfo[playerid][Business_2] == id) PlayerInfo[playerid][Business_2] = 0;
 					    else return SendErrorMessage(playerid, "Couldn't find business.");
 
-						//format(Biz[id][Owner], 32, "");
-						Biz[id][Owned] = 0;
-						Biz[id][Owner] = 0;
+						//format(Business[id][Owner], 32, "");
+						Business[id][Owned] = 0;
+						Business[id][Owner] = 0;
 
-						mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `Biz` SET Owned = 0, Owner = 0 WHERE SQLID = %d LIMIT 1",Biz[id][SQLID]);
+						mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `Biz` SET Owned = 0, Owner = 0 WHERE SQLID = %d LIMIT 1",Business[id][SQLID]);
                         mysql_tquery(SQL_CONNECTION, query);
                         
-                        mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT `Username` FROM Accounts WHERE SQLID = %d LIMIT 1", Biz[id][Owner]);
-		        		mysql_tquery(SQL_CONNECTION, query, "UpdateBizLabel", "i", id);
+                        mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT `Username` FROM Accounts WHERE SQLID = %d LIMIT 1", Business[id][Owner]);
+		        		mysql_tquery(SQL_CONNECTION, query, "Update_Business_Label", "i", id);
 	                    
-	                    ReloadBusiness(id);
+	                    Reload_Business(id);
 					}
 					if(!strcmp(option, "decline", true))
 					{
@@ -6356,13 +5474,13 @@ CMD:key(playerid, params[])
     id = InRangeOfBiz(playerid);
     if(id != 0)
  	{
- 	    if(PlayerInfo[playerid][Business] == id || PlayerInfo[playerid][Business2] == id)
+ 	    if(PlayerInfo[playerid][Business_1] == id || PlayerInfo[playerid][Business_2] == id)
  	    {
- 	        if(Biz[id][Locked] == 0)
+ 	        if(Business[id][Locked] == 0)
  	        {
          		format(str, sizeof(str), "* %s places the key in the door, locking it.*", GetRoleplayName(playerid), str);
 				SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
-				Biz[id][Locked] = 1;
+				Business[id][Locked] = 1;
 				MYSQL_Update_Interger(Houses[id][SQLID], "Biz", "Locked", 1);
 				return 1;
  	        }
@@ -6371,7 +5489,7 @@ CMD:key(playerid, params[])
  	            format(str, sizeof(str), "* %s places the key in the door, unlocking it.*", GetRoleplayName(playerid), str);
 				SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 				MYSQL_Update_Interger(Houses[id][SQLID], "Biz", "Locked", 1);
-				Biz[id][Locked] = 0;
+				Business[id][Locked] = 0;
 				return 1;
  	        }
  	    }
@@ -7000,7 +6118,7 @@ stock IsBusinessOwner(playerid, bid)
 
 IsInOwnedBusiness(playerid)
 {
-	if(PlayerInfo[playerid][bEntered] == PlayerInfo[playerid][Business] || PlayerInfo[playerid][bEntered] == PlayerInfo[playerid][Business2]) return PlayerInfo[playerid][bEntered];
+	if(PlayerInfo[playerid][bEntered] == PlayerInfo[playerid][Business_1] || PlayerInfo[playerid][bEntered] == PlayerInfo[playerid][Business_2]) return PlayerInfo[playerid][bEntered];
 	return 0;
 }
 
@@ -7014,8 +6132,8 @@ CMD:safestore(playerid,params[])
 			if(sscanf(params, "d", amount)) return SendClientMessage(playerid, COLOR_GRAY, "/safestore [amount]");
 			if(PlayerInfo[playerid][Cash] >= amount)
 			{
-				MYSQL_Update_Interger(Biz[bid][SQLID], "Biz", "Safe", Biz[bid][Safe] += amount);
-				format(str, sizeof(str), "You stored $%d in the safe! Total($%d)", amount, Biz[bid][Safe]);
+				MYSQL_Update_Interger(Business[bid][SQLID], "Biz", "Safe", Business[bid][Safe] += amount);
+				format(str, sizeof(str), "You stored $%d in the safe! Total($%d)", amount, Business[bid][Safe]);
 				SendClientMessage(playerid, COLOR_GREEN, str);
 				GivePlayerMoneyEx(playerid, -amount);
 			}
@@ -7048,10 +6166,10 @@ CMD:safeget(playerid,params[])
 		if(bid)
 		{
 			if(sscanf(params, "d", amount)) return SendClientMessage(playerid, COLOR_GRAY, "/safeget [amount]");
-			if(Biz[bid][Safe] >= amount)
+			if(Business[bid][Safe] >= amount)
 			{
-				MYSQL_Update_Interger(Biz[bid][SQLID], "Biz", "Safe", Biz[bid][Safe] -= amount);
-				format(str, sizeof(str), "You taken $%d from the safe! Total($%d)", amount, Biz[bid][Safe]);
+				MYSQL_Update_Interger(Business[bid][SQLID], "Biz", "Safe", Business[bid][Safe] -= amount);
+				format(str, sizeof(str), "You taken $%d from the safe! Total($%d)", amount, Business[bid][Safe]);
 				SendClientMessage(playerid, COLOR_GREEN, str);
 				GivePlayerMoneyEx(playerid, amount);
 			}
@@ -7073,7 +6191,7 @@ CMD:checksafe(playerid,params[])
 		if(bid)
 		{
 		    bid = PlayerInfo[playerid][bEntered];
-			format(str, sizeof(str), "There is $%d in the safe!", Biz[bid][Safe]);
+			format(str, sizeof(str), "There is $%d in the safe!", Business[bid][Safe]);
 			SendClientMessage(playerid, COLOR_GREEN, str);
 		}
 		else
@@ -7091,11 +6209,11 @@ CMD:entrancefee(playerid,params[])
 			if(sscanf(params, "d", amount)) return SendClientMessage(playerid, COLOR_GRAY, "/entrancefee [amount]");
 			if(amount < 0 && amount >= 50)
 			{
-			    Biz[bid][EntranceFee] = amount;
-			    MYSQL_Update_Interger(Biz[bid][SQLID], "Biz", "EntranceFee", Biz[bid][EntranceFee]);
-				format(str, sizeof(str), "EntranceFee set at $%d!", Biz[bid][EntranceFee]);
+			    Business[bid][EntranceFee] = amount;
+			    MYSQL_Update_Interger(Business[bid][SQLID], "Biz", "EntranceFee", Business[bid][EntranceFee]);
+				format(str, sizeof(str), "EntranceFee set at $%d!", Business[bid][EntranceFee]);
 				SendClientMessage(playerid, COLOR_GREEN, str);
-				ReloadBusiness(bid);
+				Reload_Business(bid);
 			}
 			else
 			{
@@ -7170,7 +6288,7 @@ public InRangeOfBiz(playerid)
 {
 	for(new id = 0; id < MAX_BIZ; id++)
 	{
-		if(IsPlayerInRangeOfPoint(playerid, 3.0, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ]))
+		if(IsPlayerInRangeOfPoint(playerid, 3.0, Business[id][PosX], Business[id][PosY], Business[id][PosZ]))
 		{
 		    return id;
 		}
@@ -7186,7 +6304,7 @@ CMD:bizinfo(playerid,params[])
 		if(InRangeOfBiz(playerid) > 0)
 		{
 		    new str[128];
-            format(str, sizeof(str), ""COL_WHITE"Business ID:"COL_BLUE" %d \n"COL_WHITE"Price:"COL_BLUE" $%d \n"COL_WHITE"Safe Amount:"COL_BLUE" $%d", InRangeOfBiz(playerid), Biz[InRangeOfBiz(playerid)][Price], Biz[InRangeOfBiz(playerid)][Safe]);
+            format(str, sizeof(str), ""COL_WHITE"Business ID:"COL_BLUE" %d \n"COL_WHITE"Price:"COL_BLUE" $%d \n"COL_WHITE"Safe Amount:"COL_BLUE" $%d", InRangeOfBiz(playerid), Business[InRangeOfBiz(playerid)][Price], Business[InRangeOfBiz(playerid)][Safe]);
 		    Dialog_Show(playerid,BANK_BALANCE,DIALOG_STYLE_MSGBOX,"Business Information",str,"Close","");
 		}
 		else
@@ -7234,8 +6352,8 @@ CMD:quiztest(playerid,params[])
 	    CreateSpacer(playerid, 10);
 	    format(QAnswer[playerid], 2, "%d", strval(QuizQuestions[rand][0]));
 		Dialog_Show(playerid, QUIZ22, DIALOG_STYLE_LIST, QuizQuestions[rand][1], QuizQuestions[rand][2],"Select","");
-		SendClientSplitMessage(playerid, COLOR_SLATEGRAY, QuizQuestions[rand][1]);
-		SendClientSplitMessage(playerid, COLOR_WHITE, QuizQuestions[rand][2]);
+		SendSplitMessage(playerid, COLOR_SLATEGRAY, QuizQuestions[rand][1]);
+		SendSplitMessage(playerid, COLOR_WHITE, QuizQuestions[rand][2]);
 
 	}
 	return 1;
@@ -7246,7 +6364,7 @@ CMD:balance(playerid,params[])
     if(InRangeOfIcon(playerid, 5) == 1)
 	{
 		new str[128];
-		if(Biz[PlayerInfo[playerid][bEntered]][Owned] == 2)
+		if(Business[PlayerInfo[playerid][bEntered]][Owned] == 2)
 		{
 			format(str, sizeof(str), "Bank Balance: "COL_DGREEN"$%s", FormatNumber(PlayerInfo[playerid][Bank]));
 			Dialog_Show(playerid,BANK_BALANCE,DIALOG_STYLE_MSGBOX,"- My Bank -",str,"Close","");
@@ -7269,7 +6387,7 @@ CMD:withdraw(playerid,params[])
 	if(InRangeOfIcon(playerid, 5) == 1)
 	{
 		new str[128], amount;
-		if(Biz[PlayerInfo[playerid][bEntered]][Owned] == 2)
+		if(Business[PlayerInfo[playerid][bEntered]][Owned] == 2)
 		{
 			if(sscanf(params, "d", amount)) return SendClientMessage(playerid, COLOR_GRAY, "/withdraw [amount]");
 			if(PlayerInfo[playerid][Bank] >= amount)
@@ -7298,7 +6416,7 @@ CMD:deposit(playerid,params[])
 	if(InRangeOfIcon(playerid, 5) == 1)
 	{
 		new str[128], amount;
-		if(Biz[PlayerInfo[playerid][bEntered]][Owned] == 2)
+		if(Business[PlayerInfo[playerid][bEntered]][Owned] == 2)
 		{
 			if(sscanf(params, "d", amount)) return SendClientMessage(playerid, COLOR_GRAY, "/deposit [amount]");
 			if(PlayerInfo[playerid][Cash] >= amount)
@@ -7360,7 +6478,7 @@ CMD:ahelp(playerid, params[])
 		SendClientMessage(playerid, COLOR_GRAY, "ADMIN LVL 6:[/reload][/payday][/createsv][/deletesv][/setbiz][/housemanager]");
 		SendClientMessage(playerid, COLOR_GRAY, "ADMIN LVL 6:[/editobject][/selectobject][/makemovableobject][/aChangeCharacterUsername][/aChangeMAPassword]");
  		SendClientMessage(playerid, COLOR_GRAY, "ADMIN LVL 6:[/setplayer [id] [option]]");
- 		SendClientMessage(playerid, COLOR_GRAY, "ADMIN LVL 6:\t [house][business][bank][cash][ma_admin][vehicle(1,2,3)][ExemptIP]");
+ 		SendClientMessage(playerid, COLOR_GRAY, "ADMIN LVL 6:\t [house][Business_1][bank][cash][ma_admin][vehicle(1,2,3)][ExemptIP]");
 		SendClientMessage(playerid, COLOR_GRAY, "DEBUG CMD:  [/inhouse][/inbiz][/vinfo][/binfo]");
 	}
 	
@@ -7388,7 +6506,7 @@ CMD:inbiz(playerid,params[])
 	new str[128];
 	if(MasterAccount[playerid][Admin] >= 1)
 		{
-			format(str, sizeof(str), "You are in business: %d next ID is. You are in VW %d %d and Int %d %d", PlayerInfo[playerid][bEntered], Biz[PlayerInfo[playerid][bEntered]][World], GetPlayerVirtualWorld(playerid), Biz[PlayerInfo[playerid][bEntered]][Interior], GetPlayerInterior(playerid));
+			format(str, sizeof(str), "You are in business: %d next ID is. You are in VW %d %d and Int %d %d", PlayerInfo[playerid][bEntered], Business[PlayerInfo[playerid][bEntered]][World], GetPlayerVirtualWorld(playerid), Business[PlayerInfo[playerid][bEntered]][Interior], GetPlayerInterior(playerid));
 			SendClientMessage(playerid, COLOR_GRAY, str);
 			InfoBoxForPlayer(playerid, "You are muted, you can't talk. \n If you think this is incorrect,\n Post an appeal on forums.");
 
@@ -7583,24 +6701,6 @@ CMD:freeze(playerid, params[])
 	return 1;
 }
 
-CMD:unfreeze(playerid, params[])
-{
-	new pID, str[128], astr[128];
-	if(MasterAccount[playerid][Admin] >= 2)
-	{
-	    if(sscanf(params, "u", pID)) return SendClientMessage(playerid, COLOR_GRAY, "/unfreeze [id]");
-		TogglePlayerControllable(pID, 1);
- 		format(astr, sizeof(astr), "%s has unfrozen %s.", GetRoleplayName(playerid), GetRoleplayName(pID));
-		SendAdminsMessage(1, COLOR_RED, astr);
-		format(str, sizeof(str), "Admin %s has unfrozen you.", GetRoleplayName(playerid));
-	    SendClientMessage(pID, COLOR_RED, str);
-	}
-	else
-	{
-	    SendErrorMessage(playerid, ERROR_ADMIN);
-	}
-	return 1;
-}
 
 
 CMD:slap(playerid, params[])
@@ -7817,8 +6917,8 @@ public OnPlayerEnterDynamicRaceCP(playerid, checkpointid)
 					Trucking[playerid][SectionID] = 2;
 					PlayerPlaySound(playerid, 1139, 0.0, 0.0, 10.0);
 					DestroyDynamicRaceCP(checkpointid);
-					Trucking[playerid][CheckpointID] = CreateDynamicRaceCP(2, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0.0, 0.0, 0.0, 8, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), playerid, 5000);
-					format(str, sizeof(str), "The imported good is now being processed. You will now deliver the finished product to %s.", Biz[id][Name]);
+					Trucking[playerid][CheckpointID] = CreateDynamicRaceCP(2, Business[id][PosX], Business[id][PosY], Business[id][PosZ], 0.0, 0.0, 0.0, 8, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), playerid, 5000);
+					format(str, sizeof(str), "The imported good is now being processed. You will now deliver the finished product to %s.", Business[id][Name]);
 					SendClientMessage(playerid, COLOR_YELLOWGREEN, str);
 				}
 
@@ -8838,12 +7938,12 @@ CMD:gotob(playerid,params[])
 		{
 			for(id = 0; id < Total_Biz_Created + 1; id++)
 	        {
-	            if(strfind(Biz[id][Name], idi, true) != -1)
+	            if(strfind(Business[id][Name], idi, true) != -1)
 	            {
-					SetPlayerPosEx(playerid, Biz[id][PosX], Biz[id][PosY], Biz[id][PosZ], 0, 0);
+					SetPlayerPosEx(playerid, Business[id][PosX], Business[id][PosY], Business[id][PosZ], 0, 0);
 			        PlayerInfo[playerid][hEntered] = 0;
 			        PlayerInfo[playerid][bEntered] = 0;
-		   			format(str, sizeof(str), "%s has teleported to business %s(%d).", GetRoleplayName(playerid), Biz[id][Name], id);
+		   			format(str, sizeof(str), "%s has teleported to business %s(%d).", GetRoleplayName(playerid), Business[id][Name], id);
 					SendAdminsMessage(1, COLOR_SLATEGRAY, str);
 					return 1;
 			    }
@@ -9059,7 +8159,7 @@ CMD:deletebiz(playerid, params[])
 	if(MasterAccount[playerid][Admin] == 6)
 	{
 	    if(sscanf(params, "d", bizid)) return SendClientMessage(playerid, COLOR_GRAY, "/deletebiz [id]");
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "DELETE FROM `%e`.`Biz` WHERE `Biz`.`ID` = %d", SQL_DB, Biz[bizid][SQLID]);
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "DELETE FROM `%e`.`Biz` WHERE `Biz`.`ID` = %d", SQL_DB, Business[bizid][SQLID]);
 		mysql_tquery(SQL_CONNECTION, query);
 		Total_Biz_Created --;
 		format(str, sizeof(str), "%s has deleted a business(ID:%d).", GetRoleplayName(playerid), bizid);
@@ -9101,6 +8201,8 @@ CMD:billcosby(playerid, params[])
 
     return 1;
 }
+
+
 
 CMD:setplayer(playerid, params[])
 {
@@ -9322,7 +8424,7 @@ CMD:setplayer(playerid, params[])
 						{
 	                        if(option2 > 0 && option2 <= MAX_BIZ)
 							{
-	                            PlayerInfo[player][Business] = option2;
+	                            PlayerInfo[player][Business_1] = option2;
 						        SendSetMessages(player, playerid, option1, option2);
 	                            return 1;
 						    }
@@ -9332,13 +8434,13 @@ CMD:setplayer(playerid, params[])
 						    }
 				        }
 					}
-					else if(!strcmp(option1, "business2", true))
+					else if(!strcmp(option1, "Business_2", true))
 					{
 					    if (MasterAccount[playerid][Admin] >= 6)
 						{
 	                        if(option2 > 0 && option2 <= MAX_BIZ)
 							{
-	                            PlayerInfo[player][Business2] = option2;
+	                            PlayerInfo[player][Business_2] = option2;
 						        SendSetMessages(player, playerid, option1, option2);
 	                            return 1;
 						    }
@@ -9467,7 +8569,7 @@ CMD:setplayer(playerid, params[])
 		{
 		    SendClientMessage(playerid, COLOR_GRAY, "/setplayer [id] [option]");
 		    SendClientMessage(playerid, COLOR_GRAY, "Options:\t [health][armour][level][skinvw][inteior][age][gender][faction]");
-		    SendClientMessage(playerid, COLOR_GRAY, "Options:\t [rank][job][house][business][hentered][bentered][bank][adminlevel]");
+		    SendClientMessage(playerid, COLOR_GRAY, "Options:\t [rank][job][house][Business_1][hentered][bentered][bank][adminlevel]");
 
 		}*/
 	}
@@ -9631,37 +8733,7 @@ public OnPlayerTakeDamage(playerid, issuerid, Float:amount, weaponid, bodypart)
     return 1;
 }
 
-stock MYSQL_Update_Account(playerid, option1[], option2)
-{
-	new query[128];
-    mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET %e = %d WHERE SQLID = %d LIMIT 1", option1, option2, PlayerInfo[playerid][SQLID]);
-	mysql_tquery(SQL_CONNECTION, query);
-	return 1;
-}
 
-stock MYSQL_Update_String(sqlid, table[], column[], str[])
-{
-	new query[280];
-    mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `%e` SET `%e` = '%e' WHERE SQLID = %d LIMIT 1", table, column, str, sqlid);
-	mysql_tquery(SQL_CONNECTION, query);
-	return 1;
-}
-
-stock MYSQL_Update_Interger(sqlid, table[], column[], interger)
-{
-	new query[280];
-    mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `%e` SET `%e` = %d WHERE SQLID = %d LIMIT 1", table, column, interger, sqlid);
-	mysql_tquery(SQL_CONNECTION, query);
-	return 1;
-}
-
-stock MYSQL_Update_Float(sqlid, table[], column[], Float:interger)
-{
-	new query[280];
-    mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `%e` SET `%e` = %f WHERE SQLID = %d LIMIT 1", table, column, interger, sqlid);
-	mysql_tquery(SQL_CONNECTION, query);
-	return 1;
-}
 
 stock SendSetMessages(player, playerid, option1[], option2)
 {
@@ -9685,10 +8757,10 @@ CMD:setbiz(playerid, params[])
 			if(!strcmp(option2, "interior", true))
 			{
 				new int = GetPlayerInterior(playerid);
-				Biz[id][Interior] = int;
-				GetPlayerPos(playerid, Biz[id][InteriorX], Biz[id][InteriorY], Biz[id][InteriorZ]);
+				Business[id][Interior] = int;
+				GetPlayerPos(playerid, Business[id][InteriorX], Business[id][InteriorY], Business[id][InteriorZ]);
 
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Interior = %d, InteriorX = %f, InteriorY = %f, InteriorZ = %f WHERE SQLID = %d LIMIT 1", Biz[id][Interior], Biz[id][InteriorX], Biz[id][InteriorY], Biz[id][InteriorZ], Biz[id][SQLID]);
+				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Interior = %d, InteriorX = %f, InteriorY = %f, InteriorZ = %f WHERE SQLID = %d LIMIT 1", Business[id][Interior], Business[id][InteriorX], Business[id][InteriorY], Business[id][InteriorZ], Business[id][SQLID]);
 				mysql_tquery(SQL_CONNECTION, query);
 
 				format(str, sizeof(str), "Biz id: "COL_BLUE"%i "COL_WHITE"interior has been set to "COL_BLUE"%i", id, int);
@@ -9699,80 +8771,80 @@ CMD:setbiz(playerid, params[])
  //			| Option 2 | Exterior |
 			if(!strcmp(option2, "exterior", true))
 			{
-				GetPlayerPos(playerid, Biz[id][PosX],Biz[id][PosY],Biz[id][PosZ]);
+				GetPlayerPos(playerid, Business[id][PosX],Business[id][PosY],Business[id][PosZ]);
 
 				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET PosX = %f, PosY = %f, PosZ = %f WHERE SQLID = %d LIMIT 1",
 
-												Biz[id][PosX],
-												Biz[id][PosY],
-												Biz[id][PosZ],
-												Biz[id][SQLID]);
+												Business[id][PosX],
+												Business[id][PosY],
+												Business[id][PosZ],
+												Business[id][SQLID]);
 
 				mysql_tquery(SQL_CONNECTION, query);
 				SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
-				ReloadBusiness(id);
+				Reload_Business(id);
 			}
 
 			if(!strcmp(option2, "owner", true))
 			{
-				MYSQL_Update_Interger(Biz[id][SQLID], "Biz", "Owner", option3);
+				MYSQL_Update_Interger(Business[id][SQLID], "Biz", "Owner", option3);
 				SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
-				ReloadBusiness(id);
+				Reload_Business(id);
 			}
 
 			if(!strcmp(option2, "owned", true))
 			{
 			    if(option3 <= 3)
 			    {
-					MYSQL_Update_Interger(Biz[id][SQLID], "Biz", "Owned", option3);
+					MYSQL_Update_Interger(Business[id][SQLID], "Biz", "Owned", option3);
 					SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
-					ReloadBusiness(id);
+					Reload_Business(id);
 				}
 			}
 
 			if(!strcmp(option2, "price", true))
 			{
-				MYSQL_Update_Interger(Biz[id][SQLID], "Biz", "Price", option3);
+				MYSQL_Update_Interger(Business[id][SQLID], "Biz", "Price", option3);
 				SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
-				ReloadBusiness(id);
+				Reload_Business(id);
 			}
 
 			if(!strcmp(option2, "payout", true))
 			{
-				MYSQL_Update_Interger(Biz[id][SQLID], "Biz", "Payout", option3);
+				MYSQL_Update_Interger(Business[id][SQLID], "Biz", "Payout", option3);
 
 				SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
-				ReloadBusiness(id);
+				Reload_Business(id);
 			}
 
 			if(!strcmp(option2, "Safe", true))
 			{
-				MYSQL_Update_Interger(Biz[id][SQLID], "Biz", "Safe", option3);
+				MYSQL_Update_Interger(Business[id][SQLID], "Biz", "Safe", option3);
 				SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
-				ReloadBusiness(id);
+				Reload_Business(id);
 			}
 
 			if(!strcmp(option2, "Type", true))
 			{
-				MYSQL_Update_Interger(Biz[id][SQLID], "Biz", "Type", option3);
+				MYSQL_Update_Interger(Business[id][SQLID], "Biz", "Type", option3);
 				SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
-				ReloadBusiness(id);
+				Reload_Business(id);
 			}
 
 			if(!strcmp(option2, "EntranceFee", true))
 			{
-				MYSQL_Update_Interger(Biz[id][SQLID], "Biz", "EntranceFee", option3);
+				MYSQL_Update_Interger(Business[id][SQLID], "Biz", "EntranceFee", option3);
 				SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
-				ReloadBusiness(id);
+				Reload_Business(id);
 			}
 
 			if(!strcmp(option2, "Locked", true))
 			{
 			    if(option3 <= 3)
 			    {
-					MYSQL_Update_Interger(Biz[id][SQLID], "Biz", "Locked", option3);
+					MYSQL_Update_Interger(Business[id][SQLID], "Biz", "Locked", option3);
 					SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
-					ReloadBusiness(id);
+					Reload_Business(id);
 				}
 			}
 		}
@@ -12772,10 +11844,10 @@ Dialog:CREATEBUSINESS(playerid, response, listitem, inputtext[])
 
 
 
-		//GetPlayerPos(playerid, Biz[Create_New_Biz_ID[playerid]][PosX],Biz[Create_New_Biz_ID[playerid]][PosY],Biz[Create_New_Biz_ID[playerid]][PosZ]);
-		//format(Biz[PlayerInfo[playerid][NewID]][Name], 32, "%s", inputtext);
+		//GetPlayerPos(playerid, Business[Create_New_Biz_ID[playerid]][PosX],Business[Create_New_Biz_ID[playerid]][PosY],Business[Create_New_Biz_ID[playerid]][PosZ]);
+		//format(Business[PlayerInfo[playerid][NewID]][Name], 32, "%s", inputtext);
 
-		Dialog_Show(playerid, CREATEBUSINESS2, DIALOG_STYLE_INPUT, "Business Creation", "Enter the price of the business you have created:", "Continue","Cancel");
+		Dialog_Show(playerid, CREATEBusiness_2, DIALOG_STYLE_INPUT, "Business Creation", "Enter the price of the business you have created:", "Continue","Cancel");
 	}
     return 1;
 }
@@ -12788,7 +11860,7 @@ public GetBizID(playerid)
 	return 1;
 }
 
-Dialog:CREATEBUSINESS2(playerid, response, listitem, inputtext[])
+Dialog:CREATEBusiness_2(playerid, response, listitem, inputtext[])
 {
 	if(!response) return SendErrorMessage(playerid, ERROR_DIALOG);
     if(response)
@@ -12796,18 +11868,18 @@ Dialog:CREATEBUSINESS2(playerid, response, listitem, inputtext[])
 
         if(strval(inputtext) > 0 && strval(inputtext) < 5000000)
         {
-			Biz[Create_New_Biz_ID[playerid]][Price] = strval(inputtext);
+			Business[Create_New_Biz_ID[playerid]][Price] = strval(inputtext);
 
-			MYSQL_Update_Interger(Create_New_Biz_ID[playerid], "Biz", "Price", Biz[Create_New_Biz_ID[playerid]][Price]);
+			MYSQL_Update_Interger(Create_New_Biz_ID[playerid], "Biz", "Price", Business[Create_New_Biz_ID[playerid]][Price]);
 
 			new str[128];
-			format(str, sizeof(str), "Price set at: $%d", Biz[Create_New_Biz_ID[playerid]][Price]);
+			format(str, sizeof(str), "Price set at: $%d", Business[Create_New_Biz_ID[playerid]][Price]);
 			SendClientMessage(playerid, COLOR_GRAY, str);
 			Dialog_Show(playerid, CREATEBUSINESS4, DIALOG_STYLE_INPUT, "Business Creation", "Enter the payout of the business you have created:", "Continue","Cancel");
 		}
 		else
 		{
-		    Dialog_Show(playerid, CREATEBUSINESS2, DIALOG_STYLE_INPUT, "Business Creation", "Enter the price of the business you have created:", "Continue","Cancel");
+		    Dialog_Show(playerid, CREATEBusiness_2, DIALOG_STYLE_INPUT, "Business Creation", "Enter the price of the business you have created:", "Continue","Cancel");
 
 		}
 
@@ -12820,12 +11892,12 @@ Dialog:CREATEBUSINESS4(playerid, response, listitem, inputtext[])
 	if(!response) return SendErrorMessage(playerid, ERROR_DIALOG);
     if(response)
     {
-		Biz[Create_New_Biz_ID[playerid]][Payout] = strval(inputtext);
-		MYSQL_Update_Interger(Create_New_Biz_ID[playerid], "Biz", "Payout", Biz[Create_New_Biz_ID[playerid]][Payout]);
+		Business[Create_New_Biz_ID[playerid]][Payout] = strval(inputtext);
+		MYSQL_Update_Interger(Create_New_Biz_ID[playerid], "Biz", "Payout", Business[Create_New_Biz_ID[playerid]][Payout]);
 
 
 		new str[128];
-		format(str, sizeof(str), "Payout set at: $%d", Biz[Create_New_Biz_ID[playerid]][Payout]);
+		format(str, sizeof(str), "Payout set at: $%d", Business[Create_New_Biz_ID[playerid]][Payout]);
 		SendClientMessage(playerid, COLOR_GRAY, str);
 		Dialog_Show(playerid, CREATEBUSINESS3, DIALOG_STYLE_LIST, "Business Creation - Business Type","[1]Convenience Store\n[2]Ammunation\n[3]News Agency\n[4] Betting Shop\n[5]Clothes Shop(Zip)\n[6]Doughnut Place\n[2]Ammunation 3\n[4]Off Track Betting\n[7]Sex Shop\n[8]Electronic Shop\n[1]Gas Station\n[5]Binco\n[5]Didier Sachs\n[9]Club\n[9]Bar\n[9]Lil Prob Inn\n[6]Jay's Diner\n[6]Grant Diner\n[10]Burger Shot\n[10]Cluckin' Bell","Create","Cancel");
     }
@@ -12839,17 +11911,17 @@ Dialog:CREATEBUSINESS3(playerid, response, listitem, inputtext[])
     {
         new query[300], str[128];
 
-		Biz[Create_New_Biz_ID[playerid]][InteriorX] = BusinessInteriorPos[listitem][0];
-		Biz[Create_New_Biz_ID[playerid]][InteriorY] = BusinessInteriorPos[listitem][1];
-		Biz[Create_New_Biz_ID[playerid]][InteriorZ] = BusinessInteriorPos[listitem][2];
-		Biz[Create_New_Biz_ID[playerid]][World] = Create_New_Biz_ID[playerid];
-		Biz[Create_New_Biz_ID[playerid]][Interior] = BusinessInteriors[listitem][2][0];
-		Biz[Create_New_Biz_ID[playerid]][Type] = BusinessInteriors[listitem][0][0];
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Interior = %d, World = %d, Type = %d, InteriorX = %f, InteriorY = %f, InteriorZ = %f WHERE SQLID = %d LIMIT 1", BusinessInteriors[listitem][2][0], Biz[Create_New_Biz_ID[playerid]][World], BusinessInteriors[listitem][0][0], BusinessInteriorPos[listitem][0], BusinessInteriorPos[listitem][1], BusinessInteriorPos[listitem][2], Biz[Create_New_Biz_ID[playerid]][SQLID]);
+		Business[Create_New_Biz_ID[playerid]][InteriorX] = BusinessInteriorPos[listitem][0];
+		Business[Create_New_Biz_ID[playerid]][InteriorY] = BusinessInteriorPos[listitem][1];
+		Business[Create_New_Biz_ID[playerid]][InteriorZ] = BusinessInteriorPos[listitem][2];
+		Business[Create_New_Biz_ID[playerid]][World] = Create_New_Biz_ID[playerid];
+		Business[Create_New_Biz_ID[playerid]][Interior] = BusinessInteriors[listitem][2][0];
+		Business[Create_New_Biz_ID[playerid]][Type] = BusinessInteriors[listitem][0][0];
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Interior = %d, World = %d, Type = %d, InteriorX = %f, InteriorY = %f, InteriorZ = %f WHERE SQLID = %d LIMIT 1", BusinessInteriors[listitem][2][0], Business[Create_New_Biz_ID[playerid]][World], BusinessInteriors[listitem][0][0], BusinessInteriorPos[listitem][0], BusinessInteriorPos[listitem][1], BusinessInteriorPos[listitem][2], Business[Create_New_Biz_ID[playerid]][SQLID]);
 		mysql_tquery(SQL_CONNECTION, query);
-		format(str, sizeof(str), "%s has created/updated business: %s.", GetRoleplayName(playerid), Biz[Create_New_Biz_ID[playerid]][Name]);
+		format(str, sizeof(str), "%s has created/updated business: %s.", GetRoleplayName(playerid), Business[Create_New_Biz_ID[playerid]][Name]);
 		SendAdminsMessage(1, COLOR_ORANGERED, str);
-		ReloadBusiness(Create_New_Biz_ID[playerid]);
+		Reload_Business(Create_New_Biz_ID[playerid]);
 
 
     }
@@ -12882,14 +11954,14 @@ Dialog:ChangeBizName(playerid, response, listitem, inputtext[])
 	if(!response) return SendErrorMessage(playerid, ERROR_DIALOG);
     if(response)
     {
-		format(Biz[bizzid[playerid]][Name], 64, "%s", inputtext);
+		format(Business[bizzid[playerid]][Name], 64, "%s", inputtext);
 		new str[128];
-		format(str, sizeof(str), "You have set business %d's name to %s.", bizzid[playerid], Biz[bizzid[playerid]][Name]);
+		format(str, sizeof(str), "You have set business %d's name to %s.", bizzid[playerid], Business[bizzid[playerid]][Name]);
 		SendClientMessage(playerid, COLOR_YELLOW, str);
 
-		MYSQL_Update_String(Biz[bizzid[playerid]][SQLID], "Biz", "Name", Biz[bizzid[playerid]][Name]);
+		MYSQL_Update_String(Business[bizzid[playerid]][SQLID], "Biz", "Name", Business[bizzid[playerid]][Name]);
 
-		ReloadBusiness(bizzid[playerid]);
+		Reload_Business(bizzid[playerid]);
 	}
     return 1;
 }
