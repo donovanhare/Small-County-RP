@@ -1,4 +1,91 @@
 //==============================================================================
+//          -- > Error Message Defines
+//==============================================================================
+#define ERROR_LOGGEDIN															"You are not logged in, mate."
+#define ERROR_ADMIN 															"You don't have access to this command."
+#define ERROR_SPAM_TIME															"This command cannot be performed at this point in time."
+#define ERROR_LOCATION															"This command cannot be performed at this location."
+#define ERROR_MONEY																"Insufficient funds."
+#define ERROR_ADMINLEVEL														"This cannot be performed on a higher level administrator."
+#define ERROR_INVALIDPLAYER														"Invalid player specified."
+#define ERROR_VEHICLE															"You must be in a vehicle to perform this command."
+#define ERROR_FACTION 															"You don't have access to this command."
+#define ERROR_VALUE																"You cannot use that value at this point in time."
+#define ERROR_OPTION															"Not a valid option."
+#define ERROR_DIALOG															"The dialog has been closed."
+#define ERROR_RANK																"Not a high enough rank."
+#define ERROR_MUTED																"You are muted, you cannot talk."
+#define ERROR_OWNED																"You already own an item of this type."
+#define ERROR_OWNER																"This item is already owned."
+#define ERROR_NOTOWNED															"You do not own this item."
+#define ERROR_JOB																"You don't have the job required to do this."
+#define ERROR_CONNECTED															"The player that you are requesting isn't connected."
+
+
+//==============================================================================
+//          -- > Server Limits
+//==============================================================================
+#define MAX_VEH                                                      			200
+#define MAX_FACTIONS                                                            10
+#define MAX_HOUSES                                                              100
+#define MAX_BIZ                                                                 100
+#define MAX_ICONS                                                               50
+#define MAX_OBJECTZ                                                             5000
+#define MAX_JOBS                                                                5
+
+//==============================================================================
+#define PAYDAY_STANDARD                                                         250
+#define PAYDAY_FACTION	                                                        300
+#define PAYDAY_DONATOR	                                                        2500
+#define PAYDAY_ADMIN	                                                        3750
+#define PAYDAY_XP_STANDARD                                                      1
+#define PAYDAY_XP_BIZ                                                           2
+#define PAYDAY_XP_FACTION                                                       1
+//==============================================================================
+#define Range_VShort                                                            4.0
+#define Range_Short                                                             15.0
+#define Range_Normal                                                            20.0
+#define Range_Long                                                              40.0
+#define Range_VLong                                                             100.0   
+
+
+#define SPLITLENGTH 118
+
+#define LOG_PATH "/Server Logs/%s.txt"
+
+
+
+#define SECONDS(%0)             (%0*1000)
+#define MINUTES(%0)             (%0*SECONDS(60))
+#define HOURS(%0)               (%0*MINUTES(60))
+
+#define ALTCMD:%1->%2; \
+    CMD:%1(playerid, params[]) \
+    return cmd_%2(playerid, params);
+
+#define ALTCMD2:%1->%2; \
+    CMD:%1(playerid) \
+    return cmd_%2(playerid);
+
+// PRESSED(keys)
+#define PRESSED(%0) \
+	(((newkeys & (%0)) == (%0)) && ((oldkeys & (%0)) != (%0)))
+
+
+//==============================================================================
+#define TAXI_JOB														  		 1
+#define MECHANIC_JOB													  		 2
+
+#define PNC_JAIL																 1
+#define PNC_CHARGE																 2
+#define PNC_FINES																 3
+#define PNC_WARRANT																 4
+#define PNC_WLOG																 5
+
+
+
+
+//==============================================================================
 //          -- > Colors
 //==============================================================================
 #define COL_WHITE                                                               "{FFFFFF}"
@@ -20,7 +107,7 @@
 #define COLOR_GRAY                                                              0xC0C0C0FF
 #define COLOR_WHITE                                                             0xFFFFFFFF
 #define COLOR_GREY                                                              0xAFAFAFAA
-#define COLOR_LBLUE                                                             0x00C0FFAA
+#define COLOR_LBLUE                                                             0x3C3176AA
 #define COLOR_MBLUE                                                             0x2E37FEAA
 #define COLOR_DGREEN                                                            0x007200AA
 #define COLOR_RP                                                                0xC2A2DAAA

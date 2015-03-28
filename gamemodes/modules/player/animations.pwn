@@ -6,6 +6,33 @@ new LibsPreloaded[MAX_PLAYERS];
 new Text:AnimText[MAX_PLAYERS];
 //==========================================================================
 
+public OnPlayerSpawn(playerid)
+{
+    if(!LibsPreloaded[playerid]) {
+        PreloadAnimLib(playerid,"BOMBER");
+        PreloadAnimLib(playerid,"RAPPING");
+        PreloadAnimLib(playerid,"SHOP");
+        PreloadAnimLib(playerid,"BEACH");
+        PreloadAnimLib(playerid,"SMOKING");
+        PreloadAnimLib(playerid,"FOOD");
+        PreloadAnimLib(playerid,"ON_LOOKERS");
+        PreloadAnimLib(playerid,"DEALER");
+        PreloadAnimLib(playerid,"MISC");
+        PreloadAnimLib(playerid,"SWEET");
+        PreloadAnimLib(playerid,"RIOT");
+        PreloadAnimLib(playerid,"PED");
+        PreloadAnimLib(playerid,"POLICE");
+        PreloadAnimLib(playerid,"CRACK");
+        PreloadAnimLib(playerid,"CARRY");
+        PreloadAnimLib(playerid,"COP_AMBIENT");
+        PreloadAnimLib(playerid,"PARK");
+        PreloadAnimLib(playerid,"INT_HOUSE");
+        PreloadAnimLib(playerid,"FOOD");
+        LibsPreloaded[playerid] = 1;
+    }
+    return 1;
+}
+
 
 OnePlayAnim(playerid,animlib[],animname[], Float:Speed, looping, lockx, locky, lockz, lp)
 {

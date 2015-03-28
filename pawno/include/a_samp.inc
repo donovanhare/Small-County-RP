@@ -1,6 +1,6 @@
 /*  SA-MP Functions
  *
- *  (c) Copyright 2005-2012, SA-MP Team
+ *  (c) Copyright 2005-2015, SA-MP Team
  *
  */
 
@@ -27,7 +27,7 @@
 
 // Limits and internal constants
 #define MAX_PLAYER_NAME							(24)
-#define MAX_PLAYERS								(500)
+#define MAX_PLAYERS								(1000)
 #define MAX_VEHICLES							(2000)
 #define INVALID_PLAYER_ID						(0xFFFF)
 #define INVALID_VEHICLE_ID						(0xFFFF)
@@ -58,7 +58,8 @@ native SendClientMessage(playerid, color, const message[]);
 native SendClientMessageToAll(color, const message[]);
 native SendPlayerMessageToPlayer(playerid, senderid, const message[]);
 native SendPlayerMessageToAll(senderid, const message[]);
-native SendDeathMessage(killer,killee,weapon);
+native SendDeathMessage(killer, killee, weapon);
+native SendDeathMessageToPlayer(playerid, killer, killee, weapon);
 native GameTextForAll(const string[],time,style);
 native GameTextForPlayer(playerid,const string[],time,style);
 native SetTimer(funcname[], interval, repeating);
@@ -73,6 +74,8 @@ native Float:asin(Float:value);
 native Float:acos(Float:value);
 native Float:atan(Float:value);
 native Float:atan2(Float:x, Float:y);
+native GetPlayerPoolSize();
+native GetVehiclePoolSize();
 
 // Game
 native SetGameModeText(const string[]);
@@ -121,8 +124,11 @@ native GetServerVarAsBool(const varname[]);
 native GetPlayerNetworkStats(playerid, retstr[], retstr_size);
 native GetNetworkStats(retstr[], retstr_size);
 native GetPlayerVersion(playerid, const version[], len); // Returns the SA-MP client revision as reported by the player
+native BlockIpAddress(ip_address[], timems);
+native UnBlockIpAddress(ip_address[]);
 
 // Extended admin network stats
+native GetServerTickRate();
 native NetStats_GetConnectedTime(playerid);
 native NetStats_MessagesReceived(playerid);
 native NetStats_BytesReceived(playerid);
@@ -197,10 +203,12 @@ native DeletePlayer3DTextLabel(playerid, PlayerText3D:id);
 native UpdatePlayer3DTextLabelText(playerid, PlayerText3D:id, color, text[]);
 
 // Player GUI Dialog
-#define DIALOG_STYLE_MSGBOX		0
-#define DIALOG_STYLE_INPUT		1
-#define DIALOG_STYLE_LIST		2
-#define DIALOG_STYLE_PASSWORD	3
+#define DIALOG_STYLE_MSGBOX				0
+#define DIALOG_STYLE_INPUT				1
+#define DIALOG_STYLE_LIST				2
+#define DIALOG_STYLE_PASSWORD			3
+#define DIALOG_STYLE_TABLIST			4
+#define DIALOG_STYLE_TABLIST_HEADERS	5
 
 native ShowPlayerDialog(playerid, dialogid, style, caption[], info[], button1[], button2[]);
 
@@ -331,7 +339,7 @@ forward OnEnterExitModShop(playerid, enterexit, interiorid);
 forward OnVehiclePaintjob(playerid, vehicleid, paintjobid);
 forward OnVehicleRespray(playerid, vehicleid, color1, color2);
 forward OnVehicleDamageStatusUpdate(vehicleid, playerid);
-forward OnUnoccupiedVehicleUpdate(vehicleid, playerid, passenger_seat);
+forward OnUnoccupiedVehicleUpdate(vehicleid, playerid, passenger_seat, Float:new_x, Float:new_y, Float:new_z, Float:vel_x, Float:vel_y, Float:vel_z);
 forward OnPlayerSelectedMenuRow(playerid, row);
 forward OnPlayerExitedMenu(playerid);
 forward OnPlayerInteriorChange(playerid, newinteriorid, oldinteriorid);
@@ -348,6 +356,8 @@ forward OnPlayerGiveDamage(playerid, damagedid, Float:amount, weaponid, bodypart
 forward OnPlayerClickMap(playerid, Float:fX, Float:fY, Float:fZ);
 forward OnPlayerClickTextDraw(playerid, Text:clickedid);
 forward OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid);
+forward OnIncomingConnection(playerid, ip_address[], port);
+forward OnTrailerUpdate(playerid, vehicleid);
 
 #define CLICK_SOURCE_SCOREBOARD		0
 forward OnPlayerClickPlayer(playerid, clickedplayerid, source);

@@ -22,49 +22,100 @@
 #include <lookup>
 #include <YSI\y_hooks>
 
+
 //==============================================================================
 //          -- > Gamemode Includes
 //==============================================================================	
 
-#include "/modules/server/defines/colours.pwn"
-#include "/modules/server/defines/error_msgs.pwn"
-#include "/modules/server/defines/limits.pwn"
-#include "/modules/server/defines/random.pwn"
-
-#include "/modules/server/sql/connection.pwn"
-#include "/modules/server/sql/functions.pwn"
-#include "/modules/server/sql/load_settings.pwn"
-
-
+#include "/modules/server/defines.pwn"
+#include "/modules/server/connection.pwn"
+#include "/modules/server/load_settings.pwn"
 #include "/modules/server/features/login_music.pwn"
 
-//==============================================================================
-
-#include "/modules/player/account/join/login.pwn"
-
-#include "/modules/player/account/character.pwn"
-#include "/modules/player/account/master_acc.pwn"
-#include "/modules/player/account/character_functions.pwn"
-
-
-#include "/modules/player/inventory/inv.pwn"
-
-#include "/modules/player/chats/functions.pwn"
-#include "/modules/player/chats/commands.pwn"
-
-#include "modules/player/commands/animations.pwn"
-
-//==============================================================================
-
+#include "modules/player/animations.pwn"
 #include "modules/business/functions.pwn"
 
-//#include "/modules/vehicle/accessories/compact_disks.pwn"
-//#include "/modules/vehicle/accessories/radio_stations.pwn"
 
-
-
+//==============================================================================
 //          -- > Enums
 //==============================================================================
+enum MA_Info
+{
+	SQLID,
+	Name[32],
+	Account01,
+	Account02,
+	Account03,
+	Admin,
+	Name01[32],
+	Name02[32],
+	Name03[32],
+	RegisterIP[16],
+	LatestIP[16]
+};
+
+enum pinfo
+{
+	SQLID,
+ 	Username[32],
+	LoggedIn,
+	LoginAttempts,
+	Tutorial,
+	Level,
+	XP,
+	Cash,
+	Admin,
+	AdminDuty,
+	Skin,
+	Float:PosX,
+	Float:PosY,
+	Float:PosZ,
+	VWorld,
+	Interior,
+	Age,
+	Gender,
+	Kicks,
+	Muted,
+	Faction,
+	Rank,
+	Job,
+	House,
+	Business_1,
+	Business_2,
+	Float:Health,
+	Float:Armour,
+	bEntered,
+	hEntered,
+	TotalVehicles,
+	Bank,
+	Dealership,
+	RegisterIP[16],
+	LatestIP[16],
+	NewID,
+	NewVehicle,
+	ExemptIP,
+    TotalTimePlayed,
+    OnlinePeriod,
+    IsSpec,
+    QuizProgress,
+    ClothesSelection,
+    Payday,
+    LastOnline,
+    DrivingTest,
+    DeleteingObject,
+    TruckingCompleted,
+    TruckCoolDown,
+    InHospital,
+    MovableObject,
+    FactionOffer,
+    Cuffed,
+    Spawn,
+    Jail,
+    PNC,
+    Weapons[104],
+    Duty,
+    Uniform
+};
 
 
 
@@ -237,12 +288,34 @@ enum ems
 };
 
 
+
+enum inv
+{
+    PhoneNumber,
+    PhoneStatus,
+    PhoneCaller,
+    PhoneEmergency,
+    VehicleRadio,
+    Radio,
+    RadioFreq,
+    Screwdriver
+};
+
+
+
+
+
 native WP_Hash(buffer[], len, const str[]);
 
 
 //==========================================================================
 //	Server/Player Variables												  //
 //==========================================================================
+
+new PlayerInfo[MAX_PLAYERS][pinfo];
+new MasterAccount[MAX_PLAYERS][MA_Info];
+new Inventory[MAX_PLAYERS][inv];
+
 new OOCStatus = 0;
 
 new Weapon[MAX_PLAYERS][13];
@@ -785,7 +858,7 @@ public OnPlayerConnect(playerid)
     format(str, 128, "%s has joined the server", GetDatabaseName(playerid));
     SendAdminsMessage(1, COLOR_GRAY, str);
 
-    
+    Reset_PlayerInfo(playerid);
 
 	TogglePlayerSpectating(playerid, 1);
 	SetPlayerColor(playerid, COLOR_WHITE);
@@ -800,7 +873,7 @@ public PlayerConnected(playerid)
 {
 	if(IsPlayerConnected(playerid))
 	{
-		new str[128];
+		new str[128], query[400];
 		format(str, sizeof(str), "%s [%s]", Server[Name], Server[Version]);
 		SendClientMessage(playerid, COLOR_ORANGE, str);
 		format(str, 128, "Welcome to the server, %s.", GetDatabaseName(playerid));
@@ -808,6 +881,11 @@ public PlayerConnected(playerid)
 		
 		SetPlayerCameraLookAt(playerid, -193.2323, 1098.5872, 19.5938);
 	    InterpolateCameraPos(playerid, -463.8441, 1098.2235, 23.3950, 176.2551, 1093.3696, 38.7697, 100000, CAMERA_MOVE);
+	    InfoBoxForPlayer(playerid, "== ~y~[Small County Roleplay]~w~ ==~n~Welcome to Small County Roleplay!");
+
+
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT SQLID FROM `MasterAccounts` WHERE MA_Name = '%e' LIMIT 1", GetDatabaseName(playerid));
+	    mysql_tquery(SQL_CONNECTION, query, "ShowPlayerLogin", "i", playerid);
 	    InfoBoxForPlayer(playerid, "== ~y~[Small County Roleplay]~w~ ==~n~Welcome to Small County Roleplay!");
 	}
 
@@ -1410,33 +1488,6 @@ public OnPlayerDisconnect(playerid, reason)
 	return 1;
 }
 
-public OnPlayerSpawn(playerid)
-{
-	if(!LibsPreloaded[playerid]) {
-   		PreloadAnimLib(playerid,"BOMBER");
-   		PreloadAnimLib(playerid,"RAPPING");
-    	PreloadAnimLib(playerid,"SHOP");
-   		PreloadAnimLib(playerid,"BEACH");
-   		PreloadAnimLib(playerid,"SMOKING");
-    	PreloadAnimLib(playerid,"FOOD");
-    	PreloadAnimLib(playerid,"ON_LOOKERS");
-    	PreloadAnimLib(playerid,"DEALER");
-    	PreloadAnimLib(playerid,"MISC");
-    	PreloadAnimLib(playerid,"SWEET");
-    	PreloadAnimLib(playerid,"RIOT");
-    	PreloadAnimLib(playerid,"PED");
-    	PreloadAnimLib(playerid,"POLICE");
-		PreloadAnimLib(playerid,"CRACK");
-		PreloadAnimLib(playerid,"CARRY");
-		PreloadAnimLib(playerid,"COP_AMBIENT");
-		PreloadAnimLib(playerid,"PARK");
-		PreloadAnimLib(playerid,"INT_HOUSE");
-		PreloadAnimLib(playerid,"FOOD");
-		LibsPreloaded[playerid] = 1;
-	}
-	return 1;
-}
-
 forward FixKick(playerid);
 public FixKick(playerid)
 {
@@ -1729,6 +1780,34 @@ stock CreateSpacer(playerid, lines)
 	return 1;
 }
 
+
+forward MYSQL_Update_String(sqlid, table[], column[], str[]);
+public MYSQL_Update_String(sqlid, table[], column[], str[])
+{
+	new query[280];
+    mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `%e` SET `%e` = '%e' WHERE SQLID = %d LIMIT 1", table, column, str, sqlid);
+	mysql_tquery(SQL_CONNECTION, query);
+	return 1;
+}
+
+forward MYSQL_Update_Interger(sqlid, table[], column[], interger);
+public MYSQL_Update_Interger(sqlid, table[], column[], interger)
+{
+	new query[280];
+    mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `%e` SET `%e` = %d WHERE SQLID = %d LIMIT 1", table, column, interger, sqlid);
+	mysql_tquery(SQL_CONNECTION, query);
+	return 1;
+}
+
+forward MYSQL_Update_Float(sqlid, table[], column[], Float:interger);
+public MYSQL_Update_Float(sqlid, table[], column[], Float:interger)
+{
+	new query[280];
+    mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `%e` SET `%e` = %f WHERE SQLID = %d LIMIT 1", table, column, interger, sqlid);
+	mysql_tquery(SQL_CONNECTION, query);
+	return 1;
+}
+
 MYSQL_Update_Account(playerid, option1[], option2)
 {
 	new query[128];
@@ -1739,6 +1818,12 @@ MYSQL_Update_Account(playerid, option1[], option2)
 
 Reset_PlayerInfo(playerid)
 {
+
+	for(new i; pinfo:i < pinfo; i++)
+	{
+    	PlayerInfo[playerid][pinfo:i] = 0;
+	}
+
  	Inventory[playerid][PhoneStatus] = 0;
  	Inventory[playerid][PhoneCaller] = -1;
  	Inventory[playerid][PhoneNumber] = 0;
@@ -1770,6 +1855,17 @@ Reset_PlayerInfo(playerid)
  	PickedUpPickup[playerid] = false;
 	LoopAnim[playerid] = 0;
 	LibsPreloaded[playerid] = 0;
+	return 1;
+}
+
+
+stock ResetMasterAccountVariables(playerid)
+{
+	MasterAccount[playerid][SQLID] = 0;
+	MasterAccount[playerid][Account01] = 0;
+	MasterAccount[playerid][Account02] = 0;
+	MasterAccount[playerid][Account03] = 0;
+	MasterAccount[playerid][Admin] = 0;
 	return 1;
 }
 
@@ -5160,7 +5256,110 @@ CMD:announcement(playerid, params[])
 ALTCMD:announce->announcement;
 
 
+//==============================================================================
+//          -- > Chat Functions
+//==============================================================================
 
+
+
+
+stock SendSplitMessage(playerid, color, final[])
+{
+    #pragma unused playerid, color
+    new buffer[SPLITLENGTH+5];
+    new len = strlen(final);
+    if(len>SPLITLENGTH)
+    {
+        new times = (len/SPLITLENGTH);
+        for(new i = 0; i < times+1; i++)
+        {
+            strdel(buffer, 0, SPLITLENGTH+5);
+            if(len-(i*SPLITLENGTH)>SPLITLENGTH)
+            {
+                strmid(buffer, final, SPLITLENGTH*i, SPLITLENGTH*(i+1));
+                format(buffer, sizeof(buffer), "%s ...", buffer);
+            }
+            else
+            {
+                strmid(buffer, final, SPLITLENGTH*i, len);
+            }
+            SendClientMessage(playerid, color, buffer);
+        }
+    }
+    else
+    {
+        //if == 1 - normal if = 2 asay
+        SendClientMessage(playerid, color, final);
+    }
+}
+
+stock SendLocalMessage(playerid, msg[], Float:MessageRange, Range1color, Range2color)
+{
+    new Float: PlayerX, Float: PlayerY, Float: PlayerZ;
+    GetPlayerPos(playerid, PlayerX, PlayerY, PlayerZ);
+    for(new i = 0; i < MAX_PLAYERS; i++ )
+    {
+        if(IsPlayerInRangeOfPoint(i, MessageRange, PlayerX, PlayerY,PlayerZ))
+        {
+            SendSplitMessage(i, Range1color, msg);
+        }
+        else if(IsPlayerInRangeOfPoint(i, MessageRange/2.0, PlayerX, PlayerY,PlayerZ))
+        {
+            SendSplitMessage(i, Range2color, msg);
+        }
+    }
+    return 1;
+}
+
+
+stock SendPunishmentMessage(str[])
+{
+    for(new i = 0; i < MAX_PLAYERS; i++)
+    {
+        if(IsPlayerConnected(i))
+        {
+            if(PlayerInfo[i][LoggedIn] > 0)
+            {
+                new astr[128];
+                format(astr, sizeof(astr), "[PUNISHMENT] %s", str);
+                SendClientMessage(i, COLOR_ORANGERED, astr);
+             }
+        }
+    }
+    return 1;
+}
+
+stock SendErrorMessage(playerid, str[])
+{
+    new astr[128];
+    format(astr, sizeof(astr), "> [ERROR] %s", str);
+    SendClientMessage(playerid, COLOR_GRAY, astr);
+    return 1;
+}
+
+stock SendInfoMessage(playerid, str[])
+{
+    new astr[128];
+    format(astr, sizeof(astr), "[INFO] %s", str);
+    SendClientMessage(playerid, COLOR_LBLUE, astr);
+    return 1;
+}
+
+stock SendAdminsMessage(level, color, str[])
+{
+    for(new i = 0; i < MAX_PLAYERS; i++)
+    {
+        if(IsPlayerConnected(i))
+        {
+            new astr[128];
+            if(MasterAccount[i][Admin] >= level)
+            {
+                format(astr, sizeof(astr), "[Admin Msg] %s", str);
+                SendClientMessage(i, color, astr);
+            }
+        }
+    }
+}
 
 public OnPlayerText(playerid, text[])
 {
@@ -5171,7 +5370,13 @@ public OnPlayerText(playerid, text[])
 	LastCommandTime[playerid] = gettime();
 	Log(playerid, text);
 
-    if(Inventory[playerid][PhoneStatus] == 4)
+	if(Inventory[playerid][PhoneStatus] != 4)
+    {
+        format(str, sizeof(str), "%s says: %s",GetRoleplayName(playerid), text);
+        SendLocalMessage(playerid, str, Range_Normal, COLOR_WHITE, COLOR_GRAY);
+        SetPlayerChatBubble(playerid, text, COLOR_WHITE, Range_Normal, SECONDS(7));
+    }  
+    else if(Inventory[playerid][PhoneStatus] == 4)
 	{
 
 	    format(str, sizeof(str), "[Phone] %s says: %s",GetRoleplayName(playerid), text);
@@ -5234,6 +5439,136 @@ public OnPlayerText(playerid, text[])
 	return 0;
 	
 }	
+
+//==============================================================================
+//          -- > Chat Commands
+//==============================================================================
+
+CMD:b(playerid, params[])
+{
+    new str[200];
+    if(sscanf(params, "s[200]", str)) return SendClientMessage(playerid, COLOR_GRAY, "/b [message]");
+
+    format(str, sizeof(str), "(( %s: %s ))", GetRoleplayName(playerid), str);
+    SendLocalMessage(playerid, str,Range_Normal, COLOR_LBLUE, COLOR_LBLUE);
+    SetPlayerChatBubble(playerid, str, COLOR_LBLUE, Range_Normal, 7000);
+
+    return 1;
+}
+
+CMD:me(playerid, params[])
+{
+    new str[200];
+    if(sscanf(params, "s[200]", str)) return SendClientMessage(playerid, COLOR_GRAY, "/me [message]");
+
+    format(str, sizeof(str), "%s %s", GetRoleplayName(playerid), str);
+    SendLocalMessage(playerid, str, Range_Normal, COLOR_RP, COLOR_RP);
+    SetPlayerChatBubble(playerid, str, COLOR_RP, Range_Normal, 7000);
+    
+    return 1;
+}
+
+CMD:ame(playerid, params[])
+{
+    new str[200];
+    if(sscanf(params, "s[200]", str)) return SendClientMessage(playerid, COLOR_GRAY, "/ame [message]");
+
+    format(str, sizeof(str), "* %s %s *", GetRoleplayName(playerid), str);
+    SetPlayerChatBubble(playerid, str, COLOR_RP, Range_Short, 7000);
+    SendClientMessage(playerid, COLOR_RP, str);
+    return 1;
+}
+
+CMD:a(playerid, params[])
+{
+    new str[200];
+    if(MasterAccount[playerid][Admin] > 0)
+    {
+        if(sscanf(params, "s[200]", str)) return SendClientMessage(playerid, COLOR_GRAY, "/a [text]");
+        format(str, sizeof(str), "%s: %s", GetRoleplayName(playerid), str);
+        SendAdminsMessage(1, COLOR_TURQUOISE, str);
+    }
+    else SendErrorMessage(playerid, ERROR_ADMIN);
+    return 1;
+}
+
+CMD:do(playerid, params[])
+{
+    new str[200];
+    if(sscanf(params, "s[200]", str)) return SendClientMessage(playerid, COLOR_GRAY, "/do [text]");
+
+    format(str, sizeof(str), "%s ((%s))", str, GetRoleplayName(playerid));
+    SendLocalMessage(playerid, str, Range_Normal, COLOR_RP, COLOR_RP);
+    return 1;
+}
+
+CMD:shout(playerid, params[])
+{
+    new str[200], msg[200];
+    if(sscanf(params, "s[200]", msg)) return SendClientMessage(playerid, COLOR_GRAY, "/(s)hout [text]");
+    if(Inventory[playerid][PhoneStatus] != 4)
+    {
+        format(str, sizeof(str), "%s shouts: %s!", GetRoleplayName(playerid), msg);
+        SendLocalMessage(playerid, str, Range_Long, COLOR_ORANGE, COLOR_ORANGE);
+        SetPlayerChatBubble(playerid, str, COLOR_ORANGE, Range_Long, 7000);
+    }
+    else
+    {
+        format(str, sizeof(str), "[Phone] %s shouts: %s!", GetRoleplayName(playerid), msg);
+        SendSplitMessage(Inventory[playerid][PhoneCaller], COLOR_ORANGE, msg);
+        SendLocalMessage(playerid, str, Range_Long, COLOR_ORANGE, COLOR_ORANGE);
+        SetPlayerChatBubble(playerid, str, COLOR_ORANGE, Range_Long, 7000);
+    }
+    return 1;
+}
+ALTCMD:s->shout;
+
+CMD:low(playerid, params[])
+{
+    new str[168], msg[200];
+    if(sscanf(params, "s[200]", msg)) return SendClientMessage(playerid, COLOR_GRAY, "/(l)ow [text]");
+
+    format(str, sizeof(str), "[LOW] %s: %s", GetRoleplayName(playerid), msg);
+    SendLocalMessage(playerid, str, Range_VShort, COLOR_GRAY, COLOR_GRAY);
+    SetPlayerChatBubble(playerid, "* Speaks quietly. *", COLOR_RP, Range_VShort, 4000);
+
+    return 1;
+}
+ALTCMD:l->low;
+
+CMD:whisper(playerid, params[])
+{
+    new str[200], msg[200], pID;
+    if(sscanf(params, "us[200]", pID,msg)) return SendClientMessage(playerid, COLOR_GRAY, "/whisper [playerid] [message]");
+
+    if(IsInRangeOfPlayer(playerid, pID, 5))
+    {
+        format(str, sizeof(str), "%s whispers: %s", GetRoleplayName(playerid), msg);
+        SendSplitMessage(pID, COLOR_WHITE, str);
+        format(str, sizeof(str), "* %s whispers something to %s. *", GetRoleplayName(playerid), GetRoleplayName(pID));
+        SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
+        SetPlayerChatBubble(playerid, str, COLOR_RP, Range_Short, 7000);
+    }
+    else
+    {
+        InfoBoxForPlayer(playerid, "You are too far away from this player.");
+    }
+    return 1;
+}
+ALTCMD:w->whisper;
+
+CMD:pm(playerid, params[])
+{
+    new pID, pmmsg[200], str[200];
+    if(sscanf(params, "us[200]", pID, pmmsg)) return SendClientMessage(playerid, COLOR_GRAY, "/pm [playerid] [message]");
+    format(str, sizeof(str), "[PM from [%d] %s]: %s", playerid, GetRoleplayName(playerid), pmmsg);
+    SendSplitMessage(pID, COLOR_YELLOW, str);
+
+    format(str, sizeof(str), "[PM to [%d] %s]: %s", pID, GetRoleplayName(pID), pmmsg);
+    SendSplitMessage(playerid, COLOR_YELLOW, str);
+    return 1;
+}
+
 
 CMD:buyhouse(playerid, params[])
 {
