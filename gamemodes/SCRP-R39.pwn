@@ -34,6 +34,7 @@
 
 #include "modules/player/animations.pwn"
 #include "modules/business/functions.pwn"
+#include "modules/houses/functions.pwn"
 
 
 //==============================================================================
@@ -178,26 +179,6 @@ enum faction
 	Float:PosZ
 };
 
-enum house
-{
-	SQLID,
-	Name[32],
-	Float:PosX,
-	Float:PosY,
-	Float:PosZ,
-	Interior,
-	World,
-	Float:IntX,
-	Float:IntY,
-	Float:IntZ,
-	Owner[MAX_PLAYER_NAME],
-	Type,
-	Price,
-	Text3D:LabelID,
-	PickupID,
-	Locked,
-	Safe
-};
 
 enum icon
 {
@@ -303,8 +284,6 @@ enum inv
 
 
 
-
-
 native WP_Hash(buffer[], len, const str[]);
 
 
@@ -362,7 +341,6 @@ new EmergencyState[MAX_VEH];
 //==========================================================================
 new IconID;
 new Icons[MAX_ICONS][icon], Total_Icons_Created;
-new Houses[MAX_HOUSES][house], Total_Houses_Created, houseid[MAX_PLAYERS];
 new Objects[MAX_OBJECTZ][object], Total_Objects_Created;
 //==========================================================================
 
@@ -744,7 +722,7 @@ public OnGameModeInit()
     
 	mysql_tquery(SQL_CONNECTION, "SELECT * FROM `Settings` LIMIT 1", "LoadSettings");
 
-    mysql_tquery(SQL_CONNECTION, "SELECT * FROM `Houses` ORDER BY SQLID ASC", "LoadHouses");
+    Fetch_Houses();
 
     Fetch_Businesses();
 
@@ -1356,107 +1334,6 @@ public GetPlayerSQLID(playerid)
 	return 1;
 }
 
-forward CreateHouse(id);
-public CreateHouse(id)
-{
-	new str[128];
-    if(Houses[id][Owner] == 0)
-    {
-		format(str, sizeof(str), ""COL_RED"FOR SALE\n"COL_WHITE"%s\nPrice: $%d \n",Houses[id][Name],Houses[id][Price]);
-		Houses[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, -1, -1, -1, 10.0);
-    	Houses[id][PickupID] = CreateDynamicPickup(1273, 23, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 0, 0, -1, 250);
-
-	}
-	else if(Houses[id][Owner] > 0)
-	{
-	    new query[128];
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT `Username` FROM Accounts WHERE SQLID = %d LIMIT 1", Houses[id][Owner]);
-        mysql_tquery(SQL_CONNECTION, query, "CreateHouseLabel", "i", id);
-
-		Houses[id][PickupID] = CreateDynamicPickup(1273, 23, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 0, 0, -1, 250);
-	}
-	return 1;
-
-}
-
-
-forward CreateHouseLabel(id);
-public CreateHouseLabel(id)
-{
-	new str[128], houseowner[MAX_PLAYER_NAME];
-	cache_get_field_content(0, "Username", houseowner, SQL_CONNECTION, MAX_PLAYER_NAME);
-	format(str, sizeof(str), "%s\n"COL_GRAY"Owner: %s", Houses[id][Name], houseowner);
-  	Houses[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, -1, -1, -1, 10.0);
-	return 1;
-}
-
-
-forward LoadHouses();
-public LoadHouses()
-{
-
-	if(cache_num_rows())
-    {
-        for(new id = 1; id<cache_num_rows(); id++)
-        {
-			Houses[id][SQLID] = cache_get_field_content_int(id, "SQLID", SQL_CONNECTION);
-	  		cache_get_field_content(id, "Name", Houses[id][Name], SQL_CONNECTION, 32);
-			Houses[id][PosX] = cache_get_field_content_float(id, "PosX", SQL_CONNECTION);
-			Houses[id][PosY] = cache_get_field_content_float(id, "PosY", SQL_CONNECTION);
-			Houses[id][PosZ] = cache_get_field_content_float(id, "PosZ", SQL_CONNECTION);
-			Houses[id][Interior] = cache_get_field_content_int(id, "Interior", SQL_CONNECTION);
-			Houses[id][World] = cache_get_field_content_int(id, "World", SQL_CONNECTION);
-			Houses[id][IntX] = cache_get_field_content_float(id, "IntX", SQL_CONNECTION);
-			Houses[id][IntY] = cache_get_field_content_float(id, "IntY", SQL_CONNECTION);
-			Houses[id][IntZ] = cache_get_field_content_float(id, "IntZ", SQL_CONNECTION);
-			Houses[id][Owner] = cache_get_field_content_int(id, "Owner", SQL_CONNECTION);
-			Houses[id][Price] = cache_get_field_content_int(id, "Price", SQL_CONNECTION);
-			Houses[id][Safe] = cache_get_field_content_int(id, "Safe", SQL_CONNECTION);
-
-	        Total_Houses_Created++;
-	        CreateHouse(id);
-
-		}
-
-	}
-	printf("[MYSQL]: %d Houses have been successfully loaded from the database.", Total_Houses_Created);
-	return 1;
-}
-
-
-forward LoadHouse(id);
-public LoadHouse(id)
-{
-
-	if(cache_num_rows())
-    {
-
-		Houses[id][SQLID] = cache_get_field_content_int(0, "SQLID", SQL_CONNECTION);
-  		cache_get_field_content(0, "Name", Houses[id][Name], SQL_CONNECTION, 32);
-		Houses[id][PosX] = cache_get_field_content_float(0, "PosX", SQL_CONNECTION);
-		Houses[id][PosY] = cache_get_field_content_float(0, "PosY", SQL_CONNECTION);
-		Houses[id][PosZ] = cache_get_field_content_float(0, "PosZ", SQL_CONNECTION);
-		Houses[id][Interior] = cache_get_field_content_int(0, "Interior", SQL_CONNECTION);
-		Houses[id][World] = cache_get_field_content_int(0, "World", SQL_CONNECTION);
-		Houses[id][IntX] = cache_get_field_content_float(0, "IntX", SQL_CONNECTION);
-		Houses[id][IntY] = cache_get_field_content_float(0, "IntY", SQL_CONNECTION);
-		Houses[id][IntZ] = cache_get_field_content_float(0, "IntZ", SQL_CONNECTION);
-		Houses[id][Owner] = cache_get_field_content_int(0, "Owner", SQL_CONNECTION);
-		Houses[id][Price] = cache_get_field_content_int(0, "Price", SQL_CONNECTION);
-		Houses[id][Safe] = cache_get_field_content_int(0, "Safe", SQL_CONNECTION);
-
-		CreateHouse(id);
-	}
-	else
-	{
-		printf("ERROR: Loading house %d.", id);
-		return 0;
-	}
-	printf("[MYSQL]: House %d has successfully been reload from the database.", id);
-	return 1;
-}
-
-
 
 public OnPlayerDisconnect(playerid, reason)
 {
@@ -1816,13 +1693,23 @@ MYSQL_Update_Account(playerid, option1[], option2)
 	return 1;
 }
 
+CMD:pvars(playerid)
+{
+	for(new i; pinfo:i < pinfo; i++)
+	{
+    	SendClientMessage(playerid, COLOR_WHITE, PlayerInfo[playerid][pinfo:i]);
+	}
+	return 1;
+}
+
 Reset_PlayerInfo(playerid)
 {
-
 	for(new i; pinfo:i < pinfo; i++)
 	{
     	PlayerInfo[playerid][pinfo:i] = 0;
 	}
+
+	PlayerInfo[playerid][IsSpec] = -1;
 
  	Inventory[playerid][PhoneStatus] = 0;
  	Inventory[playerid][PhoneCaller] = -1;
@@ -2897,9 +2784,11 @@ CMD:changespawn(playerid, params[])
 	 	format(str, sizeof(str), "(4) %s\n", Business[PlayerInfo[playerid][Business_2]][Name]);
 	    strcat(dialog, str, sizeof(dialog));
 	}
- 	format(str, sizeof(str), "(5) Faction Spawn");
-    strcat(dialog, str, sizeof(dialog));
-
+	if(PlayerInfo[playerid][Faction])
+	{
+		format(str, sizeof(str), "(5) Faction Spawn");
+    	strcat(dialog, str, sizeof(dialog));
+	}
 	Dialog_Show(playerid, ChangeSpawn, DIALOG_STYLE_LIST, "Change Character Spawn", dialog,"Select","Cancel");
 	return 1;
 }
@@ -4237,17 +4126,6 @@ stock ReloadHouses()
 	return 1;
 }
 
-stock ReloadHouse(id)
-{
-	new query[128];
-	Total_Houses_Created --;
-	DestroyDynamic3DTextLabel(Houses[id][LabelID]);
-	DestroyDynamicPickup(Houses[id][PickupID]);
-
-	mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT * FROM `Houses` WHERE SQLID = %d LIMIT 1", Houses[id][SQLID]);
-	mysql_tquery(SQL_CONNECTION, query, "LoadHouse", "d", id);
-	return 1;
-}
 
 stock ReloadIcon(id)
 {
@@ -4268,7 +4146,7 @@ public AddBusinessMoney(id, amount)
 	if(id > 0)
 	{
 		Business[id][Safe] += amount;
-        MYSQL_Update_Interger(Business[id][SQLID], "Biz", "Safe", Business[id][Safe]);
+        MYSQL_Update_Interger(Business[id][SQLID], "Business", "Safe", Business[id][Safe]);
 		return 1;
 	}
 	return 0;
@@ -4950,15 +4828,15 @@ CMD:levelup(playerid, params[])
 new GeneralStore[][] =
 {
    //{Itemid???? Item, price}
-   {125,	"Mobile Phone"}, 
-   {50, 	"Watch"},  
-   {15, 	"Water Bottle"}, 
-   {45,	 	"Cigarettes"}, 
-   {2, 		"Lighter"},		
-   {12, 	"Rope"},
-   {2400, 	"Vehicle Radio"},
-   {400, 	"Radio"},
-   {35, 	"Screwdriver"}
+   {1, 125,	"Mobile Phone"}, 
+   {0, 50, 	"Watch"},  
+   {0, 15, 	"Water Bottle"}, 
+   {0, 45,	"Cigarettes"}, 
+   {0, 2, 	"Lighter"},		
+   {0, 12, 	"Rope"},
+   {2, 2400,"Vehicle Radio"},
+   {3, 400, "Radio"},
+   {4, 35, 	"Screwdriver"}
 };
 
 #define PHONE 												  				     0
@@ -4983,7 +4861,7 @@ CMD:buy(playerid, params[])
 
 			for (new i = 0; i < sizeof(GeneralStore); ++i)
 			{
-				format(str, sizeof(str), "%s ($%d)\n", GeneralStore[i][1], GeneralStore[i][0]);
+				format(str, sizeof(str), "%s ($%d)\n", GeneralStore[i][2], GeneralStore[i][1]);
 				strcat(CheckOut, str, sizeof(CheckOut));
 			}
 
@@ -5129,10 +5007,10 @@ stock BuyItem(playerid, item)
 		new str[128];
 		GiveInventoryItem(playerid, item, 1);
 
-		AddBusinessMoney(PlayerInfo[playerid][bEntered], GeneralStore[item][0]);
-		GivePlayerMoneyEx(playerid, -GeneralStore[item][0]);
+		AddBusinessMoney(PlayerInfo[playerid][bEntered], GeneralStore[item][1]);
+		GivePlayerMoneyEx(playerid, -GeneralStore[item][1]);
 
-		format(str, sizeof(str), "* The cashier swipes the object past the scanner. The cash register would display $%d. *", GeneralStore[item][0]);
+		format(str, sizeof(str), "* The cashier swipes the object past the scanner. The cash register would display $%d. *", GeneralStore[item][1]);
 		SendLocalMessage(playerid, str, Range_VShort, COLOR_RP, COLOR_RP);
 	}
 	else
@@ -5211,49 +5089,6 @@ stock FormatNumber(Float:amount)
 
 
 
-
-CMD:ooc(playerid, params[])
-{
-    new str[128];
-
-    if(sscanf(params, "s[128]", params)) return SendClientMessage(playerid, COLOR_GRAY, "/(o)oc [message]");
-    if(OOCStatus == 1)
-    {
-		if(PlayerInfo[playerid][Muted] == 0)
-		{
-	    	format(str, sizeof(str), "(([Global]%s: %s ))", GetRoleplayName(playerid), params);
-	    	SendClientMessageToAll(COLOR_LBLUE, str);
-	    }
-	    else SendErrorMessage(playerid, "You are muted.");
-	
-	}
-	else
-	{
-	    SendErrorMessage(playerid, "Global chat is currently DISABLED!");
-	}
-    return 1;
-}
-ALTCMD:o->ooc;
-
-CMD:announcement(playerid, params[])
-{
-	new str[200];
-	if(MasterAccount[playerid][Admin] > 0)
-	{
-		if(sscanf(params, "s[200]", str)) return SendClientMessage(playerid, COLOR_GRAY, "/announcement [message]");
-
-		format(str, sizeof(str), "[Announcement] %s: %s", GetRoleplayName(playerid), str);
-		for (new i = 0; i < MAX_PLAYERS; ++i)
-		{
-			if(PlayerInfo[i][LoggedIn] == 1) SendSplitMessage(i, COLOR_VIOLET, str);
-		}
-
-		SetPlayerChatBubble(playerid, str, COLOR_VIOLET, 20.0, SECONDS(7));
-	}
-	else SendErrorMessage(playerid, ERROR_ADMIN);
-	return 1;
-}
-ALTCMD:announce->announcement;
 
 
 //==============================================================================
@@ -5569,6 +5404,49 @@ CMD:pm(playerid, params[])
     return 1;
 }
 
+CMD:ooc(playerid, params[])
+{
+    new str[128];
+
+    if(sscanf(params, "s[128]", params)) return SendClientMessage(playerid, COLOR_GRAY, "/(o)oc [message]");
+    if(OOCStatus == 1)
+    {
+		if(PlayerInfo[playerid][Muted] == 0)
+		{
+	    	format(str, sizeof(str), "(([Global]%s: %s ))", GetRoleplayName(playerid), params);
+	    	SendClientMessageToAll(COLOR_LBLUE, str);
+	    }
+	    else SendErrorMessage(playerid, "You are muted.");
+	
+	}
+	else
+	{
+	    SendErrorMessage(playerid, "Global chat is currently DISABLED!");
+	}
+    return 1;
+}
+ALTCMD:o->ooc;
+
+CMD:announcement(playerid, params[])
+{
+	new str[200];
+	if(MasterAccount[playerid][Admin] > 0)
+	{
+		if(sscanf(params, "s[200]", str)) return SendClientMessage(playerid, COLOR_GRAY, "/announcement [message]");
+
+		format(str, sizeof(str), "[Announcement] %s: %s", GetRoleplayName(playerid), str);
+		for (new i = 0; i < MAX_PLAYERS; ++i)
+		{
+			if(PlayerInfo[i][LoggedIn] == 1) SendSplitMessage(i, COLOR_VIOLET, str);
+		}
+
+		SetPlayerChatBubble(playerid, str, COLOR_VIOLET, 20.0, SECONDS(7));
+	}
+	else SendErrorMessage(playerid, ERROR_ADMIN);
+	return 1;
+}
+ALTCMD:announce->announcement;
+
 
 CMD:buyhouse(playerid, params[])
 {
@@ -5592,7 +5470,7 @@ CMD:buyhouse(playerid, params[])
 
 			MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Owner", Houses[id][Owner]);
 
-			ReloadHouse(id);
+			Reload_House(id);
 		}
 		
 		else if(!strcmp(option, "decline", true))
@@ -5627,7 +5505,7 @@ CMD:sellhouse(playerid, params[])
 
 					MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Owner", 0);
 
-			        ReloadHouse(id);
+			        Reload_House(id);
 		        }
 
         		else if(!strcmp(option, "decline", true))
@@ -5816,14 +5694,14 @@ CMD:key(playerid, params[])
          		format(str, sizeof(str), "* %s places the key in the door, locking it.*", GetRoleplayName(playerid), str);
 				SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 				Business[id][Locked] = 1;
-				MYSQL_Update_Interger(Houses[id][SQLID], "Biz", "Locked", 1);
+				MYSQL_Update_Interger(Houses[id][SQLID], "Business", "Locked", 1);
 				return 1;
  	        }
  	        else
  	        {
  	            format(str, sizeof(str), "* %s places the key in the door, unlocking it.*", GetRoleplayName(playerid), str);
 				SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
-				MYSQL_Update_Interger(Houses[id][SQLID], "Biz", "Locked", 1);
+				MYSQL_Update_Interger(Houses[id][SQLID], "Business", "Locked", 1);
 				Business[id][Locked] = 0;
 				return 1;
  	        }
@@ -6467,7 +6345,7 @@ CMD:safestore(playerid,params[])
 			if(sscanf(params, "d", amount)) return SendClientMessage(playerid, COLOR_GRAY, "/safestore [amount]");
 			if(PlayerInfo[playerid][Cash] >= amount)
 			{
-				MYSQL_Update_Interger(Business[bid][SQLID], "Biz", "Safe", Business[bid][Safe] += amount);
+				MYSQL_Update_Interger(Business[bid][SQLID], "Business", "Safe", Business[bid][Safe] += amount);
 				format(str, sizeof(str), "You stored $%d in the safe! Total($%d)", amount, Business[bid][Safe]);
 				SendClientMessage(playerid, COLOR_GREEN, str);
 				GivePlayerMoneyEx(playerid, -amount);
@@ -6503,7 +6381,7 @@ CMD:safeget(playerid,params[])
 			if(sscanf(params, "d", amount)) return SendClientMessage(playerid, COLOR_GRAY, "/safeget [amount]");
 			if(Business[bid][Safe] >= amount)
 			{
-				MYSQL_Update_Interger(Business[bid][SQLID], "Biz", "Safe", Business[bid][Safe] -= amount);
+				MYSQL_Update_Interger(Business[bid][SQLID], "Business", "Safe", Business[bid][Safe] -= amount);
 				format(str, sizeof(str), "You taken $%d from the safe! Total($%d)", amount, Business[bid][Safe]);
 				SendClientMessage(playerid, COLOR_GREEN, str);
 				GivePlayerMoneyEx(playerid, amount);
@@ -6545,7 +6423,7 @@ CMD:entrancefee(playerid,params[])
 			if(amount < 0 && amount >= 50)
 			{
 			    Business[bid][EntranceFee] = amount;
-			    MYSQL_Update_Interger(Business[bid][SQLID], "Biz", "EntranceFee", Business[bid][EntranceFee]);
+			    MYSQL_Update_Interger(Business[bid][SQLID], "Business", "EntranceFee", Business[bid][EntranceFee]);
 				format(str, sizeof(str), "EntranceFee set at $%d!", Business[bid][EntranceFee]);
 				SendClientMessage(playerid, COLOR_GREEN, str);
 				Reload_Business(bid);
@@ -9122,7 +9000,7 @@ CMD:setbiz(playerid, params[])
 
 			if(!strcmp(option2, "owner", true))
 			{
-				MYSQL_Update_Interger(Business[id][SQLID], "Biz", "Owner", option3);
+				MYSQL_Update_Interger(Business[id][SQLID], "Business", "Owner", option3);
 				SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
 				Reload_Business(id);
 			}
@@ -9131,7 +9009,7 @@ CMD:setbiz(playerid, params[])
 			{
 			    if(option3 <= 3)
 			    {
-					MYSQL_Update_Interger(Business[id][SQLID], "Biz", "Owned", option3);
+					MYSQL_Update_Interger(Business[id][SQLID], "Business", "Owned", option3);
 					SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
 					Reload_Business(id);
 				}
@@ -9139,14 +9017,14 @@ CMD:setbiz(playerid, params[])
 
 			if(!strcmp(option2, "price", true))
 			{
-				MYSQL_Update_Interger(Business[id][SQLID], "Biz", "Price", option3);
+				MYSQL_Update_Interger(Business[id][SQLID], "Business", "Price", option3);
 				SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
 				Reload_Business(id);
 			}
 
 			if(!strcmp(option2, "payout", true))
 			{
-				MYSQL_Update_Interger(Business[id][SQLID], "Biz", "Payout", option3);
+				MYSQL_Update_Interger(Business[id][SQLID], "Business", "Payout", option3);
 
 				SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
 				Reload_Business(id);
@@ -9154,21 +9032,21 @@ CMD:setbiz(playerid, params[])
 
 			if(!strcmp(option2, "Safe", true))
 			{
-				MYSQL_Update_Interger(Business[id][SQLID], "Biz", "Safe", option3);
+				MYSQL_Update_Interger(Business[id][SQLID], "Business", "Safe", option3);
 				SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
 				Reload_Business(id);
 			}
 
 			if(!strcmp(option2, "Type", true))
 			{
-				MYSQL_Update_Interger(Business[id][SQLID], "Biz", "Type", option3);
+				MYSQL_Update_Interger(Business[id][SQLID], "Business", "Type", option3);
 				SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
 				Reload_Business(id);
 			}
 
 			if(!strcmp(option2, "EntranceFee", true))
 			{
-				MYSQL_Update_Interger(Business[id][SQLID], "Biz", "EntranceFee", option3);
+				MYSQL_Update_Interger(Business[id][SQLID], "Business", "EntranceFee", option3);
 				SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
 				Reload_Business(id);
 			}
@@ -9177,7 +9055,7 @@ CMD:setbiz(playerid, params[])
 			{
 			    if(option3 <= 3)
 			    {
-					MYSQL_Update_Interger(Business[id][SQLID], "Biz", "Locked", option3);
+					MYSQL_Update_Interger(Business[id][SQLID], "Business", "Locked", option3);
 					SendClientMessage(playerid, COLOR_GREEN, "> Business updated!");
 					Reload_Business(id);
 				}
@@ -9256,43 +9134,43 @@ CMD:sethouse(playerid, params[])
 
 				mysql_tquery(SQL_CONNECTION, query);
 				SendClientMessage(playerid, COLOR_GREEN, "> House(s) updated!");
-				ReloadHouse(id);
+				Reload_House(id);
 			}
 			if(!strcmp(option, "interior", true))
 			{
 				Houses[id][Interior] = option2;
 				MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Interior", Houses[id][Interior]);
-                ReloadHouse(id);
+                Reload_House(id);
 			}
 			if(!strcmp(option, "world", true))
 			{
 				Houses[id][World] = option2;
 				MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "World", Houses[id][World]);
-                ReloadHouse(id);
+                Reload_House(id);
 			}
 			if(!strcmp(option, "owner", true))
 			{
 				Houses[id][Owner] = option2;
 				MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Owner", Houses[id][Owner]);
-                ReloadHouse(id);
+                Reload_House(id);
 			}
 			if(!strcmp(option, "price", true))
 			{
 				Houses[id][Price] = option2;
 				MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Price", Houses[id][Price]);
-                ReloadHouse(id);
+                Reload_House(id);
 			}
 			if(!strcmp(option, "locked", true))
 			{
 				Houses[id][Locked] = option2;
 				MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Locked", Houses[id][Locked]);
-                ReloadHouse(id);
+                Reload_House(id);
 			}
 			if(!strcmp(option, "safe", true))
 			{
 				Houses[id][Safe] = option2;
 				MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Safe", Houses[id][Safe]);
-                ReloadHouse(id);
+                Reload_House(id);
 			}
 		}
 	}
@@ -9310,7 +9188,7 @@ CMD:reload(playerid, params[])
 	{
 		if(sscanf(params, "s[24]", option)) return SendClientMessage(playerid, COLOR_GRAY, "/reload [biz/houses]");
 		{
-   			if(!strcmp(option, "biz", true))
+   			if(!strcmp(option, "Business", true))
 			{
 				ReloadBiz();
 				SendClientMessage(playerid, COLOR_GREEN, "Businesses Reloaded!");
@@ -12205,7 +12083,7 @@ Dialog:CREATEBusiness_2(playerid, response, listitem, inputtext[])
         {
 			Business[Create_New_Biz_ID[playerid]][Price] = strval(inputtext);
 
-			MYSQL_Update_Interger(Create_New_Biz_ID[playerid], "Biz", "Price", Business[Create_New_Biz_ID[playerid]][Price]);
+			MYSQL_Update_Interger(Create_New_Biz_ID[playerid], "Business", "Price", Business[Create_New_Biz_ID[playerid]][Price]);
 
 			new str[128];
 			format(str, sizeof(str), "Price set at: $%d", Business[Create_New_Biz_ID[playerid]][Price]);
@@ -12228,7 +12106,7 @@ Dialog:CREATEBUSINESS4(playerid, response, listitem, inputtext[])
     if(response)
     {
 		Business[Create_New_Biz_ID[playerid]][Payout] = strval(inputtext);
-		MYSQL_Update_Interger(Create_New_Biz_ID[playerid], "Biz", "Payout", Business[Create_New_Biz_ID[playerid]][Payout]);
+		MYSQL_Update_Interger(Create_New_Biz_ID[playerid], "Business", "Payout", Business[Create_New_Biz_ID[playerid]][Payout]);
 
 
 		new str[128];
@@ -12294,7 +12172,7 @@ Dialog:ChangeBizName(playerid, response, listitem, inputtext[])
 		format(str, sizeof(str), "You have set business %d's name to %s.", bizzid[playerid], Business[bizzid[playerid]][Name]);
 		SendClientMessage(playerid, COLOR_YELLOW, str);
 
-		MYSQL_Update_String(Business[bizzid[playerid]][SQLID], "Biz", "Name", Business[bizzid[playerid]][Name]);
+		MYSQL_Update_String(Business[bizzid[playerid]][SQLID], "Business", "Name", Business[bizzid[playerid]][Name]);
 
 		Reload_Business(bizzid[playerid]);
 	}
@@ -12312,7 +12190,7 @@ Dialog:ChangeHouseName(playerid, response, listitem, inputtext[])
 		SendClientMessage(playerid, COLOR_YELLOW, str);
 		MYSQL_Update_String(Houses[houseid[playerid]][SQLID], "Houses", "Name", Houses[houseid[playerid]][Name]);
 
-		ReloadHouse(houseid[playerid]);
+		Reload_House(houseid[playerid]);
 	}
     return 1;
 }
@@ -12351,7 +12229,7 @@ CMD:phoneinfo(playerid,params[])
 		
 
 	}
-	else InfoBoxForPlayer(playerid, ERROR_NOTOWNED);
+	else SendErrorMessage(playerid, ERROR_NOTOWNED);
 	
 	return 1;
 }
@@ -12367,11 +12245,11 @@ CMD:phoneon(playerid,params[])
 		    format(str, sizeof(str), "* %s presses and holds the power button of the phone. *",GetRoleplayName(playerid));
 		    SendClientMessage(playerid, COLOR_RP, str);
 			SetPlayerChatBubble(playerid, str, COLOR_RP, 10.0, 5000);
-		    InfoBoxForPlayer(playerid, "You have turned your phone on!");
+		    SendErrorMessage(playerid, "You have turned your phone on!");
 		}
-		else InfoBoxForPlayer(playerid, "The phone is already on!");
+		else SendErrorMessage(playerid, "The phone is already on!");
 	}
-	else InfoBoxForPlayer(playerid, ERROR_NOTOWNED);
+	else SendErrorMessage(playerid, ERROR_NOTOWNED);
 	
 	return 1;
 }
@@ -12387,11 +12265,11 @@ CMD:phoneoff(playerid,params[])
 		    format(str, sizeof(str), "* %s presses and holds the power button of the phone. *",GetRoleplayName(playerid));
 		    SendClientMessage(playerid, COLOR_RP, str);
 			SetPlayerChatBubble(playerid, str, COLOR_RP, 10.0, 5000);
-		    InfoBoxForPlayer(playerid, "You have turned your phone off!");
+		    SendErrorMessage(playerid, "You have turned your phone off!");
 		}
-		else InfoBoxForPlayer(playerid, "The phone is already off/in use!");	
+		else SendErrorMessage(playerid, "The phone is already off/in use!");	
 	}
-	else InfoBoxForPlayer(playerid, ERROR_NOTOWNED);
+	else SendErrorMessage(playerid, ERROR_NOTOWNED);
 	return 1;
 }
 
@@ -12405,14 +12283,14 @@ CMD:call(playerid,params[])
 		    new number;
 		    if(sscanf(params, "d", number)) return SendClientMessage(playerid, COLOR_GRAY, "/call [phone number]");
 			{
-			    if(number == Inventory[playerid][PhoneNumber]) SendErrorMessage(playerid, "You cannot call yourself!");
+			    if(number == Inventory[playerid][PhoneNumber]) return SendErrorMessage(playerid, "You cannot call yourself!");
 				
 				ProcessCall(playerid, number);
 			}
 		}
-		else InfoBoxForPlayer(playerid, "The phone is already off/in use!");
+		else SendErrorMessage(playerid, "The phone is already off/in use!");
 	}
-	else InfoBoxForPlayer(playerid, ERROR_NOTOWNED);
+	else SendErrorMessage(playerid, ERROR_NOTOWNED);
 	return 1;
 }
 
@@ -12504,9 +12382,9 @@ CMD:hangup(playerid,params[])
 		{
 			EndCall(playerid);
 		}
-		else InfoBoxForPlayer(playerid, "The phone is already off/not in use!");
+		else SendErrorMessage(playerid, "The phone is already off/not in use!");
 	}
-	else InfoBoxForPlayer(playerid, ERROR_NOTOWNED);
+	else SendErrorMessage(playerid, ERROR_NOTOWNED);
 	return 1;
 }
 
@@ -12525,11 +12403,11 @@ CMD:answer(playerid,params[])
 		    SendClientMessage(playerid, COLOR_RP, str);
 			SetPlayerChatBubble(playerid, str, COLOR_RP, 10.0, 5000);
 		}
-		else InfoBoxForPlayer(playerid, "No-one is calling you!");
+		else SendErrorMessage(playerid, "No-one is calling you!");
 	}
 	else
 	{
-	    InfoBoxForPlayer(playerid, ERROR_NOTOWNED);
+	    SendErrorMessage(playerid, ERROR_NOTOWNED);
 	}
 	return 1;
 }
@@ -12749,7 +12627,7 @@ Dialog:CREATEHOUSE3(playerid, response, listitem, inputtext[])
 		printf("%s", query);
 		format(query, sizeof(query), "%s has created/edited house: %s.", GetRoleplayName(playerid), Houses[hID][Name]);
 		SendAdminsMessage(1, COLOR_ORANGERED, query);
-		ReloadHouse(hID);
+		Reload_House(hID);
 
     }
     return 1;

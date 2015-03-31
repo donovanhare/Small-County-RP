@@ -27,14 +27,14 @@ new Create_New_Biz_ID[MAX_PLAYERS];
 
 Fetch_Businesses()
 {
-	mysql_tquery(SQL_CONNECTION, "SELECT * FROM `Biz` ORDER BY SQLID ASC", "Load_Businesses");
+	mysql_tquery(SQL_CONNECTION, "SELECT * FROM `Business` ORDER BY SQLID ASC", "Load_Businesses");
 	return 1;
 }
 
 Fetch_Business(id)
 {
 	new query[128];
-	mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT * FROM `Biz` WHERE SQLID = %d LIMIT 1", Business[id][SQLID]);
+	mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT * FROM `Business` WHERE SQLID = %d LIMIT 1", Business[id][SQLID]);
 	mysql_tquery(SQL_CONNECTION, query, "Load_Business", "d", id);
 	return 1;
 }
@@ -171,24 +171,6 @@ public Create_Business(id)
 	}
 
 	Business[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Business[id][PosX],Business[id][PosY],Business[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, -1, -1, -1, 10.0);
-	return 1;
-}
-
-forward Update_BusinessLabel(id);
-public Update_BusinessLabel(id)
-{
-	new str[128];
-	if(Business[id][Owned] == 0)
-	{
-		format(str, sizeof(str), ""COL_RED" FOR SALE\n\n"COL_ORANGE" %s \n"COL_GRAY"(/buybiz)\n Price: $%s", Business[id][Name], FormatNumber(Business[id][Price]));
-	}
-	else if(Business[id][Owned] == 1)
-	{
-		new OwnerName[MAX_PLAYER_NAME];
-		cache_get_field_content(0, "Username", OwnerName, SQL_CONNECTION, MAX_PLAYER_NAME);
-		format(str, sizeof(str), ""COL_ORANGE" %s \n"COL_GRAY" Owner: %s \n Payout: $%s \n Entrance Fee: $%s", Business[id][Name], OwnerName, FormatNumber(Business[id][Payout]), FormatNumber(Business[id][EntranceFee]));
-	}
-	UpdateDynamic3DTextLabelText(Business[id][LabelID], COLOR_WHITE, str);
 	return 1;
 }
 
