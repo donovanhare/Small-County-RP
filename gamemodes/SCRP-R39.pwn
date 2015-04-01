@@ -22,45 +22,27 @@
 #include <lookup>
 #include <YSI\y_hooks>
 
-
-//==============================================================================
-//          -- > Gamemode Includes
-//==============================================================================	
-
 #include "/modules/server/defines.pwn"
-#include "/modules/server/connection.pwn"
-#include "/modules/server/load_settings.pwn"
-#include "/modules/server/features/login_music.pwn"
-
-#include "modules/player/animations.pwn"
-#include "modules/business/functions.pwn"
-#include "modules/houses/functions.pwn"
 
 
 //==============================================================================
 //          -- > Enums
 //==============================================================================
-enum MA_Info
+
+enum acc
 {
 	SQLID,
 	Name[32],
-	Account01,
-	Account02,
-	Account03,
+	Status,
 	Admin,
-	Name01[32],
-	Name02[32],
-	Name03[32],
 	RegisterIP[16],
 	LatestIP[16]
 };
 
 enum pinfo
 {
-	SQLID,
+	ID,
  	Username[32],
-	LoggedIn,
-	LoginAttempts,
 	Tutorial,
 	Level,
 	XP,
@@ -291,8 +273,8 @@ native WP_Hash(buffer[], len, const str[]);
 //	Server/Player Variables												  //
 //==========================================================================
 
-new PlayerInfo[MAX_PLAYERS][pinfo];
-new MasterAccount[MAX_PLAYERS][MA_Info];
+new Character[MAX_PLAYERS][pinfo];
+new Account[MAX_PLAYERS][acc];
 new Inventory[MAX_PLAYERS][inv];
 
 new OOCStatus = 0;
@@ -301,6 +283,7 @@ new Weapon[MAX_PLAYERS][13];
 new WeaponAmmo[MAX_PLAYERS][13];
 
 new SkinSelection[MAX_PLAYERS] = 0;
+new LoggedIn[MAX_PLAYERS];
 
 //==========================================================================
 
@@ -358,14 +341,6 @@ new ClockSeconds;
 //==========================================================================
 //	UI  																  //
 //==========================================================================
-new PlayerText:SelectionBox[MAX_PLAYERS];
-new PlayerText:Slot01[MAX_PLAYERS];
-new PlayerText:Slot02[MAX_PLAYERS];
-new PlayerText:Slot03[MAX_PLAYERS];
-new PlayerText:Slot01_Skin[MAX_PLAYERS];
-new PlayerText:Slot02_Skin[MAX_PLAYERS];
-new PlayerText:Slot03_Skin[MAX_PLAYERS];
-
 new Text:BlackScreen[MAX_PLAYERS];
 new Text:BlackOutText[MAX_PLAYERS];
 
@@ -402,6 +377,22 @@ new Float:InactivtyCheck_Y[MAX_PLAYERS];
 new Float:InactivtyCheck_Z[MAX_PLAYERS];
 //==========================================================================
 
+//==============================================================================
+//          -- > Gamemode Includes
+//==============================================================================	
+
+#include "/modules/server/connection.pwn"
+#include "/modules/server/load_settings.pwn"
+#include "/modules/server/features/login_music.pwn"
+
+#include "modules/business/functions.pwn"
+#include "modules/houses/functions.pwn"
+
+#include "modules/player/connect/cameras.pwn"
+#include "modules/player/connect/banning.pwn"
+//#include "modules/player/connect/cameras.pwn"
+#include "modules/player/animations.pwn"
+//==============================================================================
 
 
 new CompactDisks[][][] =
@@ -820,7 +811,7 @@ public OnLookupComplete(playerid)
 	if(IsProxyUser(playerid))
 	{
 		new str[128];
-		format(str, sizeof(str), "%s's connection has been rejected. (VPN/Proxy)", GetDatabaseName(playerid));
+		format(str, sizeof(str), "%s's connection has been rejected. (VPN/Proxy)", GetName(playerid));
 		KickPlayer(playerid);
 		SendAdminsMessage(1, COLOR_INDIANRED, str);
 	}
@@ -830,19 +821,21 @@ public OnLookupComplete(playerid)
 public OnPlayerConnect(playerid)
 {
     new str[196];
-    ResetMasterAccountVariables(playerid);
+    Account_Reset(playerid);
+    Character_Reset(playerid);
 	NameCheck(playerid);
 
-    format(str, 128, "%s has joined the server", GetDatabaseName(playerid));
+    format(str, 128, "%s has joined the server", GetName(playerid));
     SendAdminsMessage(1, COLOR_GRAY, str);
-
-    Reset_PlayerInfo(playerid);
 
 	TogglePlayerSpectating(playerid, 1);
 	SetPlayerColor(playerid, COLOR_WHITE);
 
 	SetTimerEx("PlayerConnected", 100, false, "d", playerid);
 }
+
+
+new LoginAttempts[MAX_PLAYERS] = 0;
 
 
 
@@ -854,41 +847,53 @@ public PlayerConnected(playerid)
 		new str[128], query[400];
 		format(str, sizeof(str), "%s [%s]", Server[Name], Server[Version]);
 		SendClientMessage(playerid, COLOR_ORANGE, str);
-		format(str, 128, "Welcome to the server, %s.", GetDatabaseName(playerid));
+		format(str, 128, "Welcome to the server, %s.", GetName(playerid));
 	    SendClientMessage(playerid, COLOR_WHITE, str);
 		
-		SetPlayerCameraLookAt(playerid, -193.2323, 1098.5872, 19.5938);
-	    InterpolateCameraPos(playerid, -463.8441, 1098.2235, 23.3950, 176.2551, 1093.3696, 38.7697, 100000, CAMERA_MOVE);
+		Login_Camera(playerid);
+
 	    InfoBoxForPlayer(playerid, "== ~y~[Small County Roleplay]~w~ ==~n~Welcome to Small County Roleplay!");
 
+	    LoggedIn[playerid] = 0;
+	    LoginAttempts[playerid] = 0;
 
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT SQLID FROM `MasterAccounts` WHERE MA_Name = '%e' LIMIT 1", GetDatabaseName(playerid));
-	    mysql_tquery(SQL_CONNECTION, query, "ShowPlayerLogin", "i", playerid);
-	    InfoBoxForPlayer(playerid, "== ~y~[Small County Roleplay]~w~ ==~n~Welcome to Small County Roleplay!");
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT NULL FROM `Accounts` WHERE Username = '%e' LIMIT 1", GetName(playerid));
+		mysql_tquery(SQL_CONNECTION, query, "Handle_Account", "i", playerid);
 	}
 
 	return 1;
 }
 
-forward ShowPlayerLogin(playerid);
-public ShowPlayerLogin(playerid)
-{
-	new str[256], ip[18];
-	GetPlayerIp(playerid, ip, sizeof(ip));
-		
-    if(!cache_num_rows())
-    {
-		format(str, sizeof(str), "{FFFFFF}Hello, %s!\n\nWelcome to {D69929}Small County RP{FFFFFF}.\nThis username isn't registered, thus you will register it now!\n\nEnter your desired password:", GetDatabaseName(playerid));
-		Dialog_Show(playerid, REGISTER, DIALOG_STYLE_PASSWORD, "Register", str,"Register","Cancel");
-    }
-    else if(cache_num_rows()) // Login
-    {
-       	MasterAccount[playerid][SQLID] = cache_get_field_content_int(0, "SQLID", SQL_CONNECTION);
 
-		mysql_format(SQL_CONNECTION, str, sizeof(str), "SELECT NULL FROM Bans WHERE IP = '%s' OR MasterAccount = %d LIMIT 1", ip, MasterAccount[playerid][SQLID]);
-		mysql_tquery(SQL_CONNECTION, str, "CheckBans", "d", playerid);
-	}
-	return 1;
+Login_Dialog(playerid)
+{
+    new str[128];
+    format(str, sizeof(str), "{FFFFFF}Hello, %s!\n\nWelcome back to {D69929}Small County RP{FFFFFF}.\nPlease login with your existing password below.", GetName(playerid));
+    Dialog_Show(playerid, LOGIN, DIALOG_STYLE_PASSWORD, "Small County Roleplay | Login", str, "Login", "Leave");
+    return 1;
+}
+
+Register_Dialog(playerid)
+{
+    new str[128];
+    format(str, sizeof(str), "{FFFFFF}Hello, %s!\n\nWelcome to {D69929}Small County RP{FFFFFF}.\nThis username isn't registered, thus you will register it now!\n\nEnter your desired password:", GetName(playerid));
+    Dialog_Show(playerid, REGISTER, DIALOG_STYLE_PASSWORD, "Small County Roleplay | Register", str,"Register","Leave");
+    return 1;
+}
+
+
+forward Handle_Account(playerid);
+public Handle_Account(playerid)
+{
+    if(cache_num_rows())
+    {
+        Login_Dialog(playerid);
+    }
+    else
+    {
+        Register_Dialog(playerid);
+    }
+    return 1;
 }
 
 Dialog:LOGIN(playerid, response, listitem, inputtext[])
@@ -896,388 +901,121 @@ Dialog:LOGIN(playerid, response, listitem, inputtext[])
 	if(!response){ SendClientMessage(playerid, COLOR_RED, "You have left the server."); KickPlayer(playerid);}
     if(response)
     {
-        new query[1000],escapepass[129];
+        new query[256], escapepass[129];
         WP_Hash(escapepass, sizeof(escapepass), inputtext);
-   		
 
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT * FROM MasterAccounts WHERE MA_Name = '%e' AND MA_Password = '%e' LIMIT 1", GetDatabaseName(playerid), escapepass);
-    	mysql_tquery(SQL_CONNECTION, query, "OnPlayerLogin", "i", playerid);
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT SQLID, Status, Admin FROM Accounts WHERE Username = '%e' AND Password = '%e' LIMIT 1", GetName(playerid), escapepass);
+    	mysql_tquery(SQL_CONNECTION, query, "Login", "i", playerid);
 
 	}
     return 1;
 }
 
-forward OnPlayerLogin(playerid);
-public OnPlayerLogin(playerid)
+
+forward Login(playerid);
+public Login(playerid)
 {
- 	if(cache_num_rows())
+    if(cache_num_rows())
     {
-        new query[400];
-        PlayerInfo[playerid][LastOnline] = gettime();
-        format(MasterAccount[playerid][Name], 32, "%s", GetDatabaseName(playerid));
-        mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT SQLID, MA_Account01, MA_Account02, MA_Account03, MA_Admin FROM MasterAccounts WHERE MA_NAME = '%e' LIMIT 1", GetDatabaseName(playerid));
-    	mysql_tquery(SQL_CONNECTION, query, "Load_MasterAccount", "i", playerid);
-        
+        Account[playerid][SQLID] = cache_get_field_content_int(0, "SQLID", SQL_CONNECTION);
+        Account[playerid][Status] = cache_get_field_content_int(0, "Status", SQL_CONNECTION);
+        Account[playerid][Admin] = cache_get_field_content_int(0, "Admin", SQL_CONNECTION);
+        format(Account[playerid][Name], 32, "%s", GetName(playerid));
+
+        printf("%s: Logged in.", Account[playerid][Name]);
+
+        //Log_IP(playerid, ACCOUNT_LOGIN);
+
+        Characters_Fetch(playerid);
     }
-    else if(!cache_num_rows()) // Login
+    else // Login
     {
-		if(PlayerInfo[playerid][LoginAttempts] < 2)
-	    {
-	    	new str[200];
-			format(str, sizeof(str), "{FFFFFF}Hello, %s!\n\nWelcome back to {D69929}Small County RP{FFFFFF}.\nThe password provided was "COL_RED"incorrect"COL_WHITE", try again.", GetDatabaseName(playerid));
-			Dialog_Show(playerid, LOGIN, DIALOG_STYLE_PASSWORD, "Login", str, "Login","Cancel");
-			PlayerInfo[playerid][LoginAttempts] ++;
-		}
-		else
-		{
-			SendClientMessage(playerid, COLOR_ORANGERED, "Too many failed login attempts.");
-			KickPlayer(playerid);
-		}
-	}
-	return 1;
-}
-
-
-
-CMD:changemapassword(playerid,params[])
-{
-	new password[64], escapepass[129];
-	if(sscanf(params, "s[32]", password)) return SendClientMessage(playerid, COLOR_GRAY, "/ChangeMAPassword [New Password]");
-	{
-		if(strlen(password) > 5 && strlen(password) < 24)
-		{
-			WP_Hash(escapepass, sizeof(escapepass), password);
-			MYSQL_Update_String(MasterAccount[playerid][SQLID], "MasterAccounts", "MA_Password", escapepass);
-
-
-			SendClientMessage(playerid, COLOR_LGREEN, "You have successfully changed your password, keep it safe.");
-		}
-	    else
-	    {
-	    	SendErrorMessage(playerid, "Your password needs longer than 5 characters but less than 24!");
-	    }
-	}	
-	return 1;
-}
-
-
-CMD:achangemapassword(playerid,params[])
-{
-	new MaName[32],password[64], query[260], escapepass[129];
-	if(MasterAccount[playerid][Admin] >= 6)
-	{
-		if(sscanf(params, "s[32]s[32]", MaName, password)) return SendClientMessage(playerid, COLOR_GRAY, "/aChangeMAPassword [Master Account Name] [New Password]");
-		{
-			if(strlen(password) > 5 && strlen(password) < 24)
-			{
-				WP_Hash(escapepass, sizeof(escapepass), password);
-			    mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE MasterAccounts SET MA_Password = '%e' WHERE MA_Name = '%e' LIMIT 1", escapepass, MaName);
-				mysql_tquery(SQL_CONNECTION, query);
-				SendClientMessage(playerid, COLOR_LGREEN, "You have successfully changed the account's password, keep it safe.");
-			}
-		    else
-		    {
-		    	SendErrorMessage(playerid, "Your password needs longer than 5 characters but less than 24!");
-		    }
-		}	
-	}
-	else
-	{
-		SendErrorMessage(playerid, ERROR_ADMIN);
-	}
-	return 1;
-}
-
-
-CMD:achangecharacterusername(playerid,params[])
-{
-	
-	if(MasterAccount[playerid][Admin] >= 6)
-	{
-		new player, NewName[64];
-		if(sscanf(params, "us[32]", player, NewName)) return SendClientMessage(playerid, COLOR_GRAY, "/aChangeCharacterUsername [playerid] [New Name]");
-		{
-			MYSQL_Update_String(PlayerInfo[player][SQLID], "Accounts", "Username", NewName);
-			SetPlayerName(player, NewName);
-			SendClientMessage(playerid, COLOR_LGREEN, "You have successfully changed the character's name.");
-
-		}	
-	}
-	else
-	{
-		SendErrorMessage(playerid, ERROR_ADMIN);
-	}
-	return 1;
-}
-
-
-CMD:logout(playerid,params[])
-{
-	if(LoopAnim[playerid]) 
-    {
-        LoopAnim[playerid] = 0;
-        TextDrawHideForPlayer(playerid,AnimText[playerid]);
-	}
-	GetPlayerPos(playerid, PlayerInfo[playerid][PosX], PlayerInfo[playerid][PosY], PlayerInfo[playerid][PosZ]);
-	KillTimer(InactivtyCheck[playerid]);
-	FailDrivingTest(playerid, "You logged out.");
-	EndTruckingMission(playerid, "You logged out.");
-	new str[128];
-	format(str, sizeof(str), "%s has logged out.", GetRoleplayName(playerid));
-	SendLocalMessage(playerid, str, Range_Normal, COLOR_GRAY, COLOR_GRAY);
-	SendAdminsMessage(1, COLOR_GRAY, str);
-	Save_Account(playerid);
-	Unload_Account_Vehicles(playerid);
-	Select_MasterAccount(playerid);
-	return 1;
-}			
-
-
-
-CMD:viewcharacters(playerid,params[])
-{
-	if(MasterAccount[playerid][Admin] >= 6)
-	{
-		new account[64];
-		if(sscanf(params, "s[12]", account)) return SendClientMessage(playerid, COLOR_GRAY, "/viewcharacters [MA Name]");
-		{
-        	new query[400];//GetDatabaseName(playerid)
-	        mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT SQLID, MA_Account01, MA_Account02, MA_Account03, MA_Admin FROM MasterAccounts WHERE MA_NAME = '%e' LIMIT 1", account);
-	    	mysql_tquery(SQL_CONNECTION, query, "Load_MasterAccount", "i", playerid);	
-	   }
-        SelectTextDraw(playerid, 0xA3B4C5FF);
-	}
-	return 1;
-}
-
-forward Select_MasterAccount(playerid);
-public Select_MasterAccount(playerid)
-{
-	new query[400];
-	PlayerInfo[playerid][LoggedIn] = 0;
-	Reset_PlayerInfo(playerid);
-    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT SQLID, MA_Account01, MA_Account02, MA_Account03, MA_Admin FROM MasterAccounts WHERE SQLID = %d LIMIT 1", MasterAccount[playerid][SQLID]);
-	mysql_tquery(SQL_CONNECTION, query, "Load_MasterAccount", "i", playerid);
-
-	TogglePlayerSpectating(playerid, 1);
-	SetPlayerInterior(playerid, 0);
-	SelectTextDraw(playerid, 0xA3B4C5FF);
-	return 1;
-}
-
-forward Load_MasterAccount(playerid);
-public Load_MasterAccount(playerid)
-{
-	if(cache_num_rows())
-    {
-    	new query[400];
-        MasterAccount[playerid][SQLID] = cache_get_field_content_int(0, "SQLID", SQL_CONNECTION);
-    	MasterAccount[playerid][Account01] = cache_get_field_content_int(0, "MA_Account01", SQL_CONNECTION);
-    	MasterAccount[playerid][Account02] = cache_get_field_content_int(0, "MA_Account02", SQL_CONNECTION);
-    	MasterAccount[playerid][Account03] = cache_get_field_content_int(0, "MA_Account03", SQL_CONNECTION);
-    	MasterAccount[playerid][Admin] = cache_get_field_content_int(0, "MA_Admin", SQL_CONNECTION);
-		
-        mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT SQLID, Username FROM Accounts WHERE SQLID = %d OR SQLID = %d OR SQLID = %d LIMIT 3", MasterAccount[playerid][Account01], MasterAccount[playerid][Account02], MasterAccount[playerid][Account03]);
-    	mysql_tquery(SQL_CONNECTION, query, "DisplayCharacters", "i", playerid);
-	}
-	else
-	{
-	    SendErrorMessage(playerid, "Master Account not found.");
-	    KickPlayer(playerid);
-	}
-	return 1;
-}
-
-forward DisplayCharacters(playerid);
-public DisplayCharacters(playerid)
-{
-	if(cache_num_rows())
-    {
-    	new str[128];
-
-    	Reset_PlayerInfo(playerid);
-
-    	SelectionBox[playerid] = CreatePlayerTextDraw(playerid, 320.000000, 143.000000, "~n~Characters~n~~n~~n~~n~~n~~n~~n~~n~~n~~n~~n~");
-	    PlayerTextDrawAlignment(playerid, SelectionBox[playerid], 2);
-	    PlayerTextDrawBackgroundColor(playerid, SelectionBox[playerid], 255);
-	    PlayerTextDrawFont(playerid, SelectionBox[playerid], 2);
-	    PlayerTextDrawLetterSize(playerid, SelectionBox[playerid], 0.500000, 1.000000);
-	    PlayerTextDrawColor(playerid, SelectionBox[playerid], -1);
-	    PlayerTextDrawSetOutline(playerid, SelectionBox[playerid], 0);
-	    PlayerTextDrawSetProportional(playerid, SelectionBox[playerid], 1);
-	    PlayerTextDrawSetShadow(playerid, SelectionBox[playerid], 1);
-	    PlayerTextDrawTextSize(playerid, SelectionBox[playerid], 30.000000, 170.000000);
-		PlayerTextDrawUseBox(playerid, SelectionBox[playerid], true);
-		PlayerTextDrawBoxColor(playerid, SelectionBox[playerid], 51);
-
-	    Slot01[playerid] = CreatePlayerTextDraw(playerid, 320.000000, 180.000000, "Slot 01");
-	    PlayerTextDrawAlignment(playerid, Slot01[playerid], 2);
-	    PlayerTextDrawBackgroundColor(playerid, Slot01[playerid], 255);
-	    PlayerTextDrawFont(playerid, Slot01[playerid], 2);
-	    PlayerTextDrawLetterSize(playerid, Slot01[playerid], 0.260000, 0.799999);
-	    PlayerTextDrawColor(playerid, Slot01[playerid], -1);
-	    PlayerTextDrawSetOutline(playerid, Slot01[playerid], 0);
-	    PlayerTextDrawSetProportional(playerid, Slot01[playerid], 1);
-	    PlayerTextDrawSetShadow(playerid, Slot01[playerid], 1);
-	    PlayerTextDrawTextSize(playerid, Slot01[playerid], 7.5, 150.0);
-
-	    Slot02[playerid] = CreatePlayerTextDraw(playerid, 320.000000, 205.000000, "Slot 02");
-	    PlayerTextDrawAlignment(playerid, Slot02[playerid], 2);
-	    PlayerTextDrawBackgroundColor(playerid, Slot02[playerid], 255);
-	    PlayerTextDrawFont(playerid, Slot02[playerid], 2);
-	    PlayerTextDrawLetterSize(playerid, Slot02[playerid], 0.260000, 0.799999);
-	    PlayerTextDrawColor(playerid, Slot02[playerid], -1);
-	    PlayerTextDrawSetOutline(playerid, Slot02[playerid], 0);
-	    PlayerTextDrawSetProportional(playerid, Slot02[playerid], 1);
-	    PlayerTextDrawSetShadow(playerid, Slot02[playerid], 1);
-	    PlayerTextDrawTextSize(playerid, Slot02[playerid], 7.5, 150.0);
-
-	    Slot03[playerid] = CreatePlayerTextDraw(playerid, 320.000000, 230.000000, "Slot 03");
-	    PlayerTextDrawAlignment(playerid, Slot03[playerid], 2);
-	    PlayerTextDrawBackgroundColor(playerid, Slot03[playerid], 255);
-	    PlayerTextDrawFont(playerid, Slot03[playerid], 2);
-	    PlayerTextDrawLetterSize(playerid, Slot03[playerid], 0.260000, 0.799999);
-	    PlayerTextDrawColor(playerid, Slot03[playerid], -1);
-	    PlayerTextDrawSetOutline(playerid, Slot03[playerid], 0);
-	    PlayerTextDrawSetProportional(playerid, Slot03[playerid], 1);
-	    PlayerTextDrawSetShadow(playerid, Slot03[playerid], 1);
-	    PlayerTextDrawTextSize(playerid, Slot03[playerid], 7.5, 150.0);
-
-        Slot01_Skin[playerid] = CreatePlayerTextDraw(playerid, 220.0, 180.0, "_");
-   		PlayerTextDrawFont(playerid, Slot01_Skin[playerid], TEXT_DRAW_FONT_MODEL_PREVIEW);
-   		PlayerTextDrawAlignment(playerid, Slot01_Skin[playerid], 2);
-   		PlayerTextDrawBackgroundColor(playerid, SelectionBox[playerid], 255);
-		PlayerTextDrawSetPreviewModel(playerid, Slot01_Skin[playerid], 17);
-	    PlayerTextDrawTextSize(playerid, Slot01_Skin[playerid], 60.0, 60.0);
-		PlayerTextDrawUseBox(playerid, Slot01_Skin[playerid], true);
-		PlayerTextDrawBoxColor(playerid, Slot01_Skin[playerid], 51);
-
-        Slot02_Skin[playerid] = CreatePlayerTextDraw(playerid, 290.0, 180.0, "_");
-   		PlayerTextDrawFont(playerid, Slot02_Skin[playerid], TEXT_DRAW_FONT_MODEL_PREVIEW);
-   		PlayerTextDrawAlignment(playerid, Slot01_Skin[playerid], 2);
-   		PlayerTextDrawBackgroundColor(playerid, SelectionBox[playerid], 255);
-		PlayerTextDrawSetPreviewModel(playerid, Slot02_Skin[playerid], 17);
-	    PlayerTextDrawTextSize(playerid, Slot02_Skin[playerid], 60.0, 60.0);
-		PlayerTextDrawUseBox(playerid, Slot02_Skin[playerid], true);
-		PlayerTextDrawBoxColor(playerid, Slot02_Skin[playerid], 51);
-
-        Slot03_Skin[playerid] = CreatePlayerTextDraw(playerid, 360.0, 180.0, "_");
-        PlayerTextDrawAlignment(playerid, Slot03_Skin[playerid], 2);
-   		PlayerTextDrawFont(playerid, Slot03_Skin[playerid], TEXT_DRAW_FONT_MODEL_PREVIEW);
-   		PlayerTextDrawBackgroundColor(playerid, SelectionBox[playerid], 255);
-		PlayerTextDrawSetPreviewModel(playerid, Slot03_Skin[playerid], 17);
-	    PlayerTextDrawTextSize(playerid, Slot03_Skin[playerid], 60.0, 60.0);
-		PlayerTextDrawUseBox(playerid, Slot03_Skin[playerid], true);
-		PlayerTextDrawBoxColor(playerid, Slot03_Skin[playerid], 51);
-
-
-
-	    PlayerTextDrawSetSelectable(playerid, Slot01[playerid], 1);
-	    PlayerTextDrawSetSelectable(playerid, Slot02[playerid], 1);
-	    PlayerTextDrawSetSelectable(playerid, Slot03[playerid], 1);
-
-
-
-        for( new id = 0; id < cache_num_rows(); id++)
+        if(LoginAttempts[playerid] < 2)
         {
-			if(id == 0)
-			{
-			    MasterAccount[playerid][Account01] = cache_get_field_content_int(id, "SQLID", SQL_CONNECTION);
-			    cache_get_field_content(id, "Username", MasterAccount[playerid][Name01], SQL_CONNECTION, 32);
-			    
-			    format(str,sizeof(str),"(%d)\n%s", MasterAccount[playerid][Account01], MasterAccount[playerid][Name01]);
-				PlayerTextDrawSetString(playerid, Slot01[playerid], str);
-			}
-			if(id == 1)
-			{
-			    MasterAccount[playerid][Account02] = cache_get_field_content_int(id, "SQLID", SQL_CONNECTION);
-			    cache_get_field_content(id, "Username", MasterAccount[playerid][Name02], SQL_CONNECTION, 32);
-			    
-			    format(str,sizeof(str),"(%d)\n%s", MasterAccount[playerid][Account02], MasterAccount[playerid][Name02]);
-				PlayerTextDrawSetString(playerid, Slot02[playerid], str);
-			}
-			if(id == 2)
-			{
-			    MasterAccount[playerid][Account03] = cache_get_field_content_int(id, "SQLID", SQL_CONNECTION);
-			    cache_get_field_content(id, "Username", MasterAccount[playerid][Name03], SQL_CONNECTION, 32);
-			    
-			    format(str,sizeof(str),"(%d)\n%s", MasterAccount[playerid][Account03], MasterAccount[playerid][Name03]);
-				PlayerTextDrawSetString(playerid, Slot03[playerid], str);
-			}
-			
-			
-		}
-		if(cache_num_rows() == 1) { format(str,sizeof(str),"(0)\nNew Character");  PlayerTextDrawSetString(playerid, Slot02[playerid], str); PlayerTextDrawSetString(playerid, Slot03[playerid], str); }
-		if(cache_num_rows() == 2) { format(str,sizeof(str),"(0)\nNew Character"); PlayerTextDrawSetString(playerid, Slot03[playerid], str); }
+            Login_Dialog(playerid);
+            //Log_IP(playerid, FAILED_ACCOUNT_LOGIN);
 
-		PlayerTextDrawShow(playerid, SelectionBox[playerid]); 
-        PlayerTextDrawShow(playerid, Slot01[playerid]);  
-        PlayerTextDrawShow(playerid, Slot02[playerid]);  
-        PlayerTextDrawShow(playerid, Slot03[playerid]);
-        //PlayerTextDrawShow(playerid, Slot01_Skin[playerid]);
-        //PlayerTextDrawShow(playerid, Slot02_Skin[playerid]);
-        //PlayerTextDrawShow(playerid, Slot03_Skin[playerid]);
-        SelectTextDraw(playerid, 0xA3B4C5FF);
-        SendClientMessage(playerid, COLOR_WHEAT, "You have successfully logged in, you may now select an account to create/load with your mouse.");
-        SendClientMessage(playerid, COLOR_WHEAT, "WARNING: Pressing ESC will exit the process and you will have to relog.");
-	}
-	else
-	{
-	    Quiz(playerid, 1);
-	}
-	return 1;
-}
-
-public OnPlayerClickPlayerTextDraw(playerid, PlayerText:playertextid)
-{
-    if(_:playertextid != INVALID_TEXT_DRAW)
-    {
-    	new query[128];
-	    if(playertextid == Slot01[playerid])
-	    {
-	        if(MasterAccount[playerid][Account01] > 0)
-        	{
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT * FROM Accounts WHERE SQLID = %d LIMIT 1", MasterAccount[playerid][Account01]);
-		    	mysql_tquery(SQL_CONNECTION, query, "Load_Account", "i", playerid);
-        	}
-    		else
-			{
-			    Dialog_Show(playerid, CREATECHARCTER, DIALOG_STYLE_INPUT, "Character Creation", "Please enter your new character's (roleplay)name, it must include the underscore('_'):", "Create","Cancel");
-			}
-	        
-	    }
-	    else if(playertextid == Slot02[playerid]) 
-	    {
-	        if(MasterAccount[playerid][Account02] > 0)
-        	{
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT * FROM Accounts WHERE SQLID = %d LIMIT 1", MasterAccount[playerid][Account02]);
-		    	mysql_tquery(SQL_CONNECTION, query, "Load_Account", "i", playerid);
-        	}
-        	else
-			{
-			    Dialog_Show(playerid, CREATECHARCTER, DIALOG_STYLE_INPUT, "Character Creation", "Please enter your new character's (roleplay)name, it must include the underscore('_'):", "Create","Cancel");
-			}
-	    }
-	    else if(playertextid == Slot03[playerid])
-	    {
-	        if(MasterAccount[playerid][Account03] > 0)
-        	{
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT * FROM Accounts WHERE SQLID = %d LIMIT 1", MasterAccount[playerid][Account03]);
-		    	mysql_tquery(SQL_CONNECTION, query, "Load_Account", "i", playerid);
-        	}
-        	else
-			{
-			    Dialog_Show(playerid, CREATECHARCTER, DIALOG_STYLE_INPUT, "Character Creation", "Please enter your new character's (roleplay)name, it must include the underscore('_'):", "Create","Cancel");
-			}
-	    }
-	    PlayerTextDrawHide(playerid, SelectionBox[playerid]);
-	    PlayerTextDrawHide(playerid, Slot01[playerid]);  
-	    PlayerTextDrawHide(playerid, Slot02[playerid]);  
-	    PlayerTextDrawHide(playerid, Slot03[playerid]); 
-	    CancelSelectTextDraw(playerid);
-
+            SendClientMessage(playerid, COLOR_ORANGERED, "Incorrect Password.");
+            LoginAttempts[playerid] ++;
+        }
+        else
+        {
+            SendClientMessage(playerid, COLOR_RED, "Too many failed login attempts.");
+            KickPlayer(playerid);
+        }
     }
     return 1;
+}
+
+forward Characters_Fetch(playerid);
+public Characters_Fetch(playerid)
+{
+    new query[128];
+    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT ID, Name FROM Characters WHERE A_ID = %d LIMIT 3", Account[playerid][SQLID]);
+    mysql_tquery(SQL_CONNECTION, query, "Characters_Menu", "i", playerid);
+    return 1;
+}
+
+forward Characters_Menu(playerid);
+public Characters_Menu(playerid)
+{
+    new str[64], string[256], C_ID, C_Name[24];
+    for( new id = 0; id < cache_num_rows(); id++)
+    {
+        C_ID = cache_get_field_content_int(id, "ID", SQL_CONNECTION);
+        cache_get_field_content(id, "Name", C_Name, SQL_CONNECTION, 24);
+
+        format(str, sizeof(str), "(%d) %s\n", C_ID, C_Name);
+        strcat(string, str, sizeof(string));
+    }
+
+    if(cache_num_rows() < 3) 
+    {
+        format(str, sizeof(str), "Create Character\n");
+        strcat(string, str, sizeof(string));
+    }
+
+    format(str, sizeof(str), "%s's Characters", Account[playerid][Name]);
+    Dialog_Show(playerid, Character_Select, DIALOG_STYLE_LIST, str, string, "Select","Leave");
+
+    return 1;
+}
+
+Dialog:Character_Select(playerid, response, listitem, inputtext[])
+{
+    if(!response){ SendClientMessage(playerid, COLOR_RED, "You have left the server."); KickPlayer(playerid);}
+    if(response)
+    {
+        new C_ID[6];
+        strmid(C_ID, inputtext, strfind(inputtext, "(") + 1,  strfind(inputtext, ")"));
+        printf("%d",strval(C_ID));//continue onto character selection (maybe tutorial in brackets)
+        Character_Fetch(playerid, strval(C_ID));
+    }
+    return 1;
+}
+
+
+forward Character_Fetch(playerid, id);
+public Character_Fetch(playerid, id)
+{
+    new query[128];
+    if(id)
+    {
+	    Character[playerid][ID] = id;
+	    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT * FROM Characters WHERE ID = %d LIMIT 1", id);
+	    mysql_tquery(SQL_CONNECTION, query, "Character_Load", "i", playerid);	
+    }
+    else
+    {
+    	Character_Create(playerid);
+    }
+    return 1;
+}
+
+Character_Create(playerid)
+{
+	Dialog_Show(playerid, CREATECHARACTER, DIALOG_STYLE_INPUT, "Character Creation", "Please enter your new character's (roleplay)name, it must include the underscore('_'):", "Create","Cancel");
+	return 1;
 }
 
 
@@ -1285,10 +1023,8 @@ Dialog:REGISTER(playerid, response, listitem, inputtext[])
 {
 	if(strlen(inputtext) < 6 || strlen(inputtext) > 24)
     {
-    	new str[128];
         SendClientMessage(playerid, COLOR_ORANGERED, "You must insert a password between 6-24 characters!");
-        format(str, sizeof(str), "{FFFFFF}Hello, %s!\n\nWelcome to {D69929}Small County RP{FFFFFF}.\nThe password you'd selected didn't match the requirements!\n\nEnter your desired password:", GetDatabaseName(playerid));
-		Dialog_Show(playerid, REGISTER, DIALOG_STYLE_PASSWORD, "Register", str,"Register","Cancel");
+        Register_Dialog(playerid);
     }
     else if(strlen(inputtext) > 5 && strlen(inputtext) < 24)
     {
@@ -1296,43 +1032,30 @@ Dialog:REGISTER(playerid, response, listitem, inputtext[])
         
         WP_Hash(escapepass, sizeof(escapepass), inputtext);
 
-		GetPlayerIp(playerid, PlayerInfo[playerid][RegisterIP], 16);
+		GetPlayerIp(playerid, Character[playerid][RegisterIP], 16);
 
-    	mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO MasterAccounts (MA_Name, MA_Password, RegisterIP, RegisterDate) VALUES('%e','%e','%e', %d)", GetDatabaseName(playerid), escapepass, PlayerInfo[playerid][RegisterIP], gettime());
-		mysql_tquery(SQL_CONNECTION, query, "GetMaSQLID", "i", playerid);
+    	mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO Accounts (Username, Password, RegisterIP, RegisterDate) VALUES('%e','%e','%e', %d)", GetName(playerid), escapepass, Character[playerid][RegisterIP], gettime());
+		mysql_tquery(SQL_CONNECTION, query, "GetAccID", "i", playerid);
 		
         Quiz(playerid, 1);
 	}
     return 1;
 }
-forward GetMaSQLID(playerid);
-public GetMaSQLID(playerid)
+
+forward GetAccID(playerid);
+public GetAccID(playerid)
 {
-	MasterAccount[playerid][SQLID] = cache_insert_id();
+	Account[playerid][SQLID] = cache_insert_id();
 	return 1;
 }
 
-forward GetPlayerSQLID(playerid);
-public GetPlayerSQLID(playerid)
+forward GetCharacterID(playerid);
+public GetCharacterID(playerid)
 {
-	PlayerInfo[playerid][SQLID] = cache_insert_id();
-	if(MasterAccount[playerid][Account01] == 0)
-	{
-		MYSQL_Update_Interger(MasterAccount[playerid][SQLID], "MasterAccounts", "MA_Account01", PlayerInfo[playerid][SQLID]);
-		MasterAccount[playerid][Account01] = PlayerInfo[playerid][SQLID];
-	}
-	else if(MasterAccount[playerid][Account02] == 0)
-	{
-		MYSQL_Update_Interger(MasterAccount[playerid][SQLID], "MasterAccounts", "MA_Account02", PlayerInfo[playerid][SQLID]);
-		MasterAccount[playerid][Account02] = PlayerInfo[playerid][SQLID];
-	}
-	else if(MasterAccount[playerid][Account03] == 0)
-	{
-		MYSQL_Update_Interger(MasterAccount[playerid][SQLID], "MasterAccounts", "MA_Account03", PlayerInfo[playerid][SQLID]);
-		MasterAccount[playerid][Account03] = PlayerInfo[playerid][SQLID];
-	}
+	Character[playerid][ID] = cache_insert_id();
 	return 1;
 }
+
 
 
 public OnPlayerDisconnect(playerid, reason)
@@ -1343,15 +1066,15 @@ public OnPlayerDisconnect(playerid, reason)
 	FailDrivingTest(playerid, "You logged out.");
 	EndTruckingMission(playerid, "You logged out.");
 
-	if(PlayerInfo[playerid][ClothesSelection] == 0 || PlayerInfo[playerid][InHospital] == 1)
+	if(Character[playerid][ClothesSelection] == 0 || Character[playerid][InHospital] == 0)
 	{
-    	GetPlayerPos(playerid, PlayerInfo[playerid][PosX], PlayerInfo[playerid][PosY], PlayerInfo[playerid][PosZ]);
+    	GetPlayerPos(playerid, Character[playerid][PosX], Character[playerid][PosY], Character[playerid][PosZ]);
     }
-	GetPlayerHealth(playerid, PlayerInfo[playerid][Health]);
-	GetPlayerArmour(playerid, PlayerInfo[playerid][Armour]);
-	Save_Account(playerid);
-	PlayerInfo[playerid][LoggedIn] = 0;
-	Unload_Account_Vehicles(playerid);
+	GetPlayerHealth(playerid, Character[playerid][Health]);
+	GetPlayerArmour(playerid, Character[playerid][Armour]);
+	Character_Save(playerid);
+	LoggedIn[playerid] = 0;
+	Character_Vehicles_Unload(playerid);
     new pName[24], str[128];
     GetPlayerName(playerid, pName, 24);
 
@@ -1378,7 +1101,7 @@ stock Log(playerid, string[])
 	new File:logfile, logentry[255], time[3], date[3], datestr[11], filepath[48];
 	gettime(time[0], time[1], time[2]);
     getdate(date[0], date[1], date[2]);
-	format(logentry, sizeof logentry, "[%02d:%02d:%02d] %s(%d): %s\r\n", time[0], time[1], time[2], GetDatabaseName(playerid), playerid, string);
+	format(logentry, sizeof logentry, "[%02d:%02d:%02d] %s(%d): %s\r\n", time[0], time[1], time[2], GetName(playerid), playerid, string);
     format(datestr, sizeof datestr, "%02d-%02d-%d", date[2], date[1], date[0]);
     format(filepath, sizeof filepath, LOG_PATH, datestr);
     logfile = fopen(filepath, io_append);
@@ -1390,6 +1113,110 @@ stock Log(playerid, string[])
     }
 	return 1;
 }
+
+
+CMD:changeaccountpassword(playerid,params[])
+{
+	new password[64], escapepass[129];
+	if(sscanf(params, "s[32]", password)) return SendClientMessage(playerid, COLOR_GRAY, "/changeaccountpassword [New Password]");
+	{
+		if(strlen(password) > 5 && strlen(password) < 24)
+		{
+			WP_Hash(escapepass, sizeof(escapepass), password);
+			MYSQL_Update_String(Account[playerid][SQLID], "Accounts", "Password", escapepass);
+
+
+			SendClientMessage(playerid, COLOR_LGREEN, "You have successfully changed your password, keep it safe.");
+		}
+	    else
+	    {
+	    	SendErrorMessage(playerid, "Your password needs longer than 5 characters but less than 24!");
+	    }
+	}	
+	return 1;
+}
+
+
+CMD:achangeapassword(playerid,params[])
+{
+	new name[32],password[64], query[260], escapepass[129];
+	if(Account[playerid][Admin] >= 6)
+	{
+		if(sscanf(params, "s[32]s[32]", name, password)) return SendClientMessage(playerid, COLOR_GRAY, "/achangeapassword [Master Account Name] [New Password]");
+		{
+			if(strlen(password) > 5 && strlen(password) < 24)
+			{
+				WP_Hash(escapepass, sizeof(escapepass), password);
+			    mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET Password = '%e' WHERE Username = '%e' LIMIT 1", escapepass, name);
+				mysql_tquery(SQL_CONNECTION, query);
+				SendClientMessage(playerid, COLOR_LGREEN, "You have successfully changed the account's password, keep it safe.");
+			}
+		    else
+		    {
+		    	SendErrorMessage(playerid, "Your password needs longer than 5 characters but less than 24!");
+		    }
+		}	
+	}
+	else
+	{
+		SendErrorMessage(playerid, ERROR_ADMIN);
+	}
+	return 1;
+}
+
+
+CMD:changecname(playerid,params[])
+{
+	
+	if(Account[playerid][Admin] >= 6)
+	{
+		new player, NewName[64];
+		if(sscanf(params, "us[32]", player, NewName)) return SendClientMessage(playerid, COLOR_GRAY, "/changecname [playerid] [New Name]");
+		{
+			MYSQL_Update_String(Character[player][ID], "Characters", "Name", NewName);
+			SetPlayerName(player, NewName);
+			SendClientMessage(playerid, COLOR_LGREEN, "You have successfully changed the character's name.");
+
+		}	
+	}
+	else
+	{
+		SendErrorMessage(playerid, ERROR_ADMIN);
+	}
+	return 1;
+}
+
+
+CMD:logout(playerid,params[])
+{
+	new str[128];
+	if(LoopAnim[playerid]) 
+    {
+        LoopAnim[playerid] = 0;
+        TextDrawHideForPlayer(playerid,AnimText[playerid]);
+	}
+
+	GetPlayerPos(playerid, Character[playerid][PosX], Character[playerid][PosY], Character[playerid][PosZ]);
+	KillTimer(InactivtyCheck[playerid]);
+
+	FailDrivingTest(playerid, "You logged out.");
+	EndTruckingMission(playerid, "You logged out.");
+
+	format(str, sizeof(str), "%s has logged out.", GetRoleplayName(playerid));
+	SendLocalMessage(playerid, str, Range_Normal, COLOR_GRAY, COLOR_GRAY);
+	SendAdminsMessage(1, COLOR_GRAY, str);
+
+	Character_Save(playerid);
+	Character_Vehicles_Unload(playerid);
+
+	LoggedIn[playerid] = 0;
+	Login_Camera(playerid);
+	Character_Reset(playerid);
+	Characters_Fetch(playerid);
+	return 1;
+}			
+
+
 
 
 
@@ -1453,13 +1280,13 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 	{
 		for(new i; i < MAX_PLAYERS; i++)
 		{
-		    if(IsPlayerConnected(i) && PlayerInfo[i][IsSpec] == playerid)
+		    if(IsPlayerConnected(i) && Character[i][IsSpec] == playerid)
 		    {
 		        PlayerSpectatePlayer(i, playerid);
 		        break;
 			}
 		}
-		if(Taxi[playerid][Passanger] != -1 && PlayerInfo[playerid][Job] == TAXI_JOB)
+		if(Taxi[playerid][Passanger] != -1 && Character[playerid][Job] == TAXI_JOB)
 		{
 			EndTaxiMeter(playerid);
 		}
@@ -1476,7 +1303,7 @@ public OnPlayerStateChange(playerid, newstate, oldstate)
 	{
 		for(new i; i < MAX_PLAYERS; i++)
 		{
-		    if(IsPlayerConnected(i) && PlayerInfo[i][IsSpec] == playerid)
+		    if(IsPlayerConnected(i) && Character[i][IsSpec] == playerid)
 		    {
 		        PlayerSpectateVehicle(i, GetPlayerVehicleID(playerid));
 		        break;
@@ -1527,17 +1354,17 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 forward GivePlayerPayday(playerid, amount);
 public GivePlayerPayday(playerid, amount)
 {
-	PlayerInfo[playerid][Payday] += amount;
-	if(PlayerInfo[playerid][Payday] > 20000)
+	Character[playerid][Payday] += amount;
+	if(Character[playerid][Payday] > 20000)
 	{
-		PlayerInfo[playerid][Payday] = 20000;
-		MYSQL_Update_Account(playerid, "Payday", PlayerInfo[playerid][Payday]);
+		Character[playerid][Payday] = 20000;
+		MYSQL_Update_Character(playerid, "Payday", Character[playerid][Payday]);
 
 		SendClientMessage(playerid, COLOR_DARKVIOLET, "You have reached your paycheck capacity($20,000). In order to continue earning money you will have to collect the accumulated funds.");
 	}
 	else
 	{
-		MYSQL_Update_Account(playerid, "Payday", PlayerInfo[playerid][Payday]);
+		MYSQL_Update_Character(playerid, "Payday", Character[playerid][Payday]);
 	}
 
 }
@@ -1547,13 +1374,13 @@ CMD:payday(playerid,params[])
 {
 	if(InRangeOfIcon(playerid, 4))
 	{
-	    if(PlayerInfo[playerid][Payday] > 0)
+	    if(Character[playerid][Payday] > 0)
 	    {
 	        new str[128];
-	        format(str, sizeof(str), "You have collected a total of $%d in payments.", PlayerInfo[playerid][Payday]);
+	        format(str, sizeof(str), "You have collected a total of $%d in payments.", Character[playerid][Payday]);
 	        SendClientMessage(playerid, COLOR_DGREEN, str);
-   	 		GivePlayerMoneyEx(playerid, PlayerInfo[playerid][Payday]);
-	    	PlayerInfo[playerid][Payday] = 0;
+   	 		GivePlayerMoneyEx(playerid, Character[playerid][Payday]);
+	    	Character[playerid][Payday] = 0;
 		}
 		else
 		{
@@ -1574,9 +1401,9 @@ public GivePayday(playerid)
 	SendClientMessage(playerid, COLOR_YELLOW, "------PAYDAY------");
 
 //Business Payout
-	if(PlayerInfo[playerid][Business_1] > 0)
+	if(Character[playerid][Business_1] > 0)
 	{
-		format(bizincome, sizeof(bizincome), "Amount added to your business safe = $%d.", Business[PlayerInfo[playerid][Business_1]][Payout]);
+		format(bizincome, sizeof(bizincome), "Amount added to your business safe = $%d.", Business[Character[playerid][Business_1]][Payout]);
 		SendClientMessage(playerid, COLOR_YELLOW, bizincome);
 		
 		GivePlayerXP(playerid, PAYDAY_XP_BIZ);
@@ -1584,12 +1411,12 @@ public GivePayday(playerid)
 		format(bizincome, sizeof(bizincome), "You have received %d XP for owning a business.", PAYDAY_XP_BIZ);
 		SendClientMessage(playerid, COLOR_GRAY, bizincome);
 
-		Business[PlayerInfo[playerid][Business_1]][Safe] += Business[PlayerInfo[playerid][Business_1]][Payout];
+		Business[Character[playerid][Business_1]][Safe] += Business[Character[playerid][Business_1]][Payout];
 	}
 
-	if(PlayerInfo[playerid][Business_2] > 0)
+	if(Character[playerid][Business_2] > 0)
 	{
-		format(bizincome, sizeof(bizincome), "Amount added to your second business' safe = $%d.", Business[PlayerInfo[playerid][Business_2]][Payout]);
+		format(bizincome, sizeof(bizincome), "Amount added to your second business' safe = $%d.", Business[Character[playerid][Business_2]][Payout]);
 		SendClientMessage(playerid, COLOR_YELLOW, bizincome);
 		
 		GivePlayerXP(playerid, PAYDAY_XP_BIZ);
@@ -1597,11 +1424,11 @@ public GivePayday(playerid)
 		format(bizincome, sizeof(bizincome), "You have received %d XP for owning a business.", PAYDAY_XP_BIZ);
 		SendClientMessage(playerid, COLOR_GRAY, bizincome);
 
-		Business[PlayerInfo[playerid][Business_2]][Safe] += Business[PlayerInfo[playerid][Business_2]][Payout];
+		Business[Character[playerid][Business_2]][Safe] += Business[Character[playerid][Business_2]][Payout];
 	}
 
 //No faction Payout
-	if(PlayerInfo[playerid][Faction] == 0)
+	if(Character[playerid][Faction] == 0)
 	{
 		format(standard, sizeof(standard), "Income from Government benefits = $%d.", PAYDAY_STANDARD);
 		SendClientMessage(playerid, COLOR_YELLOW, standard);
@@ -1612,16 +1439,16 @@ public GivePayday(playerid)
 		format(standard, sizeof(standard), "You have received %d XP.", PAYDAY_XP_STANDARD);
 		SendClientMessage(playerid, COLOR_GRAY, standard);
 	}
-	if(PlayerInfo[playerid][Faction] > 0)
+	if(Character[playerid][Faction] > 0)
 	{
 		//400 * rank - 100
 	    new Salary;
-	    Salary = (PAYDAY_FACTION * PlayerInfo[playerid][Rank]) / 2;
+	    Salary = (PAYDAY_FACTION * Character[playerid][Rank]) / 2;
         GivePlayerPayday(playerid, Salary);
 
-        new fid = GetFactionIDFromSQLID(PlayerInfo[playerid][Faction]);
+        new fid = GetFactionIDFromSQLID(Character[playerid][Faction]);
 
-		format(standard, sizeof(standard), "Income for being rank %d in %s = $%d.",  PlayerInfo[playerid][Rank], Factions[fid][Name],Salary);
+		format(standard, sizeof(standard), "Income for being rank %d in %s = $%d.",  Character[playerid][Rank], Factions[fid][Name],Salary);
 		SendClientMessage(playerid, COLOR_YELLOW, standard);
 		
 		GivePlayerXP(playerid, PAYDAY_XP_FACTION);
@@ -1636,7 +1463,7 @@ public GivePayday(playerid)
 
 CMD:givepayday(playerid,params[])
 {
-	if(MasterAccount[playerid][Admin] >= 6)
+	if(Account[playerid][Admin] >= 6)
 	{
 		GivePayday(playerid);
 	}
@@ -1685,10 +1512,10 @@ public MYSQL_Update_Float(sqlid, table[], column[], Float:interger)
 	return 1;
 }
 
-MYSQL_Update_Account(playerid, option1[], option2)
+MYSQL_Update_Character(playerid, option1[], option2)
 {
 	new query[128];
-    mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET %e = %d WHERE SQLID = %d LIMIT 1", option1, option2, PlayerInfo[playerid][SQLID]);
+    mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Characters SET %e = %d WHERE ID = %d LIMIT 1", option1, option2, Character[playerid][ID]);
 	mysql_tquery(SQL_CONNECTION, query);
 	return 1;
 }
@@ -1697,19 +1524,28 @@ CMD:pvars(playerid)
 {
 	for(new i; pinfo:i < pinfo; i++)
 	{
-    	SendClientMessage(playerid, COLOR_WHITE, PlayerInfo[playerid][pinfo:i]);
+    	SendClientMessage(playerid, COLOR_WHITE, Character[playerid][pinfo:i]);
 	}
 	return 1;
 }
 
-Reset_PlayerInfo(playerid)
+Account_Reset(playerid)
+{
+	for(new i; acc:i < acc; i++)
+	{
+    	Account[playerid][acc:i] = 0;
+	}
+	return 1;
+}
+
+Character_Reset(playerid)
 {
 	for(new i; pinfo:i < pinfo; i++)
 	{
-    	PlayerInfo[playerid][pinfo:i] = 0;
+    	Character[playerid][pinfo:i] = 0;
 	}
 
-	PlayerInfo[playerid][IsSpec] = -1;
+	Character[playerid][IsSpec] = -1;
 
  	Inventory[playerid][PhoneStatus] = 0;
  	Inventory[playerid][PhoneCaller] = -1;
@@ -1746,15 +1582,7 @@ Reset_PlayerInfo(playerid)
 }
 
 
-stock ResetMasterAccountVariables(playerid)
-{
-	MasterAccount[playerid][SQLID] = 0;
-	MasterAccount[playerid][Account01] = 0;
-	MasterAccount[playerid][Account02] = 0;
-	MasterAccount[playerid][Account03] = 0;
-	MasterAccount[playerid][Admin] = 0;
-	return 1;
-}
+
 
 stock GetPlayerID(const name[])
 {
@@ -1774,11 +1602,11 @@ stock GetPlayerID(const name[])
 stock NameCheck(playerid)
 {
 	new str[128];
-    new namecheck = strfind(GetDatabaseName(playerid), "_", true);
+    new namecheck = strfind(GetName(playerid), "_", true);
 	if(namecheck >= 1)
 	{
         InfoBoxForPlayer(playerid, "~y~== [SC:RP] == ~n~~w~ Here, on Small County Roleplay, we have a 'Master Account' system. In order to register an account you will need to join with a nickname(without the '_'), not your roleplay name.");
-		format(str, sizeof(str), "%s was kicked by the server for joining with a roleplay name.",GetDatabaseName(playerid));
+		format(str, sizeof(str), "%s was kicked by the server for joining with a roleplay name.",GetName(playerid));
 		SendAdminsMessage(1, COLOR_ORANGERED, str);
 		KickPlayer(playerid);
 	}
@@ -1786,7 +1614,7 @@ stock NameCheck(playerid)
 }
 
 
-stock GetDatabaseName(playerid)
+stock GetName(playerid)
 {
     new name[MAX_PLAYER_NAME];
     GetPlayerName(playerid, name, MAX_PLAYER_NAME);
@@ -1809,7 +1637,7 @@ stock IsAdminInVehicle(playerid)
 	{
 		for (new i = 0; i < MAX_PLAYERS; ++i)
 		{
-			if(MasterAccount[i][Admin] > 0 && GetPlayerVehicleID(playerid) == GetPlayerVehicleID(i))
+			if(Account[i][Admin] > 0 && GetPlayerVehicleID(playerid) == GetPlayerVehicleID(i))
 			{
 				return 0;
 			}
@@ -1840,7 +1668,7 @@ public OnPlayerUpdate(playerid)
 			SetVehicleHealth(VID, 300.0);	
     	}
 
-	    if(MasterAccount[playerid][Admin] == 0)
+	    if(Account[playerid][Admin] == 0)
 	    {
     		if(InRangeOfIcon(playerid, 11) == 0 && IsAdminInVehicle(playerid) == 0 && Trucking[playerid][TruckID] == 0)
 			{
@@ -1886,31 +1714,31 @@ public OnPlayerUpdate(playerid)
 			
 		}
 	}
-	else if(PlayerInfo[playerid][ClothesSelection] == 1)
+	else if(Character[playerid][ClothesSelection] == 1)
 	{
 		new Keys,ud,lr;
     	GetPlayerKeys(playerid,Keys,ud,lr);
     	if(Keys == KEY_SECONDARY_ATTACK)
     	{
     	    new str[128];
-		    PlayerInfo[playerid][ClothesSelection] = 0;
-		    PlayerInfo[playerid][Skin] = GetPlayerSkin(playerid);
+		    Character[playerid][ClothesSelection] = 0;
+		    Character[playerid][Skin] = GetPlayerSkin(playerid);
 
-			MYSQL_Update_Account(playerid, "Skin", PlayerInfo[playerid][Skin]);
+			MYSQL_Update_Character(playerid, "Skin", Character[playerid][Skin]);
 
-			SetPlayerPos(playerid, PlayerInfo[playerid][PosX], PlayerInfo[playerid][PosY], PlayerInfo[playerid][PosZ]);
-			SetPlayerInterior(playerid, PlayerInfo[playerid][Interior]);
-			SetPlayerVirtualWorld(playerid, PlayerInfo[playerid][VWorld]);
+			SetPlayerPos(playerid, Character[playerid][PosX], Character[playerid][PosY], Character[playerid][PosZ]);
+			SetPlayerInterior(playerid, Character[playerid][Interior]);
+			SetPlayerVirtualWorld(playerid, Character[playerid][VWorld]);
 			SetCameraBehindPlayer(playerid);
 	       	TogglePlayerControllable(playerid, 1);
 
-	       	format(str, sizeof(str), "Thank you for shopping at %s.", Business[PlayerInfo[playerid][bEntered]][Name]);
+	       	format(str, sizeof(str), "Thank you for shopping at %s.", Business[Character[playerid][bEntered]][Name]);
 	       	InfoBoxForPlayer(playerid, str);
     	}
         else if(lr == KEY_LEFT)
         {
 		    new str[128];
-		    if(PlayerInfo[playerid][Gender] == 1)
+		    if(Character[playerid][Gender] == 1)
 			{
       			if(SkinSelection[playerid] <= sizeof(MaleSkins) - 1 && SkinSelection[playerid] > 0)
 				{
@@ -1928,7 +1756,7 @@ public OnPlayerUpdate(playerid)
 	  			InfoBoxForPlayer2(playerid, str);
 	  			return 1;
 		    }
-			else if(PlayerInfo[playerid][Gender] == 2)
+			else if(Character[playerid][Gender] == 2)
 			{
 				if(SkinSelection[playerid] <= sizeof(FemaleSkins) - 1 && SkinSelection[playerid] > 0)
 				{
@@ -1947,7 +1775,7 @@ public OnPlayerUpdate(playerid)
         else if(lr == KEY_RIGHT)
 		{
 		    new str[128];
-		    if(PlayerInfo[playerid][Gender] == 1)
+		    if(Character[playerid][Gender] == 1)
 		    {
 				if(SkinSelection[playerid] < sizeof(MaleSkins) - 1)
 				{
@@ -1963,7 +1791,7 @@ public OnPlayerUpdate(playerid)
 	  			InfoBoxForPlayer2(playerid, str);
 	  			return 1;
 		    }
-			else if(PlayerInfo[playerid][Gender] == 2)
+			else if(Character[playerid][Gender] == 2)
 			{
 				if(SkinSelection[playerid] < sizeof(FemaleSkins) - 1)
 				{
@@ -1981,18 +1809,18 @@ public OnPlayerUpdate(playerid)
 		}
 	}
 
-	else if(PlayerInfo[playerid][IsSpec] != -1)
+	else if(Character[playerid][IsSpec] != -1)
 	{
 		new Keys,ud,lr;
     	GetPlayerKeys(playerid,Keys,ud,lr);
         if(lr == KEY_LEFT)
         {
-        	new newplayer = PlayerInfo[playerid][IsSpec] - 1;
+        	new newplayer = Character[playerid][IsSpec] - 1;
 
         	if(IsPlayerConnected(newplayer))
     		{
-	           	PlayerInfo[playerid][IsSpec] -= 1;
-	        	SpectatePlayer(playerid, PlayerInfo[playerid][IsSpec]);
+	           	Character[playerid][IsSpec] -= 1;
+	        	SpectatePlayer(playerid, Character[playerid][IsSpec]);
         	}
         	else
     		{
@@ -2001,12 +1829,12 @@ public OnPlayerUpdate(playerid)
         }
         else if(lr == KEY_RIGHT)
 		{
-        	new newplayer = PlayerInfo[playerid][IsSpec] - 1;
+        	new newplayer = Character[playerid][IsSpec] - 1;
 
         	if(IsPlayerConnected(newplayer))
     		{
-	           	PlayerInfo[playerid][IsSpec] += 1;
-	        	SpectatePlayer(playerid, PlayerInfo[playerid][IsSpec]);
+	           	Character[playerid][IsSpec] += 1;
+	        	SpectatePlayer(playerid, Character[playerid][IsSpec]);
         	}
         	else
     		{
@@ -2023,7 +1851,7 @@ CMD:repair(playerid,params[])
 	{
 		if(GetPlayerVehicleID(playerid) > 0)
 		{
-		    if(PlayerInfo[playerid][Cash] >= 1000)
+		    if(Character[playerid][Cash] >= 1000)
 		    {
 		        GivePlayerMoneyEx(playerid, -1000);
 		        new vid = GetPlayerVehicleID(playerid);
@@ -2046,7 +1874,7 @@ CMD:repair(playerid,params[])
 
 CMD:afix(playerid,params[])
 {
-	if(MasterAccount[playerid][Admin] >= 1)
+	if(Account[playerid][Admin] >= 1)
 	{
 	    new str[128];
 	    if(GetPlayerVehicleID(playerid))
@@ -2070,7 +1898,7 @@ CMD:afix(playerid,params[])
 
 CMD:flip(playerid,params[])
 {
-	if(MasterAccount[playerid][Admin] >= 1)
+	if(Account[playerid][Admin] >= 1)
 	{
 	    new str[128], vID = GetPlayerVehicleID(playerid);
 	    if(GetPlayerVehicleID(playerid))
@@ -2181,7 +2009,7 @@ stock ShowSpeedo(playerid, speed, fuel)
 
 	else
 	{
-	    format(str, sizeof(str), "POSSIBLE HACK DETECTED: %s (Speed Hack) Speed received: %d MPH.", GetDatabaseName(playerid), speed);
+	    format(str, sizeof(str), "POSSIBLE HACK DETECTED: %s (Speed Hack) Speed received: %d MPH.", GetName(playerid), speed);
 	    SendAdminsMessage(1, COLOR_RED, str);
 	}
 	return 1;
@@ -2193,59 +2021,59 @@ stock KickPlayer(playerid)
 	SetTimerEx("FixKick", 200, false, "d", playerid);
 }
 
-stock Save_Account(playerid)
+stock Character_Save(playerid)
 {
 
-	if(PlayerInfo[playerid][LoggedIn] == 1)
+	if(LoggedIn[playerid] == 1)
 	{
 		new query[3000];
 
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET Tutorial = %d, Level = %d, XP = %d, Cash = %d,Skin = %d, PosX = %f,PosY = %f,PosZ = %f,VWorld = %d,Interior = %d, Kicks = %d, Muted = %d,Faction = %d, Rank = %d, Job = %d, Health = 100, Armour = %f, hEntered = %d, bEntered =%d, Bank = %d, LatestIP = '%e', Age = %d, Gender = %d, ExemptIP = %d, TotalTimePlayed = %d, OnlinePeriod = %d, Payday = %d WHERE SQLID = %d LIMIT 1",
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Characters SET Tutorial = %d, Level = %d, XP = %d, Cash = %d,Skin = %d, PosX = %f,PosY = %f,PosZ = %f,VWorld = %d,Interior = %d, Kicks = %d, Muted = %d,Faction = %d, Rank = %d, Job = %d, Health = 100, Armour = %f, hEntered = %d, bEntered =%d, Bank = %d, LatestIP = '%e', Age = %d, Gender = %d, ExemptIP = %d, TotalTimePlayed = %d, OnlinePeriod = %d, Payday = %d WHERE ID = %d LIMIT 1",
 
-			PlayerInfo[playerid][Tutorial],
-			PlayerInfo[playerid][Level],
-			PlayerInfo[playerid][XP],
-			PlayerInfo[playerid][Cash],
-			PlayerInfo[playerid][Skin],
-		    PlayerInfo[playerid][PosX],
-			PlayerInfo[playerid][PosY],
-			PlayerInfo[playerid][PosZ],
+			Character[playerid][Tutorial],
+			Character[playerid][Level],
+			Character[playerid][XP],
+			Character[playerid][Cash],
+			Character[playerid][Skin],
+		    Character[playerid][PosX],
+			Character[playerid][PosY],
+			Character[playerid][PosZ],
 			GetPlayerVirtualWorld(playerid),
 			GetPlayerInterior(playerid),
-			PlayerInfo[playerid][Kicks],
-			PlayerInfo[playerid][Muted],
-		    PlayerInfo[playerid][Faction],
-		    PlayerInfo[playerid][Rank],
-		    PlayerInfo[playerid][Job],
-		    PlayerInfo[playerid][Armour],
-			PlayerInfo[playerid][hEntered],
-			PlayerInfo[playerid][bEntered],
-			PlayerInfo[playerid][Bank],
-			PlayerInfo[playerid][LatestIP],
-			PlayerInfo[playerid][Age],
-			PlayerInfo[playerid][Gender],
-			PlayerInfo[playerid][ExemptIP],
-			PlayerInfo[playerid][TotalTimePlayed],
-			PlayerInfo[playerid][OnlinePeriod],
-			PlayerInfo[playerid][Payday],
-			PlayerInfo[playerid][SQLID]);
+			Character[playerid][Kicks],
+			Character[playerid][Muted],
+		    Character[playerid][Faction],
+		    Character[playerid][Rank],
+		    Character[playerid][Job],
+		    Character[playerid][Armour],
+			Character[playerid][hEntered],
+			Character[playerid][bEntered],
+			Character[playerid][Bank],
+			Character[playerid][LatestIP],
+			Character[playerid][Age],
+			Character[playerid][Gender],
+			Character[playerid][ExemptIP],
+			Character[playerid][TotalTimePlayed],
+			Character[playerid][OnlinePeriod],
+			Character[playerid][Payday],
+			Character[playerid][ID]);
 			
 		mysql_tquery(SQL_CONNECTION, query);
 
 
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET LastOnline = %d, Cuffed = %d, Spawn = %d, Jail = %d, Uniform = %d WHERE SQLID = %d LIMIT 1",
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Characters SET LastOnline = %d, Cuffed = %d, Spawn = %d, Jail = %d, Uniform = %d WHERE ID = %d LIMIT 1",
 
-			PlayerInfo[playerid][LastOnline],
-			PlayerInfo[playerid][Cuffed],
-			PlayerInfo[playerid][Spawn],
-			PlayerInfo[playerid][Jail],
-			PlayerInfo[playerid][Uniform],
-			PlayerInfo[playerid][SQLID]);
+			Character[playerid][LastOnline],
+			Character[playerid][Cuffed],
+			Character[playerid][Spawn],
+			Character[playerid][Jail],
+			Character[playerid][Uniform],
+			Character[playerid][ID]);
 			
 		mysql_tquery(SQL_CONNECTION, query);
 
 
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET PhoneStatus = %d, PhoneNumber = %d, VehicleRadio = %d, Radio = %d, RadioFreq = %d, Screwdriver = %d WHERE SQLID = %d LIMIT 1",
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Characters SET PhoneStatus = %d, PhoneNumber = %d, VehicleRadio = %d, Radio = %d, RadioFreq = %d, Screwdriver = %d WHERE ID = %d LIMIT 1",
 		
 			Inventory[playerid][PhoneStatus],
 			Inventory[playerid][PhoneNumber],
@@ -2253,52 +2081,57 @@ stock Save_Account(playerid)
 			Inventory[playerid][Radio],
 			Inventory[playerid][RadioFreq],
 			Inventory[playerid][Screwdriver],
-			PlayerInfo[playerid][SQLID]);
+			Character[playerid][ID]);
 			
 		mysql_tquery(SQL_CONNECTION, query);
 
 
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET GDL = %d, CDL = %d, MDL = %d, TruckingCompleted = %d, TruckCoolDown = %d, Fare = %d WHERE SQLID = %d LIMIT 1",
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Characters SET GDL = %d, CDL = %d, MDL = %d, TruckingCompleted = %d, TruckCoolDown = %d, Fare = %d WHERE ID = %d LIMIT 1",
 		
 			DMV[playerid][GDL],
 			DMV[playerid][CDL],
 			DMV[playerid][MDL],
 
-			PlayerInfo[playerid][TruckingCompleted],
-			PlayerInfo[playerid][TruckCoolDown],
+			Character[playerid][TruckingCompleted],
+			Character[playerid][TruckCoolDown],
 
 			Taxi[playerid][Fare],
 
-			PlayerInfo[playerid][SQLID]);
+			Character[playerid][ID]);
 			
 		mysql_tquery(SQL_CONNECTION, query);
 
 
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE MasterAccounts SET MA_Admin = %d WHERE SQLID = %d LIMIT 1",
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Accounts SET Admin = %d WHERE SQLID = %d LIMIT 1",
 		
-			MasterAccount[playerid][Admin],
-			MasterAccount[playerid][SQLID]);
+			Account[playerid][Admin],
+			Account[playerid][SQLID]);
 			
 		mysql_tquery(SQL_CONNECTION, query, "", "");
 
-	    new weap[104];
-	    for(new x = 1; x < 13; x++)
-	    {
-	    	new weapna, weapam, str[18];
-	    	GetPlayerWeaponData(playerid, x, weapna, weapam);
-	    	if(weapam == 0) 
-    		{
-    			Weapon[playerid][x] = 0;
-    			WeaponAmmo[playerid][x] = 0;
-			}
-	    	format(str, sizeof(str), "%d,%d,", Weapon[playerid][x], WeaponAmmo[playerid][x]);
-	        strcat(weap, str);
-	    }
-	    MYSQL_Update_String(PlayerInfo[playerid][SQLID], "Accounts", "Weapons", weap);
-
+	    Weapons_Save(playerid);
 
 	}
 	return 1;
+}
+
+Weapons_Save(playerid)
+{
+	new weap[104],query[200];
+    for(new x = 1; x < 13; x++)
+    {
+    	new weapna, weapam, str[18];
+    	GetPlayerWeaponData(playerid, x, weapna, weapam);
+    	if(weapam == 0) 
+		{
+			Weapon[playerid][x] = 0;
+			WeaponAmmo[playerid][x] = 0;
+		}
+    	format(str, sizeof(str), "%d,%d,", Weapon[playerid][x], WeaponAmmo[playerid][x]);
+        strcat(weap, str);
+    }
+    mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Characters SET Weapons = '%e' WHERE ID = %d LIMIT 1", weap, Character[playerid][ID]);	
+	mysql_tquery(SQL_CONNECTION, query);
 }
 
 stock GetWeaponSlot(weaponid)
@@ -2431,7 +2264,7 @@ stock GetWeaponIDFromName(str[])
 
 CMD:resetweapons(playerid, params[])
 {
-    if(MasterAccount[playerid][Admin] >= 3)
+    if(Account[playerid][Admin] >= 3)
     {
         new Player;
     	if(sscanf(params, "u", Player)) return SendClientMessage(playerid, COLOR_GRAY, "/resetweapons [playerid]");
@@ -2447,7 +2280,7 @@ CMD:resetweapons(playerid, params[])
 
 CMD:updateweapons(playerid, params[])
 {
-    if(MasterAccount[playerid][Admin] >= 3)
+    if(Account[playerid][Admin] >= 3)
     {
         new Player;
     	if(sscanf(params, "u", Player)) return SendClientMessage(playerid, COLOR_GRAY, "/resetweapons [playerid]");
@@ -2483,11 +2316,11 @@ stock GivePlayerGun(player, WeaponID, Ammo)
 CMD:giveweapon(playerid, params[])
 {
     new WeaponName[50], gWeaponAmmo, Player, WeaponID, str[128];
-    if(MasterAccount[playerid][Admin] >= 2)
+    if(Account[playerid][Admin] >= 2)
     {
         if(sscanf(params, "us[50]d", Player, WeaponName, gWeaponAmmo)) return SendClientMessage(playerid, COLOR_GRAY, "/giveweapon [playerid] [Name] [Ammo]");
 		WeaponID = GetWeaponIDFromName(WeaponName);
-		if(MasterAccount[playerid][Admin] != 6 && !Restricted_Weapon(WeaponID)) return SendErrorMessage(playerid, ERROR_OPTION);
+		if(Account[playerid][Admin] != 6 && !Restricted_Weapon(WeaponID)) return SendErrorMessage(playerid, ERROR_OPTION);
 		if(gWeaponAmmo > 1000) return SendErrorMessage(playerid, ERROR_VALUE);
 	    
 		GivePlayerGun(Player, WeaponID, gWeaponAmmo);
@@ -2503,42 +2336,42 @@ CMD:giveweapon(playerid, params[])
     return 1;
 }
 
-forward Load_Account(playerid);
-public Load_Account(playerid)
+forward Character_Load(playerid);
+public Character_Load(playerid)
 {
 
-	PlayerInfo[playerid][SQLID] = cache_get_field_content_int(0, "SQLID", SQL_CONNECTION);
-	cache_get_field_content(0, "Username", PlayerInfo[playerid][Username], SQL_CONNECTION, 32);
-    PlayerInfo[playerid][Tutorial] = cache_get_field_content_int(0, "Tutorial", SQL_CONNECTION);
-    PlayerInfo[playerid][Level] = cache_get_field_content_int(0, "Level", SQL_CONNECTION);
-    PlayerInfo[playerid][XP] = cache_get_field_content_int(0, "XP", SQL_CONNECTION);
-    PlayerInfo[playerid][Cash] = cache_get_field_content_int(0, "Cash", SQL_CONNECTION);
-    PlayerInfo[playerid][Skin] = cache_get_field_content_int(0, "Skin", SQL_CONNECTION);
-    PlayerInfo[playerid][PosX] = cache_get_field_content_float(0, "PosX", SQL_CONNECTION);
-    PlayerInfo[playerid][PosY] = cache_get_field_content_float(0, "PosY", SQL_CONNECTION);
-    PlayerInfo[playerid][PosZ] = cache_get_field_content_float(0, "PosZ", SQL_CONNECTION);
-    PlayerInfo[playerid][Interior] = cache_get_field_content_int(0, "Interior", SQL_CONNECTION);
-    PlayerInfo[playerid][VWorld] = cache_get_field_content_int(0, "VWorld", SQL_CONNECTION);
-    PlayerInfo[playerid][Age] = cache_get_field_content_int(0, "Age", SQL_CONNECTION);
-    PlayerInfo[playerid][Gender] = cache_get_field_content_int(0, "Gender", SQL_CONNECTION);
-    PlayerInfo[playerid][Kicks] = cache_get_field_content_int(0, "Kicks", SQL_CONNECTION);
-    PlayerInfo[playerid][Muted] = cache_get_field_content_int(0, "Muted", SQL_CONNECTION);
-    PlayerInfo[playerid][Faction] = cache_get_field_content_int(0, "Faction", SQL_CONNECTION);
-    PlayerInfo[playerid][Rank] = cache_get_field_content_int(0, "Rank", SQL_CONNECTION);
-    PlayerInfo[playerid][Job] = cache_get_field_content_int(0, "Job", SQL_CONNECTION);
-    PlayerInfo[playerid][Health] = cache_get_field_content_float(0, "Health", SQL_CONNECTION);
-    PlayerInfo[playerid][Armour] = cache_get_field_content_float(0, "Armour", SQL_CONNECTION);
-    PlayerInfo[playerid][hEntered] = cache_get_field_content_int(0, "hEntered", SQL_CONNECTION);
-    PlayerInfo[playerid][bEntered] = cache_get_field_content_int(0, "bEntered", SQL_CONNECTION);
-    PlayerInfo[playerid][Bank] = cache_get_field_content_int(0, "Bank", SQL_CONNECTION);
-	PlayerInfo[playerid][ExemptIP] = cache_get_field_content_int(0, "ExemptIP", SQL_CONNECTION);
-	PlayerInfo[playerid][TotalTimePlayed] = cache_get_field_content_int(0, "TotalTimePlayed", SQL_CONNECTION);
-	PlayerInfo[playerid][OnlinePeriod] = cache_get_field_content_int(0, "OnlinePeriod", SQL_CONNECTION);
-	PlayerInfo[playerid][Payday] = cache_get_field_content_int(0, "Payday", SQL_CONNECTION);
-	PlayerInfo[playerid][Cuffed] = cache_get_field_content_int(0, "Cuffed", SQL_CONNECTION);
-	PlayerInfo[playerid][Spawn] = cache_get_field_content_int(0, "Spawn", SQL_CONNECTION);
-	PlayerInfo[playerid][Jail] = cache_get_field_content_int(0, "Jail", SQL_CONNECTION);
-	PlayerInfo[playerid][Uniform] = cache_get_field_content_int(0, "Uniform", SQL_CONNECTION);
+	Character[playerid][ID] = cache_get_field_content_int(0, "ID", SQL_CONNECTION);
+	cache_get_field_content(0, "Name", Character[playerid][Username], SQL_CONNECTION, 32);
+    Character[playerid][Tutorial] = cache_get_field_content_int(0, "Tutorial", SQL_CONNECTION);
+    Character[playerid][Level] = cache_get_field_content_int(0, "Level", SQL_CONNECTION);
+    Character[playerid][XP] = cache_get_field_content_int(0, "XP", SQL_CONNECTION);
+    Character[playerid][Cash] = cache_get_field_content_int(0, "Cash", SQL_CONNECTION);
+    Character[playerid][Skin] = cache_get_field_content_int(0, "Skin", SQL_CONNECTION);
+    Character[playerid][PosX] = cache_get_field_content_float(0, "PosX", SQL_CONNECTION);
+    Character[playerid][PosY] = cache_get_field_content_float(0, "PosY", SQL_CONNECTION);
+    Character[playerid][PosZ] = cache_get_field_content_float(0, "PosZ", SQL_CONNECTION);
+    Character[playerid][Interior] = cache_get_field_content_int(0, "Interior", SQL_CONNECTION);
+    Character[playerid][VWorld] = cache_get_field_content_int(0, "VWorld", SQL_CONNECTION);
+    Character[playerid][Age] = cache_get_field_content_int(0, "Age", SQL_CONNECTION);
+    Character[playerid][Gender] = cache_get_field_content_int(0, "Gender", SQL_CONNECTION);
+    Character[playerid][Kicks] = cache_get_field_content_int(0, "Kicks", SQL_CONNECTION);
+    Character[playerid][Muted] = cache_get_field_content_int(0, "Muted", SQL_CONNECTION);
+    Character[playerid][Faction] = cache_get_field_content_int(0, "Faction", SQL_CONNECTION);
+    Character[playerid][Rank] = cache_get_field_content_int(0, "Rank", SQL_CONNECTION);
+    Character[playerid][Job] = cache_get_field_content_int(0, "Job", SQL_CONNECTION);
+    Character[playerid][Health] = cache_get_field_content_float(0, "Health", SQL_CONNECTION);
+    Character[playerid][Armour] = cache_get_field_content_float(0, "Armour", SQL_CONNECTION);
+    Character[playerid][hEntered] = cache_get_field_content_int(0, "hEntered", SQL_CONNECTION);
+    Character[playerid][bEntered] = cache_get_field_content_int(0, "bEntered", SQL_CONNECTION);
+    Character[playerid][Bank] = cache_get_field_content_int(0, "Bank", SQL_CONNECTION);
+	Character[playerid][ExemptIP] = cache_get_field_content_int(0, "ExemptIP", SQL_CONNECTION);
+	Character[playerid][TotalTimePlayed] = cache_get_field_content_int(0, "TotalTimePlayed", SQL_CONNECTION);
+	Character[playerid][OnlinePeriod] = cache_get_field_content_int(0, "OnlinePeriod", SQL_CONNECTION);
+	Character[playerid][Payday] = cache_get_field_content_int(0, "Payday", SQL_CONNECTION);
+	Character[playerid][Cuffed] = cache_get_field_content_int(0, "Cuffed", SQL_CONNECTION);
+	Character[playerid][Spawn] = cache_get_field_content_int(0, "Spawn", SQL_CONNECTION);
+	Character[playerid][Jail] = cache_get_field_content_int(0, "Jail", SQL_CONNECTION);
+	Character[playerid][Uniform] = cache_get_field_content_int(0, "Uniform", SQL_CONNECTION);
 	
 	Inventory[playerid][PhoneStatus] = cache_get_field_content_int(0, "PhoneStatus", SQL_CONNECTION);
 	Inventory[playerid][PhoneNumber] = cache_get_field_content_int(0, "PhoneNumber", SQL_CONNECTION);
@@ -2547,8 +2380,8 @@ public Load_Account(playerid)
 	Inventory[playerid][RadioFreq] = cache_get_field_content_int(0, "RadioFreq", SQL_CONNECTION);
 	Inventory[playerid][Screwdriver] = cache_get_field_content_int(0, "Screwdriver", SQL_CONNECTION);
 
-	PlayerInfo[playerid][TruckingCompleted] = cache_get_field_content_int(0, "TruckingCompleted", SQL_CONNECTION);
-	PlayerInfo[playerid][TruckCoolDown] = cache_get_field_content_int(0, "TruckCoolDown", SQL_CONNECTION);
+	Character[playerid][TruckingCompleted] = cache_get_field_content_int(0, "TruckingCompleted", SQL_CONNECTION);
+	Character[playerid][TruckCoolDown] = cache_get_field_content_int(0, "TruckCoolDown", SQL_CONNECTION);
 
 	DMV[playerid][GDL] = cache_get_field_content_int(0, "GDL", SQL_CONNECTION);
 	DMV[playerid][CDL] = cache_get_field_content_int(0, "CDL", SQL_CONNECTION);
@@ -2556,19 +2389,21 @@ public Load_Account(playerid)
 
 	Taxi[playerid][Fare] = cache_get_field_content_int(0, "Fare", SQL_CONNECTION);
 
+	Character[playerid][LastOnline] = gettime();
 
-	cache_get_field_content(0, "Weapons", PlayerInfo[playerid][Weapons], SQL_CONNECTION, 104);
+
+	cache_get_field_content(0, "Weapons", Character[playerid][Weapons], SQL_CONNECTION, 104);
 
 	new pos = 0;
 	for (new x = 1; x < 13; ++x)
 	{
         new temp[4];
-        strmid(temp, PlayerInfo[playerid][Weapons], pos, strfind(PlayerInfo[playerid][Weapons], ",", true, pos));
+        strmid(temp, Character[playerid][Weapons], pos, strfind(Character[playerid][Weapons], ",", true, pos));
 
 		Weapon[playerid][x] = strval(temp); 
 		pos += strlen(temp) + 1;
 
-		strmid(temp, PlayerInfo[playerid][Weapons], pos, strfind(PlayerInfo[playerid][Weapons], ",", true, pos));
+		strmid(temp, Character[playerid][Weapons], pos, strfind(Character[playerid][Weapons], ",", true, pos));
 
 		WeaponAmmo[playerid][x] = strval(temp); 
         pos += strlen(temp) + 1;
@@ -2579,20 +2414,20 @@ public Load_Account(playerid)
 
 	for(new b = 1; b < MAX_BIZ; b++)
 	{
-	    if(Business[b][Owner] == PlayerInfo[playerid][SQLID])
+	    if(Business[b][Owner] == Character[playerid][ID])
 	    {
-	        PlayerInfo[playerid][Business_1] = b;
+	        Character[playerid][Business_1] = b;
 	        break;
 	    }
 	}
 
-	if(PlayerInfo[playerid][Business_1] > 0)
+	if(Character[playerid][Business_1] > 0)
 	{
 		for(new b = 1; b < MAX_BIZ; b++)
 		{
-		    if(Business[b][Owner] == PlayerInfo[playerid][SQLID] && b != PlayerInfo[playerid][Business_1])
+		    if(Business[b][Owner] == Character[playerid][ID] && b != Character[playerid][Business_1])
 		    {
-		        PlayerInfo[playerid][Business_2] = b;
+		        Character[playerid][Business_2] = b;
 		        break;
 		    }
 		}
@@ -2600,42 +2435,27 @@ public Load_Account(playerid)
 
 	for(new h; h < MAX_HOUSES; h++)
 	{
-	    if(Houses[h][Owner] == PlayerInfo[playerid][SQLID])
+	    if(Houses[h][Owner] == Character[playerid][ID])
 	    {
-	        PlayerInfo[playerid][House] = h;
+	        Character[playerid][House] = h;
 	        break;
 	    }
 	}
 
-    GetPlayerIp(playerid, PlayerInfo[playerid][LatestIP], 16);
-    SetPlayerName(playerid, PlayerInfo[playerid][Username]);
+    GetPlayerIp(playerid, Character[playerid][LatestIP], 16);
+    SetPlayerName(playerid, Character[playerid][Username]);
 	PlayerSpawnIn(playerid);
     return 1;
 }
 
-forward CheckBans(playerid);
-public CheckBans(playerid)
-{
-    if(cache_num_rows())
-    {
-        SendClientMessage(playerid, COLOR_WHITE, "You are banned from the server.");
-	    KickPlayer(playerid);
-	}
-	else
-	{
-	    new str[256];
-		format(str, sizeof(str), "{FFFFFF}Hello, %s!\n\nWelcome back to {D69929}Small County RP{FFFFFF}.\nPlease login with your existing password below.", GetDatabaseName(playerid));
-		Dialog_Show(playerid, LOGIN, DIALOG_STYLE_PASSWORD, "Login", str, "Login", "Leave");
-	}
-	return 1;
-}
+
 
 IssueBan(playerid, adminname[], reason[])
 {
 	new query[256], ip[18];
 	GetPlayerIp(playerid, ip, 18);
 	
-    mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO Bans (PlayerName, IP, SQLID, MasterAccount, Timestamp, BannedBy, Reason) VALUES('%s', '%s', %d, %d, %d, '%s', '%e')", GetDatabaseName(playerid), ip, PlayerInfo[playerid][SQLID], MasterAccount[playerid][SQLID], gettime(), adminname, reason);
+    mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO Bans (PlayerName, IP, C_ID, A_ID, Timestamp, BannedBy, Reason) VALUES('%s', '%s', %d, %d, %d, '%s', '%e')", GetName(playerid), ip, Character[playerid][ID], Account[playerid][SQLID], gettime(), adminname, reason);
 	mysql_tquery(SQL_CONNECTION, query);
 	KickPlayer(playerid);
 	return 1;
@@ -2646,13 +2466,13 @@ forward PlayerSpawnIn(playerid);
 public PlayerSpawnIn(playerid)
 {
 	new query[300], str[128];
-	if(PlayerInfo[playerid][Tutorial] <= 1)
+	if(Character[playerid][Tutorial] <= 1)
     {
 
         Quiz(playerid, 1);
         return 1;
 	}
-	else if(PlayerInfo[playerid][Tutorial] >= 2 && PlayerInfo[playerid][Tutorial] < 5)
+	else if(Character[playerid][Tutorial] >= 2 && Character[playerid][Tutorial] < 5)
     {
 	    Register(playerid);
 		InfoBoxForPlayer(playerid, "It appears as if you didn't finish the registration process, you will now continue it.");
@@ -2660,17 +2480,17 @@ public PlayerSpawnIn(playerid)
 	}
 	TogglePlayerSpectating(playerid, 0);
 
-	PlayerInfo[playerid][LoggedIn] = 1;
-	PlayerInfo[playerid][LastOnline] = gettime();
+	LoggedIn[playerid] = 1;
+	Character[playerid][LastOnline] = gettime();
 
 	TextDrawShowForPlayer(playerid, Clock);
-	SetSpawnInfo(playerid, NO_TEAM, PlayerInfo[playerid][Skin], PlayerInfo[playerid][PosX], PlayerInfo[playerid][PosY], PlayerInfo[playerid][PosZ], 0.0, 0, 0, 0, 0, 0, 0);
+	SetSpawnInfo(playerid, NO_TEAM, Character[playerid][Skin], Character[playerid][PosX], Character[playerid][PosY], Character[playerid][PosZ], 0.0, 0, 0, 0, 0, 0, 0);
 	SpawnPlayer(playerid);
 	
-	SetPlayerHealth(playerid, PlayerInfo[playerid][Health]);
-	SetPlayerArmour(playerid, PlayerInfo[playerid][Armour]);
-	SetPlayerSkin(playerid, PlayerInfo[playerid][Skin]);
-	SetPlayerScore(playerid, PlayerInfo[playerid][Level]);
+	SetPlayerHealth(playerid, Character[playerid][Health]);
+	SetPlayerArmour(playerid, Character[playerid][Armour]);
+	SetPlayerSkin(playerid, Character[playerid][Skin]);
+	SetPlayerScore(playerid, Character[playerid][Level]);
 	SetPlayerTime(playerid, ClockHours, ClockMinutes);
 
 
@@ -2684,78 +2504,78 @@ public PlayerSpawnIn(playerid)
 
 	PickedUpPickup[playerid] = false;
 
-	SetPlayerPosEx(playerid, PlayerInfo[playerid][PosX], PlayerInfo[playerid][PosY], PlayerInfo[playerid][PosZ], PlayerInfo[playerid][Interior], PlayerInfo[playerid][VWorld]);
-	SetPlayerMoneyEx(playerid, PlayerInfo[playerid][Cash]);
+	SetPlayerPosEx(playerid, Character[playerid][PosX], Character[playerid][PosY], Character[playerid][PosZ], Character[playerid][Interior], Character[playerid][VWorld]);
+	SetPlayerMoneyEx(playerid, Character[playerid][Cash]);
 	
 
-    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT * FROM `PlayerVehicles` WHERE Owner = %d LIMIT 3", PlayerInfo[playerid][SQLID]);
-	mysql_tquery(SQL_CONNECTION, query,"Load_Account_Vehicles", "i", playerid);
+    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT * FROM `PlayerVehicles` WHERE Owner = %d LIMIT 3", Character[playerid][ID]);
+	mysql_tquery(SQL_CONNECTION, query,"Character_Vehicles_Load", "i", playerid);
 	UpdatePlayerWeapons(playerid);
 
 	format(str, sizeof(str), "[Loaded Character]: %s", GetRoleplayName(playerid));
 	SendClientMessage(playerid, COLOR_PALEGOLDENROD, str);
 
-	if(PlayerInfo[playerid][Jail] > 0)
+	if(Character[playerid][Jail] > 0)
 	{
-		format(str, sizeof(str), "[INFO] You are still in jail, you have a further %d minute(s) to serve.", PlayerInfo[playerid][Jail]);
+		format(str, sizeof(str), "[INFO] You are still in jail, you have a further %d minute(s) to serve.", Character[playerid][Jail]);
 		SendClientMessage(playerid, COLOR_INDIANRED, str);
 		return SendToJail(playerid);
 	}
 
 
-	if(PlayerInfo[playerid][Spawn] == 0) SetPlayerPosEx(playerid, NoobSpawns[0][0], NoobSpawns[0][1], NoobSpawns[0][2], 0, 0);
+	if(Character[playerid][Spawn] == 0) SetPlayerPosEx(playerid, NoobSpawns[0][0], NoobSpawns[0][1], NoobSpawns[0][2], 0, 0);
 
-	else if(PlayerInfo[playerid][Spawn] == 1) SetPlayerPosEx(playerid, PlayerInfo[playerid][PosX], PlayerInfo[playerid][PosY], PlayerInfo[playerid][PosZ], PlayerInfo[playerid][Interior], PlayerInfo[playerid][VWorld]);
+	else if(Character[playerid][Spawn] == 1) SetPlayerPosEx(playerid, Character[playerid][PosX], Character[playerid][PosY], Character[playerid][PosZ], Character[playerid][Interior], Character[playerid][VWorld]);
 
-	else if(PlayerInfo[playerid][Spawn] == 2)
+	else if(Character[playerid][Spawn] == 2)
 	{
-		if(PlayerInfo[playerid][House] > 0) SetPlayerPosEx(playerid, Houses[PlayerInfo[playerid][House]][PosX], Houses[PlayerInfo[playerid][House]][PosY], Houses[PlayerInfo[playerid][House]][PosZ], 0, 0);
+		if(Character[playerid][House] > 0) SetPlayerPosEx(playerid, Houses[Character[playerid][House]][PosX], Houses[Character[playerid][House]][PosY], Houses[Character[playerid][House]][PosZ], 0, 0);
 		else
 		{
 			SendErrorMessage(playerid, "Couldn't spawn at house.");
-			SetPlayerPosEx(playerid, PlayerInfo[playerid][PosX], PlayerInfo[playerid][PosY], PlayerInfo[playerid][PosZ], PlayerInfo[playerid][Interior], PlayerInfo[playerid][VWorld]);	
+			SetPlayerPosEx(playerid, Character[playerid][PosX], Character[playerid][PosY], Character[playerid][PosZ], Character[playerid][Interior], Character[playerid][VWorld]);	
 		}
 	}
 
-	else if(PlayerInfo[playerid][Spawn] == 3)
+	else if(Character[playerid][Spawn] == 3)
 	{
-		if(PlayerInfo[playerid][Business_1] > 0) SetPlayerPosEx(playerid, Business[PlayerInfo[playerid][Business_1]][PosX], Business[PlayerInfo[playerid][Business_1]][PosY], Business[PlayerInfo[playerid][Business_1]][PosZ], 0 ,0);
+		if(Character[playerid][Business_1] > 0) SetPlayerPosEx(playerid, Business[Character[playerid][Business_1]][PosX], Business[Character[playerid][Business_1]][PosY], Business[Character[playerid][Business_1]][PosZ], 0 ,0);
 		else
 		{
 			SendErrorMessage(playerid, "Couldn't spawn at business.");
-			SetPlayerPosEx(playerid, PlayerInfo[playerid][PosX], PlayerInfo[playerid][PosY], PlayerInfo[playerid][PosZ], PlayerInfo[playerid][Interior], PlayerInfo[playerid][VWorld]);
+			SetPlayerPosEx(playerid, Character[playerid][PosX], Character[playerid][PosY], Character[playerid][PosZ], Character[playerid][Interior], Character[playerid][VWorld]);
 		}
 	}
 
-	else if(PlayerInfo[playerid][Spawn] == 4)
+	else if(Character[playerid][Spawn] == 4)
 	{
-		if(PlayerInfo[playerid][Business_2] > 0) SetPlayerPosEx(playerid, Business[PlayerInfo[playerid][Business_2]][PosX], Business[PlayerInfo[playerid][Business_2]][PosY], Business[PlayerInfo[playerid][Business_2]][PosZ], 0 ,0);
+		if(Character[playerid][Business_2] > 0) SetPlayerPosEx(playerid, Business[Character[playerid][Business_2]][PosX], Business[Character[playerid][Business_2]][PosY], Business[Character[playerid][Business_2]][PosZ], 0 ,0);
 		else
 		{
 			SendErrorMessage(playerid, "Couldn't spawn at business.");
-			SetPlayerPosEx(playerid, PlayerInfo[playerid][PosX], PlayerInfo[playerid][PosY], PlayerInfo[playerid][PosZ], PlayerInfo[playerid][Interior], PlayerInfo[playerid][VWorld]);
+			SetPlayerPosEx(playerid, Character[playerid][PosX], Character[playerid][PosY], Character[playerid][PosZ], Character[playerid][Interior], Character[playerid][VWorld]);
 		}
 	}
 
-	else if(PlayerInfo[playerid][Spawn] == 5)
+	else if(Character[playerid][Spawn] == 5)
 	{
 		
-		if(PlayerInfo[playerid][Faction] != 0)
+		if(Character[playerid][Faction] != 0)
 		{
-			new fid = GetFactionIDFromSQLID(PlayerInfo[playerid][Faction]);
+			new fid = GetFactionIDFromSQLID(Character[playerid][Faction]);
 			SetPlayerPosEx(playerid, Factions[fid][PosX], Factions[fid][PosY], Factions[fid][PosZ], 0, 0);
 		}
 		else
 		{
 			SendErrorMessage(playerid, "Couldn't spawn at faction spawn.");
-			SetPlayerPosEx(playerid, PlayerInfo[playerid][PosX], PlayerInfo[playerid][PosY], PlayerInfo[playerid][PosZ], PlayerInfo[playerid][Interior], PlayerInfo[playerid][VWorld]);
+			SetPlayerPosEx(playerid, Character[playerid][PosX], Character[playerid][PosY], Character[playerid][PosZ], Character[playerid][Interior], Character[playerid][VWorld]);
 		}
 	}
 
-	else SetPlayerPosEx(playerid, PlayerInfo[playerid][PosX], PlayerInfo[playerid][PosY], PlayerInfo[playerid][PosZ], PlayerInfo[playerid][Interior], PlayerInfo[playerid][VWorld]); 
+	else SetPlayerPosEx(playerid, Character[playerid][PosX], Character[playerid][PosY], Character[playerid][PosZ], Character[playerid][Interior], Character[playerid][VWorld]); 
 
 
-	if(PlayerInfo[playerid][Cuffed] == 1) 
+	if(Character[playerid][Cuffed] == 1) 
 	{
 		SetPlayerSpecialAction(playerid,SPECIAL_ACTION_CUFFED);
 	}
@@ -2769,22 +2589,22 @@ CMD:changespawn(playerid, params[])
 	new str[128], dialog[600];
  	format(str, sizeof(str), "(0) Noob Spawn\n(1) Last Position\n");
     strcat(dialog, str, sizeof(dialog));
-	if(PlayerInfo[playerid][House])
+	if(Character[playerid][House])
 	{
-	 	format(str, sizeof(str), "(2) %s\n", Houses[PlayerInfo[playerid][House]][Name]);
+	 	format(str, sizeof(str), "(2) %s\n", Houses[Character[playerid][House]][Name]);
 	    strcat(dialog, str, sizeof(dialog));
 	}
-	if(PlayerInfo[playerid][Business_1])
+	if(Character[playerid][Business_1])
 	{
-	 	format(str, sizeof(str), "(3) %s\n", Business[PlayerInfo[playerid][Business_1]][Name]);
+	 	format(str, sizeof(str), "(3) %s\n", Business[Character[playerid][Business_1]][Name]);
 	    strcat(dialog, str, sizeof(dialog));
 	}
-	if(PlayerInfo[playerid][Business_2])
+	if(Character[playerid][Business_2])
 	{
-	 	format(str, sizeof(str), "(4) %s\n", Business[PlayerInfo[playerid][Business_2]][Name]);
+	 	format(str, sizeof(str), "(4) %s\n", Business[Character[playerid][Business_2]][Name]);
 	    strcat(dialog, str, sizeof(dialog));
 	}
-	if(PlayerInfo[playerid][Faction])
+	if(Character[playerid][Faction])
 	{
 		format(str, sizeof(str), "(5) Faction Spawn");
     	strcat(dialog, str, sizeof(dialog));
@@ -2800,9 +2620,9 @@ Dialog:ChangeSpawn(playerid, response, listitem, inputtext[])
 	new spawnid[6], finalid;
     strmid(spawnid, inputtext, strfind(inputtext, "(") + 1,  strfind(inputtext, ")"));
     finalid = strval(spawnid);
-	MYSQL_Update_Account(playerid, "Spawn", finalid);
+	MYSQL_Update_Character(playerid, "Spawn", finalid);
 
-	PlayerInfo[playerid][Spawn] = finalid;
+	Character[playerid][Spawn] = finalid;
 	SendClientMessage(playerid, COLOR_GREEN, "Spawn updated.");
     return 1;
 }
@@ -2832,21 +2652,21 @@ stock Register(playerid)
 {
     
 	TogglePlayerSpectating(playerid, 0);
-	SetSpawnInfo(playerid, NO_TEAM, PlayerInfo[playerid][Skin], 258.4893,-41.4008,1002.0234, 0, 0, 0, 0, 0, 0, 0);
+	SetSpawnInfo(playerid, NO_TEAM, Character[playerid][Skin], 258.4893,-41.4008,1002.0234, 0, 0, 0, 0, 0, 0, 0);
 	SpawnPlayer(playerid);
 	
-    PlayerInfo[playerid][Bank] = 5000;
- 	PlayerInfo[playerid][Level] = 1;
-	PlayerInfo[playerid][PosX] = -204.5245;
-	PlayerInfo[playerid][PosY] = 1119.2860;
-	PlayerInfo[playerid][PosZ] = 19.7422;
-	PlayerInfo[playerid][Skin] = 1;
-	PlayerInfo[playerid][Age] = 18;
-	PlayerInfo[playerid][LoggedIn] = 1;
-	PlayerInfo[playerid][ClothesSelection] = 1;
+    Character[playerid][Bank] = 5000;
+ 	Character[playerid][Level] = 1;
+	Character[playerid][PosX] = -204.5245;
+	Character[playerid][PosY] = 1119.2860;
+	Character[playerid][PosZ] = 19.7422;
+	Character[playerid][Skin] = 1;
+	Character[playerid][Age] = 18;
+	LoggedIn[playerid] = 1;
+	Character[playerid][ClothesSelection] = 1;
 	
 	SetSelectionPos(playerid);
-	SetPlayerSkinEx(playerid, PlayerInfo[playerid][Skin]);
+	SetPlayerSkinEx(playerid, Character[playerid][Skin]);
     SetPlayerMoneyEx(playerid, 1000);
 
 	
@@ -2887,7 +2707,7 @@ new QuizQuestions[][][] = {
 	{"3", "[QUIZ] Which of the following adheres to the correct use of an expression of quantity?", " (A) 1 Grands \n (B) 1 Millions \n (C) 1 Million \n (D) 5 Millions."},
 	{"2", "[QUIZ] How can the term 'METAGAMING' be defined?", " (A) Messing around OOCly. \n (B) Using information obtained OOC'ly in an IC situation.\n (C) Using information obtained IC'ly in an OOC situation.\n (D) Forcing certain actions upon a player."},
 	{"4", "[QUIZ] How can the term 'POWERGAMING' be defined?", " (A) The act of acquiring a position of power within the server. \n (B) Using the OOC chat IC'ly. \n (C) Acting in a realistic manner that can be appreciated by all. \n (D) None of the above."},
-	{"1", "[QUIZ] How can the term 'Money Farming' be defined?", " (A) Creating accounts for the sole purpose of gaining money. \n (B) Adopting a farm IC'ly, and selling goods produced by this farm with the intention to make profit. \n (C) Taking on the role of a homeless individual and begging others for money with adequate role-play. \n (D) Approaching other community members and offering to pay IRL cash in return for IG cash."},
+	{"1", "[QUIZ] How can the term 'Money Farming' be defined?", " (A) Creating Characters for the sole purpose of gaining money. \n (B) Adopting a farm IC'ly, and selling goods produced by this farm with the intention to make profit. \n (C) Taking on the role of a homeless individual and begging others for money with adequate role-play. \n (D) Approaching other community members and offering to pay IRL cash in return for IG cash."},
 	{"3", "[QUIZ] What is the correct definition of the abbreviation 'IC'?", " (A) In Chapter - A specific chapter in your character's life. \n (B) In Church - The act of role-playing within a church. \n (C) In Character - Taking the role of your character and acting realistically and appropriately whilst doing so. \n (D) Idiotic Characters - The concept of role-playing characters of the idiotic nature."},
 	{"3", "[QUIZ] Select the proper form of a /me.", " (A) /me there is a bottle by my feet. \n (B) /me you would hear the vehicle screeching to a halt. \n (C) /me rotates his head as he catches a glimpse of the suited man."},
 	{"2", "[QUIZ] Select the proper form of a /do.", " (A) /do paces himself to his intended destination, panting heavily upon arrival. \n (B) /do Large quantities of blood would be seen cascading down from my receding hairline. \n (C) /do Places his dominant hand on the his waist, as he swiftly lifts his shirt and withdraws the pistol from his waistline. \n (D) /do What do you think you're doing?"},
@@ -2902,7 +2722,7 @@ new QuizQuestions[][][] = {
 stock DBNameCheck(playerid, string[])
 {
 	new query[400];
-	mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT * FROM Accounts WHERE Username = '%e' LIMIT 1", string);
+	mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT * FROM Characters WHERE Name = '%e' LIMIT 1", string);
 	mysql_tquery(SQL_CONNECTION, query, "FreeNameCheck", "i", playerid);
 	return 1;
 }
@@ -2912,17 +2732,17 @@ public FreeNameCheck(playerid)
  	if(cache_num_rows())
     {
    		 SendErrorMessage(playerid, "Name taken.");
-   		 format(PlayerInfo[playerid][Username], 32, "");
-		 Dialog_Show(playerid, CREATECHARCTER, DIALOG_STYLE_INPUT, "Character Creation", "Please enter your new character's (roleplay)name, it must include the underscore('_'):", "Create","Cancel");
+   		 format(Character[playerid][Username], 32, "");
+		 Dialog_Show(playerid, CREATECHARACTER, DIALOG_STYLE_INPUT, "Character Creation", "Please enter your new character's (roleplay)name, it must include the underscore('_'):", "Create","Cancel");
 
     }
     else
     {
-        	SetPlayerName(playerid, PlayerInfo[playerid][Username]);
+        	SetPlayerName(playerid, Character[playerid][Username]);
 	        new query[400];
-   			GetPlayerIp(playerid, PlayerInfo[playerid][RegisterIP], 16);
-	    	mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO Accounts (Username, RegisterIP, RegisterDate) VALUES('%e','%e', %d)", PlayerInfo[playerid][Username], PlayerInfo[playerid][RegisterIP], gettime());
-			mysql_tquery(SQL_CONNECTION, query, "GetPlayerSQLID", "i", playerid);
+   			GetPlayerIp(playerid, Character[playerid][RegisterIP], 16);
+	    	mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO Characters (A_ID, Name, RegisterIP, RegisterDate) VALUES(%d, '%e','%e', %d)", Account[playerid][SQLID], Character[playerid][Username], Character[playerid][RegisterIP], gettime());
+			mysql_tquery(SQL_CONNECTION, query, "GetCharacterID", "i", playerid);
 			Register(playerid);
     }
 	return 1;
@@ -2974,6 +2794,7 @@ stock NameValidator(pname[])
     else if(strfind(pname,")",true) != (-1)) return 0;
     else if(strfind(pname,"=",true) != (-1)) return 0;
     else if(strfind(pname,"@",true) != (-1)) return 0;
+    else if(strfind(pname,"0",true) != (-1)) return 0;
     else if(strfind(pname,"1",true) != (-1)) return 0;
     else if(strfind(pname,"2",true) != (-1)) return 0;
     else if(strfind(pname,"3",true) != (-1)) return 0;
@@ -2997,40 +2818,44 @@ stock NameValidator(pname[])
 
 }
 
-Dialog:CREATECHARCTER(playerid, response, listitem, inputtext[])
+Dialog:CREATECHARACTER(playerid, response, listitem, inputtext[])
 {
-	if(!response) return SendErrorMessage(playerid, "");
-    if(response)
+	if(!response) 
+	{
+		KickPlayer(playerid);
+		return 0;
+	}
+
+    else if(response)
     {
         if(NameValidator(inputtext))
 		{
-			
-			format(PlayerInfo[playerid][Username], 32, "%s", inputtext);
+			format(Character[playerid][Username], 32, "%s", inputtext);
 			DBNameCheck(playerid, inputtext);
-
 		}
 		else
 		{
 		    SendErrorMessage(playerid, "Invalid name.");
-		    Dialog_Show(playerid, CREATECHARCTER, DIALOG_STYLE_INPUT, "Character Creation", "Please enter your new character's (roleplay)name, it must include the underscore('_'):", "Create","Cancel");
+		    Dialog_Show(playerid, CREATECHARACTER, DIALOG_STYLE_INPUT, "Character Creation", "Please enter your new character's (roleplay)name, it must include the underscore('_'):", "Create","Cancel");
 		}
 	}
     return 1;
 }
 
+
 Dialog:QUIZ2(playerid, response, listitem, inputtext[])
 {
 	if(listitem + 1 == strval(QAnswer[playerid]))
 	{
-		if(PlayerInfo[playerid][QuizProgress] < 5)
+		if(Character[playerid][QuizProgress] < 5)
 		{
-			PlayerInfo[playerid][QuizProgress]++;
+			Character[playerid][QuizProgress]++;
 			Quiz_Info(playerid, CORRECT, 3);
 		}
 		else
 		{
 			CreateSpacer(playerid, 10);
-			Dialog_Show(playerid, CREATECHARCTER, DIALOG_STYLE_INPUT, "Character Creation", "Please enter your new character's (roleplay)name, it must include the underscore('_'):", "Create","Cancel");
+			Character_Create(playerid);
 		}
 	}
 	else
@@ -3117,7 +2942,7 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 
 	if(fID == -1) return 1;
 
-	if(PlayerInfo[playerid][MovableObject] == 1)
+	if(Character[playerid][MovableObject] == 1)
 	{
 		if(response == EDIT_RESPONSE_FINAL)
 		{
@@ -3134,7 +2959,7 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 
 		    SetDynamicObjectPos(objectid, Objects[fID][PosX], Objects[fID][PosY], Objects[fID][PosZ]);
 		    SetDynamicObjectRot(objectid, Objects[fID][AngX], Objects[fID][AngY], Objects[fID][AngZ]);
-		    PlayerInfo[playerid][MovableObject] = 0;
+		    Character[playerid][MovableObject] = 0;
 
 		    SendClientMessage(playerid, COLOR_LIMEGREEN, "Object successfully updated! (moveable)");
 	    	return 1;
@@ -3142,7 +2967,7 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 	}
 
 
-	else if(PlayerInfo[playerid][DeleteingObject] == 0)
+	else if(Character[playerid][DeleteingObject] == 0)
 	{
 		if(response == EDIT_RESPONSE_FINAL)
 		{
@@ -3159,7 +2984,7 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 		}
 	}
 
-	else if(PlayerInfo[playerid][DeleteingObject] == 1)
+	else if(Character[playerid][DeleteingObject] == 1)
 	{
 		new query[128], str[128];
 		mysql_format(SQL_CONNECTION, query, sizeof(query), "DELETE FROM `%e`.`Objects` WHERE `Objects`.`SQLID` = %d", SQL_DB, Objects[fID][SQLID]);
@@ -3173,15 +2998,15 @@ public OnPlayerEditDynamicObject(playerid, objectid, response, Float:x, Float:y,
 		SendAdminsMessage(1, COLOR_ORANGERED, str);
 
 		ResetObjectVariables(fID);
-		PlayerInfo[playerid][DeleteingObject] = 0;
+		Character[playerid][DeleteingObject] = 0;
 	}
 
 	if(response == EDIT_RESPONSE_CANCEL)
 	{
 	    SetDynamicObjectPos(objectid, Objects[fID][PosX], Objects[fID][PosY], Objects[fID][PosZ]);
 	    SetDynamicObjectRot(objectid, Objects[fID][AngX], Objects[fID][AngY], Objects[fID][AngZ]);
-	    PlayerInfo[playerid][DeleteingObject] = 0;
-	    PlayerInfo[playerid][MovableObject] = 0;
+	    Character[playerid][DeleteingObject] = 0;
+	    Character[playerid][MovableObject] = 0;
 	}
 	return 1;
 }
@@ -3205,7 +3030,7 @@ stock ReloadObjects()
 
 CMD:reloadobjects(playerid, params[])
 {
-    if(MasterAccount[playerid][Admin] >= 6)
+    if(Account[playerid][Admin] >= 6)
 	{
 		ReloadObjects();
 	}
@@ -3232,7 +3057,7 @@ stock GetInFrontOfPlayer(playerid, &Float:x, &Float:y, Float:distance)
 
 CMD:createobject(playerid, params[])
 {
-    if(MasterAccount[playerid][Admin] >= 6)
+    if(Account[playerid][Admin] >= 6)
 	{
 	    new option1, option2[64], query[280], Float:pos[3], oint, oworld;
 	    if(sscanf(params, "ds[64]", option1, option2)) return SendClientMessage(playerid, COLOR_GRAY, "/createobject [modelid] [info]");
@@ -3307,10 +3132,10 @@ stock ResetObjectVariables(fID)
 
 CMD:deleteobject(playerid, params[])
 {
-	if(MasterAccount[playerid][Admin] == 6)
+	if(Account[playerid][Admin] == 6)
 	{
 		SendClientMessage(playerid, COLOR_YELLOW, "WARNING: To delete an object click on it and press the 'save' button. If you would like to abandon the deletion process press ESC.");
-     	PlayerInfo[playerid][DeleteingObject] = 1;
+     	Character[playerid][DeleteingObject] = 1;
      	SelectObject(playerid);
 	}
 	else
@@ -3322,10 +3147,10 @@ CMD:deleteobject(playerid, params[])
 
 CMD:makemovableobject(playerid, params[])
 {
-	if(MasterAccount[playerid][Admin] == 6)
+	if(Account[playerid][Admin] == 6)
 	{
 		SendClientMessage(playerid, COLOR_YELLOW, "WARNING: You are about to create a movable object.");
-     	PlayerInfo[playerid][MovableObject] = 1;
+     	Character[playerid][MovableObject] = 1;
      	SelectObject(playerid);
 	}
 	else
@@ -3339,7 +3164,7 @@ CMD:makemovableobject(playerid, params[])
 public OnPlayerRequestClass(playerid,classid)
 {
 	SpawnPlayer(playerid);
-	SetPlayerSkin(playerid, PlayerInfo[playerid][Skin]);
+	SetPlayerSkin(playerid, Character[playerid][Skin]);
     return 1;
 }
 
@@ -3369,7 +3194,7 @@ public OnPlayerSelectDynamicObject(playerid, objectid, modelid, Float:x, Float:y
 
 CMD:selectobject(playerid, params[])
 {
-    if(MasterAccount[playerid][Admin] >= 6)
+    if(Account[playerid][Admin] >= 6)
 	{
 	    new option1[24];
 	    if(sscanf(params, "s[24]", option1)) return SendClientMessage(playerid, COLOR_GRAY, "/selectobject [mouse/near]");
@@ -3409,7 +3234,7 @@ CMD:door(playerid, params[])
 		new Object = InRangeOfMovableFactionObject(playerid, 2.0);
 	    if(Object)
     	{
-    		if(Objects[Object][Faction] == PlayerInfo[playerid][Faction] && Objects[Object][Model] == 1495 || Objects[Object][Model] == 19303)
+    		if(Objects[Object][Faction] == Character[playerid][Faction] && Objects[Object][Model] == 1495 || Objects[Object][Model] == 19303)
 			{
 		 		if(!strcmp(option1, "open", true))
 				{
@@ -3439,7 +3264,7 @@ CMD:gate(playerid, params[])
 		new Object = InRangeOfMovableFactionObject(playerid, 6.5);
 	    if(Object)
     	{
-    		if(Objects[Object][Faction] == PlayerInfo[playerid][Faction] && Objects[Object][Model] == 2957)
+    		if(Objects[Object][Faction] == Character[playerid][Faction] && Objects[Object][Model] == 2957)
 			{
 		 		if(!strcmp(option1, "open", true))
 				{
@@ -3784,14 +3609,14 @@ public SpawnFactionVehicles()
 
 
 
-forward Load_Account_Vehicles(playerid);
-public Load_Account_Vehicles(playerid)
+forward Character_Vehicles_Load(playerid);
+public Character_Vehicles_Load(playerid)
 {
     if(cache_num_rows())
     {
         for(new i = 0; i<cache_num_rows(); i++)
         {
-			if(PlayerInfo[playerid][TotalVehicles] < 4)
+			if(Character[playerid][TotalVehicles] < 4)
 			{
 				Total_Vehicles_Created++;
 				static Float:VehicleHP;
@@ -3827,7 +3652,7 @@ public Load_Account_Vehicles(playerid)
 
 					Vehicles[Vehicle][SQLID] = Vehicles[vid][SQLID];
 					Vehicles[Vehicle][Type] = 1;
-					Vehicles[Vehicle][Owner] = PlayerInfo[playerid][SQLID];
+					Vehicles[Vehicle][Owner] = Character[playerid][ID];
 					Vehicles[Vehicle][Model] = Vehicles[vid][Model];
 					Vehicles[Vehicle][PosX] = Vehicles[vid][PosX];
 					Vehicles[Vehicle][PosY] = Vehicles[vid][PosY];
@@ -3845,7 +3670,7 @@ public Load_Account_Vehicles(playerid)
 
 
 
-					PlayerInfo[playerid][TotalVehicles]++;
+					Character[playerid][TotalVehicles]++;
 
 					SetVehicleToRespawn(Vehicle);
 					SetVehicleNumberPlate(Vehicle, Vehicles[vid][Plate]);
@@ -3875,7 +3700,7 @@ public Load_Account_Vehicles(playerid)
 	return 1;
 }
 
-stock Unload_Account_Vehicles(playerid)
+stock Character_Vehicles_Unload(playerid)
 {
 	for(new id; id < MAX_VEH; id++)
     {
@@ -3883,7 +3708,7 @@ stock Unload_Account_Vehicles(playerid)
 	    {
 	        if(Vehicles[id][Type] == 1)
 	        {
-				if (PlayerInfo[playerid][SQLID] == Vehicles[id][Owner])
+				if (Character[playerid][ID] == Vehicles[id][Owner])
 				{
 					static Float:VehicleHP[1], VehicleDamage[4];
 					GetVehicleHealth(id, VehicleHP[0]);
@@ -4009,7 +3834,7 @@ stock RespawnFactionVehicles(factionid)
 /*ReloadPlayerVehicles(playerid)
 {
 
-		Unload_Account_Vehicles(playerid);
+		Character_Vehicles_Unload(playerid);
 		LoadPlayerVehicles(playerid);
 		return 1;
 }*/
@@ -4061,17 +3886,17 @@ stock IsVehicleSpawned(vehicleid)
 
 CMD:fvreload(playerid,params[])
 {
-	if(MasterAccount[playerid][Admin] >= 2)
+	if(Account[playerid][Admin] >= 2)
 	{
-	    if(PlayerInfo[playerid][Faction] > 0)
+	    if(Character[playerid][Faction] > 0)
 	    {
-	        if(PlayerInfo[playerid][Rank] > 6)
+	        if(Character[playerid][Rank] > 6)
 	    	{
 			    new optiona[8];
 			    if(sscanf(params, "s[8]", optiona)) return SendClientMessage(playerid, COLOR_GRAY, "/fvreload [all]");
 		        if(!strcmp(optiona, "all", true))
 				{
-		    		RespawnFactionVehicles(PlayerInfo[playerid][Faction]);
+		    		RespawnFactionVehicles(Character[playerid][Faction]);
 		        }
 	        }
 		}
@@ -4155,30 +3980,30 @@ public AddBusinessMoney(id, amount)
 forward SetPlayerMoneyEx(playerid, amount);
 public SetPlayerMoneyEx(playerid, amount)
 {
-	PlayerInfo[playerid][Cash] = amount;
-	MYSQL_Update_Account(playerid, "Cash", PlayerInfo[playerid][Cash]);
+	Character[playerid][Cash] = amount;
+	MYSQL_Update_Character(playerid, "Cash", Character[playerid][Cash]);
 
     ResetPlayerMoney(playerid);
-	GivePlayerMoney(playerid, PlayerInfo[playerid][Cash]);
+	GivePlayerMoney(playerid, Character[playerid][Cash]);
 	return 1;
 }
 
 forward GivePlayerMoneyEx(playerid, amount);
 public GivePlayerMoneyEx(playerid, amount)
 {
-	PlayerInfo[playerid][Cash] += amount;
-	MYSQL_Update_Account(playerid, "Cash", PlayerInfo[playerid][Cash]);
+	Character[playerid][Cash] += amount;
+	MYSQL_Update_Character(playerid, "Cash", Character[playerid][Cash]);
 
     ResetPlayerMoney(playerid);
-	GivePlayerMoney(playerid, PlayerInfo[playerid][Cash]);
+	GivePlayerMoney(playerid, Character[playerid][Cash]);
 	return 1;
 }
 
 forward GivePlayerXP(playerid, amount);
 public GivePlayerXP(playerid, amount)
 {
-	PlayerInfo[playerid][XP] += amount;
-	MYSQL_Update_Account(playerid, "XP", PlayerInfo[playerid][XP]);
+	Character[playerid][XP] += amount;
+	MYSQL_Update_Character(playerid, "XP", Character[playerid][XP]);
 	return 1;
 }
 
@@ -4312,7 +4137,7 @@ stock IsVehicleTaxi(vID)
 CMD:v(playerid, params[])
 {
     new vehicleid[20], color1, color2, str[128], State = GetPlayerState(playerid);
-    if(MasterAccount[playerid][Admin] > 0)
+    if(Account[playerid][Admin] > 0)
 	{
 		if(State == PLAYER_STATE_DRIVER) return SendErrorMessage(playerid, "You are currently driving a vehicle.");
 	    if(!sscanf(params, "s[20]dd", vehicleid, color1, color2))
@@ -4323,7 +4148,7 @@ CMD:v(playerid, params[])
 	            vID = strval(vehicleid);
 	            if(!(399 < vID < 612)) return SendErrorMessage(playerid, ERROR_OPTION);
 	        }
-	        if(MasterAccount[playerid][Admin] != 6 && Restricted_Vehicle(vID)) return SendErrorMessage(playerid, ERROR_OPTION);
+	        if(Account[playerid][Admin] != 6 && Restricted_Vehicle(vID)) return SendErrorMessage(playerid, ERROR_OPTION);
 	        if(Total_Vehicles_Created < MAX_VEHICLES)
         	{
 		        new Float: curX, Float: curY, Float: curZ, Float: curR;
@@ -4358,7 +4183,7 @@ CMD:v(playerid, params[])
 	            vID = strval(vehicleid);
 	            if(!(399 < vID < 612)) return SendErrorMessage(playerid, "That is not a valid vehicle name/id!");
 	        }
-	        if(MasterAccount[playerid][Admin] != 6 && Restricted_Vehicle(vID)) return SendErrorMessage(playerid, ERROR_OPTION);
+	        if(Account[playerid][Admin] != 6 && Restricted_Vehicle(vID)) return SendErrorMessage(playerid, ERROR_OPTION);
         	if(Total_Vehicles_Created < MAX_VEHICLES)
         	{
 		        new Float: curX, Float: curY, Float: curZ, Float: curR;
@@ -4397,16 +4222,16 @@ public OnPlayerDeath(playerid, killerid, reason)
 {
 	new str[128];
 
-	if(PlayerInfo[playerid][Jail] > 0)
+	if(Character[playerid][Jail] > 0)
 	{
-		format(str, sizeof(str), "[INFO] You are still in jail, you have a further %d minute(s) to serve.", PlayerInfo[playerid][Jail]);
+		format(str, sizeof(str), "[INFO] You are still in jail, you have a further %d minute(s) to serve.", Character[playerid][Jail]);
 		SendClientMessage(playerid, COLOR_INDIANRED, str);
 		return SendToJail(playerid);
 	}
 
 
-    PlayerInfo[playerid][InHospital] = 1;
-    GetPlayerPos(playerid, PlayerInfo[playerid][PosX], PlayerInfo[playerid][PosY], PlayerInfo[playerid][PosZ]);
+    Character[playerid][InHospital] = 1;
+    GetPlayerPos(playerid, Character[playerid][PosX], Character[playerid][PosY], Character[playerid][PosZ]);
 
 
 	if(LoopAnim[playerid]) 
@@ -4447,20 +4272,20 @@ forward Hospital(playerid);
 public Hospital(playerid)
 {
 
-	SetSpawnInfo(playerid, 0, PlayerInfo[playerid][Skin], -318.6522, 1049.3909, 20.3403, 358.4333, 0, 0, 0, 0, 0, 0);
+	SetSpawnInfo(playerid, 0, Character[playerid][Skin], -318.6522, 1049.3909, 20.3403, 358.4333, 0, 0, 0, 0, 0, 0);
 	SpawnPlayer(playerid);
 
 	TogglePlayerSpectating(playerid, false);
 	TogglePlayerControllable(playerid, true);
 
-	PlayerInfo[playerid][Armour] = 0;
-	PlayerInfo[playerid][Health] = 100;
-	PlayerInfo[playerid][InHospital] = 0;
+	Character[playerid][Armour] = 0;
+	Character[playerid][Health] = 100;
+	Character[playerid][InHospital] = 0;
 
-	new fee = (random(100) + 25) * PlayerInfo[playerid][Level];
+	new fee = (random(100) + 25) * Character[playerid][Level];
 
-	SetPlayerHealth(playerid, PlayerInfo[playerid][Health]);
-	SetPlayerArmour(playerid, PlayerInfo[playerid][Armour]);
+	SetPlayerHealth(playerid, Character[playerid][Health]);
+	SetPlayerArmour(playerid, Character[playerid][Armour]);
 	GivePlayerMoneyEx(playerid, -fee);
 	SetPlayerPosEx(playerid, -320.2086, 1048.7581, 20.3403, 0, 0);
 	SetPlayerFacingAngle(playerid, 91.4410);
@@ -4505,7 +4330,7 @@ CMD:help(playerid, params[])
 
 
 	SendClientMessage(playerid, COLOR_YELLOW, "Other Commands:");
-	SendClientMessage(playerid, COLOR_WHITE, "/stats /inventory /changemapassword /(clearanim)ation /changespawn");
+	SendClientMessage(playerid, COLOR_WHITE, "/stats /inventory /changeaccountpassword /(clearanim)ation /changespawn");
 
 
 	SendClientMessage(playerid, COLOR_YELLOW, "Help Commands:");
@@ -4539,7 +4364,7 @@ ALTCMD:rhelp->radiohelp;
 
 CMD:fhelp(playerid, params[])
 {
-	if(PlayerInfo[playerid][Faction] > 0)
+	if(Character[playerid][Faction] > 0)
 	{
 		new str[128];
 
@@ -4547,16 +4372,16 @@ CMD:fhelp(playerid, params[])
 		SendClientMessage(playerid, COLOR_YELLOW, "Faction Commands:");
 		SendClientMessage(playerid, COLOR_WHITE, "/(f)ac /membersonline /members");
 
-		new fid = GetFactionIDFromSQLID(PlayerInfo[playerid][Faction]);
+		new fid = GetFactionIDFromSQLID(Character[playerid][Faction]);
 
-		if(PlayerInfo[playerid][Faction] == 1)
+		if(Character[playerid][Faction] == 1)
 		{
 			format(str, sizeof(str), " %s Commands:", Factions[fid][Name]);
 			SendClientMessage(playerid, COLOR_YELLOW, str);
 			SendClientMessage(playerid, COLOR_WHITE, "/door /fine /(un)cuff /(un)jail /pnc /radar /megaphone /radio /locker /changeuniform");
 		}
 
-		if(PlayerInfo[playerid][Faction] > 0 && PlayerInfo[playerid][Rank] >= Factions[fid][CommandRank])
+		if(Character[playerid][Faction] > 0 && Character[playerid][Rank] >= Factions[fid][CommandRank])
 		{
 			format(str, sizeof(str), "Rank %d+ Commands:", Factions[fid][CommandRank]);
 			SendClientMessage(playerid, COLOR_YELLOW, str);
@@ -4574,7 +4399,7 @@ CMD:fhelp(playerid, params[])
 
 CMD:bhelp(playerid, params[])
 {
-	if(PlayerInfo[playerid][Business_1] > 0 || PlayerInfo[playerid][Business_2] > 2)
+	if(Character[playerid][Business_1] > 0 || Character[playerid][Business_2] > 2)
 	{
 		SendClientMessage(playerid, COLOR_YELLOW, "Business Commands:");
 		SendClientMessage(playerid, COLOR_WHITE, "/entrancefee /checksafe /safeget /safestore /lock");
@@ -4627,7 +4452,7 @@ CMD:enter(playerid)
 		    if(Business[bID][Owned] == 1)
 		    {
  				
-	            if(Business[bID][EntranceFee] <= PlayerInfo[playerid][Cash])
+	            if(Business[bID][EntranceFee] <= Character[playerid][Cash])
 	            {
 
 					AddBusinessMoney(bID, Business[bID][EntranceFee]);
@@ -4639,11 +4464,11 @@ CMD:enter(playerid)
 					SetPlayerPosEx(playerid, Business[bID][InteriorX], Business[bID][InteriorY], Business[bID][InteriorZ], Business[bID][Interior], Business[bID][World]);
 
 
-					if(bID == PlayerInfo[playerid][Business_1] || bID == PlayerInfo[playerid][Business_2])
+					if(bID == Character[playerid][Business_1] || bID == Character[playerid][Business_2])
 					{
 						SendClientMessage(playerid, COLOR_YELLOW, "You appear to own this business, for a list of commands use /bhelp!");
 					}
-					PlayerInfo[playerid][bEntered] = bID;
+					Character[playerid][bEntered] = bID;
 				}
 				else
 				{
@@ -4654,7 +4479,7 @@ CMD:enter(playerid)
 			{
 
 				SetPlayerPosEx(playerid, Business[bID][InteriorX], Business[bID][InteriorY], Business[bID][InteriorZ], Business[bID][Interior], Business[bID][World]);
-				PlayerInfo[playerid][bEntered] = bID;
+				Character[playerid][bEntered] = bID;
 				format(str, sizeof(str), "Welcome to the %s.", Business[bID][Name]);
 				SendClientMessage(playerid, COLOR_WHITE, str);
 			}
@@ -4677,7 +4502,7 @@ CMD:enter(playerid)
             if(IsPlayerInRangeOfPoint(playerid, 2.0, Houses[id][PosX], Houses[id][PosY], Houses[id][PosZ]))
             {
                 SetPlayerPosEx(playerid, Houses[id][IntX], Houses[id][IntY], Houses[id][IntZ], Houses[id][Interior], Houses[id][World]);
-                PlayerInfo[playerid][hEntered] = id;
+                Character[playerid][hEntered] = id;
             }
 		}
 		else
@@ -4708,18 +4533,18 @@ public UnfreezePlayer(playerid)
 
 CMD:exit(playerid)
 {
-	new hID = PlayerInfo[playerid][hEntered], bID = PlayerInfo[playerid][bEntered];
+	new hID = Character[playerid][hEntered], bID = Character[playerid][bEntered];
 	if(IsPlayerInRangeOfPoint(playerid, 5.0, Houses[hID][IntX], Houses[hID][IntY], Houses[hID][IntZ]) && GetPlayerVirtualWorld(playerid) == Houses[hID][World])
     {
         SetPlayerPosEx(playerid, Houses[hID][PosX], Houses[hID][PosY], Houses[hID][PosZ], 0 , 0);
-        PlayerInfo[playerid][hEntered] = 0;
+        Character[playerid][hEntered] = 0;
     }
 
 
     if(IsPlayerInRangeOfPoint(playerid, 5.0, Business[bID][InteriorX], Business[bID][InteriorY], Business[bID][InteriorZ]) && GetPlayerVirtualWorld(playerid) == Business[bID][World])
     {
         SetPlayerPosEx(playerid, Business[bID][PosX], Business[bID][PosY], Business[bID][PosZ], 0, 0);
-        PlayerInfo[playerid][bEntered] = 0;
+        Character[playerid][bEntered] = 0;
     }
 
  	return 1;
@@ -4727,8 +4552,8 @@ CMD:exit(playerid)
 
 stock GetPlayerRank(playerid)
 {
-	new rank[34], fid = GetFactionIDFromSQLID(PlayerInfo[playerid][Faction]);
-    switch(PlayerInfo[playerid][Rank])
+	new rank[34], fid = GetFactionIDFromSQLID(Character[playerid][Faction]);
+    switch(Character[playerid][Rank])
     {
 			case 1: format(rank, sizeof(rank), "%s", Factions[fid][Rank1]);
 			case 2: format(rank, sizeof(rank), "%s", Factions[fid][Rank2]);
@@ -4768,8 +4593,8 @@ CMD:stats(playerid, params[])
 	//new player;
 	//if(sscanf(params, "u", player, playerid))
 
-	new str[168], fac[64], fid = GetFactionIDFromSQLID(PlayerInfo[playerid][Faction]);
-	if(PlayerInfo[playerid][Faction] != 0)
+	new str[168], fac[64], fid = GetFactionIDFromSQLID(Character[playerid][Faction]);
+	if(Character[playerid][Faction] != 0)
 	{
 	    format(fac, sizeof(fac), "%s", Factions[fid][Name]);
 	}
@@ -4778,17 +4603,17 @@ CMD:stats(playerid, params[])
 	    format(fac, sizeof(fac), "Civilian");
 	}
 	Line(playerid);
-	format(str, sizeof(str), "> Name: \t|\t [%s] \t|\t", GetRoleplayName(playerid));
+	format(str, sizeof(str), "> %s's Stats", GetRoleplayName(playerid));
 	SendClientMessage(playerid, COLOR_GRAY, str);
-	format(str, sizeof(str), "> Age: [%d] \t|\t Money: [%d] \t|\t Bank: [%d]", PlayerInfo[playerid][Age], PlayerInfo[playerid][Cash], PlayerInfo[playerid][Bank]);
+	format(str, sizeof(str), "> Age: [%d] | Money: [%d] | Bank: [%d]", Character[playerid][Age], Character[playerid][Cash], Character[playerid][Bank]);
 	SendClientMessage(playerid, COLOR_GRAY, str);
-	format(str, sizeof(str), "> Faction: [%s] \t|\t Rank: [%s(%d)]", fac, GetPlayerRank(playerid), PlayerInfo[playerid][Rank]);
+	format(str, sizeof(str), "> Faction: [%s] | Rank: [%s(%d)]", fac, GetPlayerRank(playerid), Character[playerid][Rank]);
 	SendClientMessage(playerid, COLOR_GRAY, str);
-	format(str, sizeof(str), "> Business: [%s] \t|\t House: [%s] Business_2 [%s]", Business[PlayerInfo[playerid][Business_1]][Name], Houses[PlayerInfo[playerid][House]][Name], Business[PlayerInfo[playerid][Business_2]][Name]);
+	format(str, sizeof(str), "> House: [%s] | Business: [%s] | Business_2 [%s]", Houses[Character[playerid][House]][Name], Business[Character[playerid][Business_1]][Name], Business[Character[playerid][Business_2]][Name]);
 	SendClientMessage(playerid, COLOR_GRAY, str);
-	format(str, sizeof(str), "> Vehicles: [%d] \t|\t Job: [%s] \t|\t TotalTimePlayed: [%d]", PlayerInfo[playerid][TotalVehicles], JobNames[PlayerInfo[playerid][Job]][0], PlayerInfo[playerid][TotalTimePlayed]);
+	format(str, sizeof(str), "> Vehicles: [%d] | Job: [%s] | TotalTimePlayed: [%d]", Character[playerid][TotalVehicles], JobNames[Character[playerid][Job]][0], Character[playerid][TotalTimePlayed]);
 	SendClientMessage(playerid, COLOR_GRAY, str);
-	format(str, sizeof(str), "> XP: [%d] \t|\t OnlinePeriod: [%d] \t|\t TruckMissionsCompleted: [%d]", PlayerInfo[playerid][XP], PlayerInfo[playerid][OnlinePeriod], PlayerInfo[playerid][TruckingCompleted]);
+	format(str, sizeof(str), "> XP: [%d] | OnlinePeriod: [%d] | TruckMissionsCompleted: [%d]", Character[playerid][XP], Character[playerid][OnlinePeriod], Character[playerid][TruckingCompleted]);
 	SendClientMessage(playerid, COLOR_GRAY, str);
 	Line(playerid);
 	
@@ -4797,20 +4622,20 @@ CMD:stats(playerid, params[])
 
 CMD:levelup(playerid, params[])
 {
-	new RequiredXP = PlayerInfo[playerid][Level] * 10, NextLevel = PlayerInfo[playerid][Level] + 1, option[12], str[128];
+	new RequiredXP = Character[playerid][Level] * 10, NextLevel = Character[playerid][Level] + 1, option[12], str[128];
 
 	format(str, sizeof(str), "Are you sure you want to buy level %d using %d experience points(XP)? (/levelup [confirm/decline])", NextLevel, RequiredXP);
 	if(sscanf(params, "s[12]", option)) return SendClientMessage(playerid, COLOR_WHEAT, str);
 	{
 		if(!strcmp(option, "confirm", true))
 		{
-			if(PlayerInfo[playerid][XP] >= RequiredXP)
+			if(Character[playerid][XP] >= RequiredXP)
 			{
-				PlayerInfo[playerid][XP] -= RequiredXP;
-				PlayerInfo[playerid][Level] = NextLevel;
-				SetPlayerScore(playerid, PlayerInfo[playerid][Level]);
+				Character[playerid][XP] -= RequiredXP;
+				Character[playerid][Level] = NextLevel;
+				SetPlayerScore(playerid, Character[playerid][Level]);
 
-				format(str, sizeof(str), "Congratulations, you are now level %d! You have %d experience points(XP) remaining.", PlayerInfo[playerid][Level], PlayerInfo[playerid][XP]);
+				format(str, sizeof(str), "Congratulations, you are now level %d! You have %d experience points(XP) remaining.", Character[playerid][Level], Character[playerid][XP]);
 				SendClientMessage(playerid, COLOR_WHEAT, str);
 			}
 			else
@@ -4851,13 +4676,13 @@ new GeneralStore[][] =
 
 CMD:buy(playerid, params[])
 {
-	if(PlayerInfo[playerid][bEntered] > 0)
+	if(Character[playerid][bEntered] > 0)
 	{
-		if(Business[PlayerInfo[playerid][bEntered]][Type]== 1)//Convenience Store
+		if(Business[Character[playerid][bEntered]][Type]== 1)//Convenience Store
 		{
 			new CheckOut[600], StoreName[64], str[64];
 
-			format(StoreName, sizeof(StoreName), "%s", Business[PlayerInfo[playerid][bEntered]][Name]);
+			format(StoreName, sizeof(StoreName), "%s", Business[Character[playerid][bEntered]][Name]);
 
 			for (new i = 0; i < sizeof(GeneralStore); ++i)
 			{
@@ -4867,21 +4692,21 @@ CMD:buy(playerid, params[])
 
 			Dialog_Show(playerid, GENERALSTORE, DIALOG_STYLE_LIST, StoreName, CheckOut, "Buy","Cancel");
 		}
-		if(Business[PlayerInfo[playerid][bEntered]][Type]== 6)//Diner
+		if(Business[Character[playerid][bEntered]][Type]== 6)//Diner
 		{
 			Dialog_Show(playerid, DINER, DIALOG_STYLE_LIST, "Diner's Menu", "-Starters-\n\n Salad \n Garlic Bread \n\n-Main Course-\n Burger \n Chips \n Chicken Nuggets \n Hotdog \n\n-Desserts-\n Icecream \n Brownie", "View","Cancel");
 		}
-		if(Business[PlayerInfo[playerid][bEntered]][Type]== 5)//Clothes
+		if(Business[Character[playerid][bEntered]][Type]== 5)//Clothes
 		{
-			if(PlayerInfo[playerid][Cash] >= 250)
+			if(Character[playerid][Cash] >= 250)
 			{
 				TogglePlayerControllable(playerid, 0);
 			    GivePlayerMoneyEx(playerid, -250);
-			    AddBusinessMoney(PlayerInfo[playerid][bEntered], 250);
-			    PlayerInfo[playerid][ClothesSelection] = 1;
-			    GetPlayerPos(playerid, PlayerInfo[playerid][PosX], PlayerInfo[playerid][PosY], PlayerInfo[playerid][PosZ]);
-			    PlayerInfo[playerid][VWorld] = GetPlayerVirtualWorld(playerid);
-				PlayerInfo[playerid][Interior] = GetPlayerInterior(playerid);
+			    AddBusinessMoney(Character[playerid][bEntered], 250);
+			    Character[playerid][ClothesSelection] = 1;
+			    GetPlayerPos(playerid, Character[playerid][PosX], Character[playerid][PosY], Character[playerid][PosZ]);
+			    Character[playerid][VWorld] = GetPlayerVirtualWorld(playerid);
+				Character[playerid][Interior] = GetPlayerInterior(playerid);
 
 				SetPlayerPos(playerid, 184.6707, -88.0618, 1002.0234);
 				SetPlayerVirtualWorld(playerid, playerid + 1000);
@@ -4889,11 +4714,11 @@ CMD:buy(playerid, params[])
 				SetPlayerFacingAngle(playerid, 90.0);
 				SetPlayerCameraPos(playerid,181.6707, -88.0618, 1002.0234);
 				SetPlayerCameraLookAt(playerid,181.6707, -88.0618, 1002.0234);
-				if(PlayerInfo[playerid][Gender] == 1)
+				if(Character[playerid][Gender] == 1)
 				{
 		  			SetPlayerSkin(playerid, MaleSkins[SkinSelection[playerid]][0]);
 				}
-				if(PlayerInfo[playerid][Gender] == 2)
+				if(Character[playerid][Gender] == 2)
 				{
 					SetPlayerSkin(playerid, FemaleSkins[SkinSelection[playerid]][0]);
 				}
@@ -4919,12 +4744,12 @@ CMD:inventory(playerid, params[])
 	}
 	if(Inventory[playerid][VehicleRadio] > 0)
 	{
-		format(str, sizeof(str), "Vehicular Radio System (x%d)\n", Inventory[playerid][VehicleRadio]);
+		format(str, sizeof(str), "Vehicle Multimedia System (x%d)\n", Inventory[playerid][VehicleRadio]);
 		strcat(dialog, str, sizeof(dialog));
 	}
 	if(Inventory[playerid][Radio] > 0)
 	{
-		format(str, sizeof(str), "Radio System (%d Mhz)\n", Inventory[playerid][Radio], Inventory[playerid][RadioFreq]);
+		format(str, sizeof(str), "Handheld Radio (%d Mhz)\n", Inventory[playerid][Radio], Inventory[playerid][RadioFreq]);
 		strcat(dialog, str, sizeof(dialog));
 	}
 	if(Inventory[playerid][Screwdriver] > 0)
@@ -4948,8 +4773,8 @@ public GiveInventoryItem(playerid, item, quantity)
 	    {
 			Inventory[playerid][PhoneNumber] = 100000 + random(8999999);
 			Inventory[playerid][PhoneStatus] = 1;
-			MYSQL_Update_Account(playerid, "PhoneStatus", Inventory[playerid][PhoneStatus]);
-			MYSQL_Update_Account(playerid, "PhoneNumber",Inventory[playerid][PhoneNumber]);
+			MYSQL_Update_Character(playerid, "PhoneStatus", Inventory[playerid][PhoneStatus]);
+			MYSQL_Update_Character(playerid, "PhoneNumber",Inventory[playerid][PhoneNumber]);
 			SendInfoMessage(playerid, "A phone has been added to your inventory.");
 			return 1;
 		}
@@ -4963,7 +4788,7 @@ public GiveInventoryItem(playerid, item, quantity)
 	{
 		if(Inventory[playerid][VehicleRadio] >= 99) return SendErrorMessage(playerid, "You cannot buy anymore of this item.");
 		Inventory[playerid][VehicleRadio] += quantity;
-		MYSQL_Update_Account(playerid, "VehicleRadio", Inventory[playerid][VehicleRadio]);
+		MYSQL_Update_Character(playerid, "VehicleRadio", Inventory[playerid][VehicleRadio]);
 		format(str, sizeof(str), "You have had %d (vehicle) sound system(s) added to your inventory, you now have a total of %d on you.", quantity, Inventory[playerid][VehicleRadio]);
 		SendInfoMessage(playerid, str);
 		return 1;
@@ -4974,7 +4799,7 @@ public GiveInventoryItem(playerid, item, quantity)
 		if(Inventory[playerid][Radio] >= 1) return SendErrorMessage(playerid, "You cannot buy anymore of this item.");
 		Inventory[playerid][Radio] += quantity;
 		Inventory[playerid][RadioFreq] = 1000;
-		MYSQL_Update_Account(playerid, "Radio", Inventory[playerid][Radio]);
+		MYSQL_Update_Character(playerid, "Radio", Inventory[playerid][Radio]);
 		format(str, sizeof(str), "%d radio has been added to your inventory and tuned to 1000 MHz, for more help refer to /rhelp.", quantity);
 		SendInfoMessage(playerid, str);
 		return 1;
@@ -4984,7 +4809,7 @@ public GiveInventoryItem(playerid, item, quantity)
 	{
 		if(Inventory[playerid][Screwdriver] >= 10) return SendErrorMessage(playerid, "You cannot buy anymore of this item.");
 		Inventory[playerid][Screwdriver] += quantity;
-		MYSQL_Update_Account(playerid, "Screwdriver", Inventory[playerid][Screwdriver]);
+		MYSQL_Update_Character(playerid, "Screwdriver", Inventory[playerid][Screwdriver]);
 		format(str, sizeof(str), "%d screwdriver has been added to your inventory.", quantity);
 		SendClientMessage(playerid, COLOR_LIGHTGRAY, str);
 		return 1;
@@ -5002,12 +4827,12 @@ public GiveInventoryItem(playerid, item, quantity)
 
 stock BuyItem(playerid, item)
 {
-	if(GeneralStore[item][1] <= PlayerInfo[playerid][Cash])
+	if(GeneralStore[item][1] <= Character[playerid][Cash])
 	{
 		new str[128];
 		GiveInventoryItem(playerid, item, 1);
 
-		AddBusinessMoney(PlayerInfo[playerid][bEntered], GeneralStore[item][1]);
+		AddBusinessMoney(Character[playerid][bEntered], GeneralStore[item][1]);
 		GivePlayerMoneyEx(playerid, -GeneralStore[item][1]);
 
 		format(str, sizeof(str), "* The cashier swipes the object past the scanner. The cash register would display $%d. *", GeneralStore[item][1]);
@@ -5039,7 +4864,7 @@ public TakeInventoryItem(playerid, item, quantity)
 	{
 		if(Inventory[playerid][VehicleRadio] <= 0) return SendErrorMessage(playerid, "Item couldn't be taken.");
 		Inventory[playerid][VehicleRadio] -= quantity;
-		MYSQL_Update_Account(playerid, "VehicleRadio", Inventory[playerid][VehicleRadio]);
+		MYSQL_Update_Character(playerid, "VehicleRadio", Inventory[playerid][VehicleRadio]);
 
 		format(str, sizeof(str), "[INFO] You have had %d (vehicle) sound system(s) taken from your inventory, you now have a total of %d on you.", quantity, Inventory[playerid][VehicleRadio]);
 		SendClientMessage(playerid, COLOR_LIGHTGRAY, str);
@@ -5050,7 +4875,7 @@ public TakeInventoryItem(playerid, item, quantity)
 	{
 		if(Inventory[playerid][Screwdriver] <= 0) return SendErrorMessage(playerid, "Item couldn't be taken.");
 		Inventory[playerid][Screwdriver] -= quantity;
-		MYSQL_Update_Account(playerid, "Screwdriver", Inventory[playerid][Screwdriver]);
+		MYSQL_Update_Character(playerid, "Screwdriver", Inventory[playerid][Screwdriver]);
 
 		format(str, sizeof(str), "[INFO] %d screwdriver has been taken from your inventory, you have %d left.", quantity, Inventory[playerid][Screwdriver]);
 		SendClientMessage(playerid, COLOR_LIGHTGRAY, str);
@@ -5153,7 +4978,7 @@ stock SendPunishmentMessage(str[])
     {
         if(IsPlayerConnected(i))
         {
-            if(PlayerInfo[i][LoggedIn] > 0)
+            if(LoggedIn[i] > 0)
             {
                 new astr[128];
                 format(astr, sizeof(astr), "[PUNISHMENT] %s", str);
@@ -5187,7 +5012,7 @@ stock SendAdminsMessage(level, color, str[])
         if(IsPlayerConnected(i))
         {
             new astr[128];
-            if(MasterAccount[i][Admin] >= level)
+            if(Account[i][Admin] >= level)
             {
                 format(astr, sizeof(astr), "[Admin Msg] %s", str);
                 SendClientMessage(i, color, astr);
@@ -5199,8 +5024,8 @@ stock SendAdminsMessage(level, color, str[])
 public OnPlayerText(playerid, text[])
 {
 	new str[600];
-	if(PlayerInfo[playerid][LoggedIn] != 1) return SendErrorMessage(playerid, ERROR_LOGGEDIN);
-	if(PlayerInfo[playerid][Muted] != 0) return InfoBoxForPlayer(playerid, "~r~You have been muted - you cannot speak.");
+	if(LoggedIn[playerid] == 0) return SendErrorMessage(playerid, ERROR_LOGGEDIN);
+	if(Character[playerid][Muted] != 0) return InfoBoxForPlayer(playerid, "~r~You have been muted - you cannot speak.");
 
 	LastCommandTime[playerid] = gettime();
 	Log(playerid, text);
@@ -5266,7 +5091,7 @@ public OnPlayerText(playerid, text[])
 
 			new query[600], calltime[12];
 			format(calltime, sizeof(calltime), "%02d:%02d:%02d", ClockHours, ClockMinutes, ClockSeconds);
-		    mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO `911 Calls` (Timestamp, Caller, Incident, Location, Service, Number, IGTime) VALUES( %d, %d, '%e', '%e', %d, %d, '%e')", gettime(), PlayerInfo[playerid][SQLID], EmergencyCall[playerid][Incident], EmergencyCall[playerid][Location], EmergencyCall[playerid][Service], Inventory[playerid][PhoneNumber], calltime);
+		    mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO `911 Calls` (Timestamp, Caller, Incident, Location, Service, Number, IGTime) VALUES( %d, %d, '%e', '%e', %d, %d, '%e')", gettime(), Character[playerid][ID], EmergencyCall[playerid][Incident], EmergencyCall[playerid][Location], EmergencyCall[playerid][Service], Inventory[playerid][PhoneNumber], calltime);
 			mysql_tquery(SQL_CONNECTION, query);
 		}
 	}
@@ -5317,7 +5142,7 @@ CMD:ame(playerid, params[])
 CMD:a(playerid, params[])
 {
     new str[200];
-    if(MasterAccount[playerid][Admin] > 0)
+    if(Account[playerid][Admin] > 0)
     {
         if(sscanf(params, "s[200]", str)) return SendClientMessage(playerid, COLOR_GRAY, "/a [text]");
         format(str, sizeof(str), "%s: %s", GetRoleplayName(playerid), str);
@@ -5411,7 +5236,7 @@ CMD:ooc(playerid, params[])
     if(sscanf(params, "s[128]", params)) return SendClientMessage(playerid, COLOR_GRAY, "/(o)oc [message]");
     if(OOCStatus == 1)
     {
-		if(PlayerInfo[playerid][Muted] == 0)
+		if(Character[playerid][Muted] == 0)
 		{
 	    	format(str, sizeof(str), "(([Global]%s: %s ))", GetRoleplayName(playerid), params);
 	    	SendClientMessageToAll(COLOR_LBLUE, str);
@@ -5430,14 +5255,14 @@ ALTCMD:o->ooc;
 CMD:announcement(playerid, params[])
 {
 	new str[200];
-	if(MasterAccount[playerid][Admin] > 0)
+	if(Account[playerid][Admin] > 0)
 	{
 		if(sscanf(params, "s[200]", str)) return SendClientMessage(playerid, COLOR_GRAY, "/announcement [message]");
 
 		format(str, sizeof(str), "[Announcement] %s: %s", GetRoleplayName(playerid), str);
 		for (new i = 0; i < MAX_PLAYERS; ++i)
 		{
-			if(PlayerInfo[i][LoggedIn] == 1) SendSplitMessage(i, COLOR_VIOLET, str);
+			if(LoggedIn[i] == 1) SendSplitMessage(i, COLOR_VIOLET, str);
 		}
 
 		SetPlayerChatBubble(playerid, str, COLOR_VIOLET, 20.0, SECONDS(7));
@@ -5454,8 +5279,8 @@ CMD:buyhouse(playerid, params[])
 
 	if(id == 0) 										return SendErrorMessage(playerid, ERROR_LOCATION);
     if(Houses[id][Owner] != 0) 							return SendErrorMessage(playerid, ERROR_OWNER);
-    if(Houses[id][Price] > PlayerInfo[playerid][Cash])  return SendErrorMessage(playerid, ERROR_MONEY);
-	if(PlayerInfo[playerid][House] != 0) 				return SendErrorMessage(playerid, ERROR_OWNED);
+    if(Houses[id][Price] > Character[playerid][Cash])  return SendErrorMessage(playerid, ERROR_MONEY);
+	if(Character[playerid][House] != 0) 				return SendErrorMessage(playerid, ERROR_OWNED);
 	
 	if(sscanf(params, "s[12]", option)) return SendClientMessage(playerid, COLOR_LBLUE, "Are you sure that you want to buy this house? (/buyhouse [confirm/decline])");
 	{
@@ -5465,8 +5290,8 @@ CMD:buyhouse(playerid, params[])
     		SendClientMessage(playerid, COLOR_LBLUE, str);
 
 		    GivePlayerMoneyEx(playerid, -Houses[id][Price]);
-			PlayerInfo[playerid][House] = id;
-            Houses[id][Owner] = PlayerInfo[playerid][SQLID];
+			Character[playerid][House] = id;
+            Houses[id][Owner] = Character[playerid][ID];
 
 			MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Owner", Houses[id][Owner]);
 
@@ -5490,7 +5315,7 @@ CMD:sellhouse(playerid, params[])
 
     if(Houses[id][Owner] > 0)
     {
-        if(PlayerInfo[playerid][House] == id)
+        if(Character[playerid][House] == id)
 		{
 			new option[12];
 			if(sscanf(params, "s[12]", option)) return SendClientMessage(playerid, COLOR_LBLUE, "Are you sure that you want to buy this house? (/buyhouse [confirm/decline])");
@@ -5500,7 +5325,7 @@ CMD:sellhouse(playerid, params[])
 				    format(str, sizeof(str), "> You have sold %s to the server!", Houses[id][Name]);
 				    SendClientMessage(playerid, COLOR_LBLUE, str);
 				    GivePlayerMoneyEx(playerid, Houses[id][Price]);
-					PlayerInfo[playerid][House] = 0;
+					Character[playerid][House] = 0;
 					Houses[id][Owner] = 0;
 
 					MYSQL_Update_Interger(Houses[id][SQLID], "Houses", "Owner", 0);
@@ -5528,9 +5353,9 @@ CMD:buybiz(playerid, params[])
 	{
  	    if(Business[id][Owned] == 0)
  	    {
- 	        if(PlayerInfo[playerid][Business_1] == 0 || PlayerInfo[playerid][Business_2] == 0)
+ 	        if(Character[playerid][Business_1] == 0 || Character[playerid][Business_2] == 0)
  	        {
-     	        if(Business[id][Price] <= PlayerInfo[playerid][Cash])
+     	        if(Business[id][Price] <= Character[playerid][Cash])
 				{
 				    new option[12];
 					if(sscanf(params, "s[12]", option)) return SendClientMessage(playerid, COLOR_LBLUE, "Are you sure that you want to buy this business? (/buybiz [confirm/decline])");
@@ -5542,24 +5367,24 @@ CMD:buybiz(playerid, params[])
 
 						    GivePlayerMoneyEx(playerid, -Business[id][Price]);
 
-						    if(PlayerInfo[playerid][Business_1] == 0)
+						    if(Character[playerid][Business_1] == 0)
 					    	{
-					    		PlayerInfo[playerid][Business_1] = id;
+					    		Character[playerid][Business_1] = id;
 					    	}
-					    	else if(PlayerInfo[playerid][Business_2] == 0)
+					    	else if(Character[playerid][Business_2] == 0)
 					    	{
-				    			PlayerInfo[playerid][Business_2] = id;
+				    			Character[playerid][Business_2] = id;
 					    	}
 					    	else return SendErrorMessage(playerid, "You already own two businesses!");
 							
 
 							Business[id][Owned] = 1;
-							Business[id][Owner] = PlayerInfo[playerid][SQLID];
+							Business[id][Owner] = Character[playerid][ID];
 
-							mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `Biz` SET Owner = %d, Owned = %d WHERE SQLID = %d LIMIT 1",  Business[id][Owner],Business[id][Owned],Business[id][SQLID]);
+							mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `Business` SET Owner = %d, Owned = %d WHERE SQLID = %d LIMIT 1",  Business[id][Owner],Business[id][Owned],Business[id][SQLID]);
 							mysql_tquery(SQL_CONNECTION, query);
 							
-							mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT `Username` FROM Accounts WHERE SQLID = %d LIMIT 1", Business[id][Owner]);
+							mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT `Name` FROM Characters WHERE SQLID = %d LIMIT 1", Business[id][Owner]);
 		        			mysql_tquery(SQL_CONNECTION, query, "Update_Business_Label", "i", id);
 
 							Reload_Business(id);
@@ -5599,7 +5424,7 @@ CMD:sellbiz(playerid, params[])
 	{
     	if(Business[id][Owned] == 1)
  	    {
- 	        if(PlayerInfo[playerid][Business_1] == id || PlayerInfo[playerid][Business_2] == id)
+ 	        if(Character[playerid][Business_1] == id || Character[playerid][Business_2] == id)
 			{
 			    new option[12];
 				if(sscanf(params, "s[12]", option)) return SendClientMessage(playerid, COLOR_LBLUE, "Are you sure that you want to sell your business? (/sellbiz [confirm/decline])");
@@ -5613,18 +5438,18 @@ CMD:sellbiz(playerid, params[])
 					    format(str, sizeof(str), "> You have sold your business(ID:%d) for $%d!", Business[id][SQLID], SalePrice);
 					    SendClientMessage(playerid, COLOR_LBLUE, str);
 
-					    if(PlayerInfo[playerid][Business_1] == id) PlayerInfo[playerid][Business_1] = 0;
-					    else if(PlayerInfo[playerid][Business_2] == id) PlayerInfo[playerid][Business_2] = 0;
+					    if(Character[playerid][Business_1] == id) Character[playerid][Business_1] = 0;
+					    else if(Character[playerid][Business_2] == id) Character[playerid][Business_2] = 0;
 					    else return SendErrorMessage(playerid, "Couldn't find business.");
 
 						//format(Business[id][Owner], 32, "");
 						Business[id][Owned] = 0;
 						Business[id][Owner] = 0;
 
-						mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `Biz` SET Owned = 0, Owner = 0 WHERE SQLID = %d LIMIT 1",Business[id][SQLID]);
+						mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE `Business` SET Owned = 0, Owner = 0 WHERE SQLID = %d LIMIT 1",Business[id][SQLID]);
                         mysql_tquery(SQL_CONNECTION, query);
                         
-                        mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT `Username` FROM Accounts WHERE SQLID = %d LIMIT 1", Business[id][Owner]);
+                        mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT `Name` FROM Characters WHERE SQLID = %d LIMIT 1", Business[id][Owner]);
 		        		mysql_tquery(SQL_CONNECTION, query, "Update_Business_Label", "i", id);
 	                    
 	                    Reload_Business(id);
@@ -5663,7 +5488,7 @@ CMD:key(playerid, params[])
 	id = InRangeOfHouse(playerid);
     if(id != 0)
  	{
- 	    if(PlayerInfo[playerid][House] == id)
+ 	    if(Character[playerid][House] == id)
  	    {
  	        if(Houses[id][Locked] == 0)
  	        {
@@ -5687,7 +5512,7 @@ CMD:key(playerid, params[])
     id = InRangeOfBiz(playerid);
     if(id != 0)
  	{
- 	    if(PlayerInfo[playerid][Business_1] == id || PlayerInfo[playerid][Business_2] == id)
+ 	    if(Character[playerid][Business_1] == id || Character[playerid][Business_2] == id)
  	    {
  	        if(Business[id][Locked] == 0)
  	        {
@@ -5750,7 +5575,7 @@ public UpdateVehicleSpeedo(playerid)
 CMD:aengine(playerid,params[])
 {
 	new State = GetPlayerState(playerid), vid = GetPlayerVehicleID(playerid);
-	if(MasterAccount[playerid][Admin] > 5)
+	if(Account[playerid][Admin] > 5)
 	{
 		if(IsABike(vid))	{	SetVehicleParamsEx(vid, 1, Lights[vid], alarm[vid], doors[vid], bonnet[vid], boot[vid], objective[vid]);	}
 		if(IsPlayerInAnyVehicle(playerid))
@@ -5795,7 +5620,7 @@ stock IsServerVehicle(vid)
 
 stock IsPlayerVehicleOwner(playerid, vid)
 {
-	if(IsPlayerVehicle(vid) && Vehicles[vid][Owner] == PlayerInfo[playerid][SQLID])
+	if(IsPlayerVehicle(vid) && Vehicles[vid][Owner] == Character[playerid][ID])
 	{
 		return 1;
 	}
@@ -5809,7 +5634,7 @@ CanDriveVehicle(playerid, vid)
 	{
 		return 1;
 	}
-	else if(Vehicles[vid][Type] == 4 && GDL_Test[playerid] > 0 || Trucking[playerid][CheckpointID] > 0 && Vehicles[vid][Type] == 5 || Vehicles[vid][Type] == 3 && Vehicles[vid][Faction] == PlayerInfo[playerid][Faction] && Vehicles[vid][Rank] <= PlayerInfo[playerid][Rank])
+	else if(Vehicles[vid][Type] == 4 && GDL_Test[playerid] > 0 || Trucking[playerid][CheckpointID] > 0 && Vehicles[vid][Type] == 5 || Vehicles[vid][Type] == 3 && Vehicles[vid][Faction] == Character[playerid][Faction] && Vehicles[vid][Rank] <= Character[playerid][Rank])
 	{
 		return 1;
 	}
@@ -6141,7 +5966,7 @@ public ReduceFuel(vehicleid)
 CMD:setfuel(playerid,params[])
 {
 	new State = GetPlayerState(playerid), vehicleid = GetPlayerVehicleID(playerid);
-	if(MasterAccount[playerid][Admin] > 0)
+	if(Account[playerid][Admin] > 0)
 	{
 		new option;
 		if(sscanf(params, "d", option)) return SendClientMessage(playerid, COLOR_GRAY, "/setfuel [amount]");
@@ -6197,7 +6022,7 @@ CMD:refuel(playerid,params[])
 			if(option > -1 && option < 101 && option + Vehicles[vid][Fuel] < 101)
 			{
 				new cost = option * 2; //+ tax; tax = random(10),
-				if(cost <= PlayerInfo[playerid][Cash])
+				if(cost <= Character[playerid][Cash])
 				{
 
 					    if(State == PLAYER_STATE_DRIVER)
@@ -6325,13 +6150,13 @@ ALTCMD:lon->lights;
 
 stock IsBusinessOwner(playerid, bid)
 {
-	if(Business[bid][Owner] == PlayerInfo[playerid][SQLID]) return 1;
+	if(Business[bid][Owner] == Character[playerid][ID]) return 1;
 	return 0;
 }
 
 IsInOwnedBusiness(playerid)
 {
-	if(PlayerInfo[playerid][bEntered] == PlayerInfo[playerid][Business_1] || PlayerInfo[playerid][bEntered] == PlayerInfo[playerid][Business_2]) return PlayerInfo[playerid][bEntered];
+	if(Character[playerid][bEntered] == Character[playerid][Business_1] || Character[playerid][bEntered] == Character[playerid][Business_2]) return Character[playerid][bEntered];
 	return 0;
 }
 
@@ -6343,7 +6168,7 @@ CMD:safestore(playerid,params[])
 		if(bid)
 		{
 			if(sscanf(params, "d", amount)) return SendClientMessage(playerid, COLOR_GRAY, "/safestore [amount]");
-			if(PlayerInfo[playerid][Cash] >= amount)
+			if(Character[playerid][Cash] >= amount)
 			{
 				MYSQL_Update_Interger(Business[bid][SQLID], "Business", "Safe", Business[bid][Safe] += amount);
 				format(str, sizeof(str), "You stored $%d in the safe! Total($%d)", amount, Business[bid][Safe]);
@@ -6403,7 +6228,7 @@ CMD:checksafe(playerid,params[])
 		new str[128], bid = IsInOwnedBusiness(playerid);
 		if(bid)
 		{
-		    bid = PlayerInfo[playerid][bEntered];
+		    bid = Character[playerid][bEntered];
 			format(str, sizeof(str), "There is $%d in the safe!", Business[bid][Safe]);
 			SendClientMessage(playerid, COLOR_GREEN, str);
 		}
@@ -6448,7 +6273,7 @@ CMD:myvehicles(playerid, params[])
 	{
 		if(GetVehicleModel(i))
 		{
-			if(Vehicles[i][Owner] == PlayerInfo[playerid][SQLID])
+			if(Vehicles[i][Owner] == Character[playerid][ID])
 			{
 				
 
@@ -6512,7 +6337,7 @@ public InRangeOfBiz(playerid)
 
 CMD:bizinfo(playerid,params[])
 {
-	if(MasterAccount[playerid][Admin] >= 1)
+	if(Account[playerid][Admin] >= 1)
 	{
 		if(InRangeOfBiz(playerid) > 0)
 		{
@@ -6557,7 +6382,7 @@ stock Quiz_Info2(playerid, info)
 
 CMD:quiztest(playerid,params[])
 {
-	if(MasterAccount[playerid][Admin] >= 1)
+	if(Account[playerid][Admin] >= 1)
 	{
 		new rand;
 		if(sscanf(params, "d", rand)) return SendClientMessage(playerid, COLOR_GRAY, "/quiztest [section]");
@@ -6577,9 +6402,9 @@ CMD:balance(playerid,params[])
     if(InRangeOfIcon(playerid, 5) == 1)
 	{
 		new str[128];
-		if(Business[PlayerInfo[playerid][bEntered]][Owned] == 2)
+		if(Business[Character[playerid][bEntered]][Owned] == 2)
 		{
-			format(str, sizeof(str), "Bank Balance: "COL_DGREEN"$%s", FormatNumber(PlayerInfo[playerid][Bank]));
+			format(str, sizeof(str), "Bank Balance: "COL_DGREEN"$%s", FormatNumber(Character[playerid][Bank]));
 			Dialog_Show(playerid,BANK_BALANCE,DIALOG_STYLE_MSGBOX,"- My Bank -",str,"Close","");
 		}
 		else
@@ -6600,14 +6425,14 @@ CMD:withdraw(playerid,params[])
 	if(InRangeOfIcon(playerid, 5) == 1)
 	{
 		new str[128], amount;
-		if(Business[PlayerInfo[playerid][bEntered]][Owned] == 2)
+		if(Business[Character[playerid][bEntered]][Owned] == 2)
 		{
 			if(sscanf(params, "d", amount)) return SendClientMessage(playerid, COLOR_GRAY, "/withdraw [amount]");
-			if(PlayerInfo[playerid][Bank] >= amount)
+			if(Character[playerid][Bank] >= amount)
 			{
-				MYSQL_Update_Account(playerid, "Bank", PlayerInfo[playerid][Bank] -= amount);
+				MYSQL_Update_Character(playerid, "Bank", Character[playerid][Bank] -= amount);
 
-				format(str, sizeof(str), ""COL_LBLUE"Withdrawal Amount: "COL_DGREEN"$%s\n"COL_LBLUE"Bank Balance: "COL_DGREEN"$%s", FormatNumber(amount), FormatNumber(PlayerInfo[playerid][Bank]));
+				format(str, sizeof(str), ""COL_LBLUE"Withdrawal Amount: "COL_DGREEN"$%s\n"COL_LBLUE"Bank Balance: "COL_DGREEN"$%s", FormatNumber(amount), FormatNumber(Character[playerid][Bank]));
 				Dialog_Show(playerid,BANK_BALANCE,DIALOG_STYLE_MSGBOX,"- My Bank -",str,"Close","");
 				GivePlayerMoneyEx(playerid, amount);
 			}
@@ -6629,13 +6454,13 @@ CMD:deposit(playerid,params[])
 	if(InRangeOfIcon(playerid, 5) == 1)
 	{
 		new str[128], amount;
-		if(Business[PlayerInfo[playerid][bEntered]][Owned] == 2)
+		if(Business[Character[playerid][bEntered]][Owned] == 2)
 		{
 			if(sscanf(params, "d", amount)) return SendClientMessage(playerid, COLOR_GRAY, "/deposit [amount]");
-			if(PlayerInfo[playerid][Cash] >= amount)
+			if(Character[playerid][Cash] >= amount)
 			{
-				MYSQL_Update_Account(playerid, "Bank", PlayerInfo[playerid][Bank] += amount);
-				format(str, sizeof(str), ""COL_LBLUE"Deposited Amount: "COL_DGREEN"$%s\n"COL_LBLUE"Bank Balance: "COL_DGREEN"$%s", FormatNumber(amount), FormatNumber(PlayerInfo[playerid][Bank]));
+				MYSQL_Update_Character(playerid, "Bank", Character[playerid][Bank] += amount);
+				format(str, sizeof(str), ""COL_LBLUE"Deposited Amount: "COL_DGREEN"$%s\n"COL_LBLUE"Bank Balance: "COL_DGREEN"$%s", FormatNumber(amount), FormatNumber(Character[playerid][Bank]));
 				Dialog_Show(playerid,BANK_BALANCE,DIALOG_STYLE_MSGBOX,"- My Bank -",str,"Close","");
 				GivePlayerMoneyEx(playerid, -amount);
 			}
@@ -6660,38 +6485,38 @@ CMD:deposit(playerid,params[])
 
 CMD:ahelp(playerid, params[])
 {
-	if(MasterAccount[playerid][Admin] == 0) return SendErrorMessage(playerid, ERROR_ADMIN);
-	if(MasterAccount[playerid][Admin] >= 1)
+	if(Account[playerid][Admin] == 0) return SendErrorMessage(playerid, ERROR_ADMIN);
+	if(Account[playerid][Admin] >= 1)
 	{
 		SendClientMessage(playerid, COLOR_YELLOW, "Admin Commands:");
 		SendClientMessage(playerid, COLOR_GRAY, "ADMIN LVL 1:[/adminduty][/binfo][/kick][/ban][/(un)freeze][/(down)slap][/(un)mute][/(announce)ment]");
 		SendClientMessage(playerid, COLOR_GRAY, "ADMIN LVL 1:[/setplayer [id] [option]]");
 		SendClientMessage(playerid, COLOR_GRAY, "ADMIN LVL 1:\t [health][armour][level][skinvw][inteior][age][gender]");
 	}
-	if(MasterAccount[playerid][Admin] >= 2)
+	if(Account[playerid][Admin] >= 2)
 	{
 		SendClientMessage(playerid, COLOR_GRAY, "ADMIN LVL 2:[/gotoh][/gotoi][/gotob][/gotov][/gotop][/getp][/getv][/giveweapon][/resetweapons]");
 	}
-	if(MasterAccount[playerid][Admin] >= 3)
+	if(Account[playerid][Admin] >= 3)
 	{
 		SendClientMessage(playerid, COLOR_GRAY, "ADMIN LVL 3:[/deletepv][/vehicle][/delv][/delvall][/fvreload]");
 	}
-	if(MasterAccount[playerid][Admin] >= 4)
+	if(Account[playerid][Admin] >= 4)
 	{
 		SendClientMessage(playerid, COLOR_GRAY, "ADMIN LVL 4:[/sethouse][/seticon][/setveh][/settime]");
 	}
-	if(MasterAccount[playerid][Admin] >= 5)
+	if(Account[playerid][Admin] >= 5)
 	{
 		SendClientMessage(playerid, COLOR_GRAY, "ADMIN LVL 5:[/createfv][/deletefv][/factionmanager][/businessmanager][/iconmanager]");
  		SendClientMessage(playerid, COLOR_GRAY, "ADMIN LVL 5:[/setplayer [id] [option]]");
 		SendClientMessage(playerid, COLOR_GRAY, "ADMIN LVL 5:\t [faction][rank][job][hentered][bentered]");
 	}
-	if(MasterAccount[playerid][Admin] >= 6)
+	if(Account[playerid][Admin] >= 6)
 	{
 		SendClientMessage(playerid, COLOR_GRAY, "ADMIN LVL 6:[/reload][/payday][/createsv][/deletesv][/setbiz][/housemanager]");
-		SendClientMessage(playerid, COLOR_GRAY, "ADMIN LVL 6:[/editobject][/selectobject][/makemovableobject][/aChangeCharacterUsername][/aChangeMAPassword]");
+		SendClientMessage(playerid, COLOR_GRAY, "ADMIN LVL 6:[/editobject][/selectobject][/makemovableobject][/changecname][/achangeapassword]");
  		SendClientMessage(playerid, COLOR_GRAY, "ADMIN LVL 6:[/setplayer [id] [option]]");
- 		SendClientMessage(playerid, COLOR_GRAY, "ADMIN LVL 6:\t [house][Business_1][bank][cash][ma_admin][vehicle(1,2,3)][ExemptIP]");
+ 		SendClientMessage(playerid, COLOR_GRAY, "ADMIN LVL 6:\t [house][Business_1][bank][cash][admin][vehicle(1,2,3)][ExemptIP]");
 		SendClientMessage(playerid, COLOR_GRAY, "DEBUG CMD:  [/inhouse][/inbiz][/vinfo][/binfo]");
 	}
 	
@@ -6702,9 +6527,9 @@ ALTCMD:ah->ahelp;
 CMD:inhouse(playerid,params[])
 {
 	new str[128];
-	if(MasterAccount[playerid][Admin] >= 1)
+	if(Account[playerid][Admin] >= 1)
 		{
-			format(str, sizeof(str), "You are in house: %d and next id is ", PlayerInfo[playerid][hEntered]);
+			format(str, sizeof(str), "You are in house: %d and next id is ", Character[playerid][hEntered]);
 			SendClientMessage(playerid, COLOR_GRAY, str);
 		}
 	else
@@ -6717,9 +6542,9 @@ CMD:inhouse(playerid,params[])
 CMD:inbiz(playerid,params[])
 {
 	new str[128];
-	if(MasterAccount[playerid][Admin] >= 1)
+	if(Account[playerid][Admin] >= 1)
 		{
-			format(str, sizeof(str), "You are in business: %d next ID is. You are in VW %d %d and Int %d %d", PlayerInfo[playerid][bEntered], Business[PlayerInfo[playerid][bEntered]][World], GetPlayerVirtualWorld(playerid), Business[PlayerInfo[playerid][bEntered]][Interior], GetPlayerInterior(playerid));
+			format(str, sizeof(str), "You are in business: %d next ID is. You are in VW %d %d and Int %d %d", Character[playerid][bEntered], Business[Character[playerid][bEntered]][World], GetPlayerVirtualWorld(playerid), Business[Character[playerid][bEntered]][Interior], GetPlayerInterior(playerid));
 			SendClientMessage(playerid, COLOR_GRAY, str);
 			InfoBoxForPlayer(playerid, "You are muted, you can't talk. \n If you think this is incorrect,\n Post an appeal on forums.");
 
@@ -6733,7 +6558,7 @@ CMD:inbiz(playerid,params[])
 
 CMD:restart(playerid, params[])
 {
-	if(MasterAccount[playerid][Admin] >= 5)
+	if(Account[playerid][Admin] >= 5)
 	{
 	    SendClientMessageToAll(COLOR_ORANGERED, "The server is restarting in 5 seconds, thus you have been kicked! ");
 	    SendRconCommand("password 38rwbui8b8");
@@ -6759,7 +6584,7 @@ public RestartServer()
 
 CMD:settime(playerid,params[])
 {
-	if(MasterAccount[playerid][Admin] >= 6)
+	if(Account[playerid][Admin] >= 6)
 	{
 	    new time,str[128];
 		if(sscanf(params, "d",time)) return SendClientMessage(playerid, COLOR_GRAY, "/settime [hour]");
@@ -6782,19 +6607,19 @@ CMD:settime(playerid,params[])
 
 CMD:kick(playerid, params[])
 {
-	if(MasterAccount[playerid][Admin] >= 1)
+	if(Account[playerid][Admin] >= 1)
 	{
 
         new pID, str[128], reason[128];
 		if(sscanf(params, "uS(Not specified)[128]", pID,reason)) return SendClientMessage(playerid, COLOR_GRAY, "/kick [ID/Name] [reason]");
-	    if(MasterAccount[pID][Admin] >= 1 && MasterAccount[playerid][Admin] != 6)
+	    if(Account[pID][Admin] >= 1 && Account[playerid][Admin] != 6)
 		{
 			SendErrorMessage(playerid, "You can't kick admins.");
 			return 1;
 		}
 		format(str, sizeof(str), "Admin %s has kicked %s | Reason: %s", GetRoleplayName(playerid), GetRoleplayName(pID), reason);
 		SendPunishmentMessage(str);
-		PlayerInfo[pID][Kicks] ++;
+		Character[pID][Kicks] ++;
 		KickPlayer(pID);
 
  	}
@@ -6807,11 +6632,11 @@ CMD:kick(playerid, params[])
 
 CMD:ban(playerid, params[])
 {
-	if(MasterAccount[playerid][Admin] >= 1)
+	if(Account[playerid][Admin] >= 1)
 	{
         new pID, str[128], reason[128];
 		if(sscanf(params, "uS(Not specified)[128]", pID,reason)) return SendClientMessage(playerid, COLOR_GRAY, "/ban [id] [reason]");
-		if(PlayerInfo[pID][Admin] >= 1  && MasterAccount[playerid][Admin] != 6)
+		if(Character[pID][Admin] >= 1  && Account[playerid][Admin] != 6)
 		{
 			SendClientMessage(playerid, COLOR_RED, "You can't ban admins.");
 		}
@@ -6819,7 +6644,7 @@ CMD:ban(playerid, params[])
 		{
 			format(str, sizeof(str), "Admin %s has banned %s | Reason: %s", GetRoleplayName(playerid), GetRoleplayName(pID), reason);
 			SendPunishmentMessage(str);
-			IssueBan(pID, GetDatabaseName(playerid), reason);
+			IssueBan(pID, GetName(playerid), reason);
 		}
 
  	}
@@ -6834,7 +6659,7 @@ CMD:ban(playerid, params[])
 CMD:toggleooc(playerid, params[])
 {
 	new str[128];
-	if(MasterAccount[playerid][Admin] >= 3)
+	if(Account[playerid][Admin] >= 3)
 	{
 		if(OOCStatus == 0)
 	    {
@@ -6859,12 +6684,12 @@ CMD:toggleooc(playerid, params[])
 CMD:mute(playerid, params[])
 {
 	new str[128], pID, astr[128];
-	if(MasterAccount[playerid][Admin] >= 2)
+	if(Account[playerid][Admin] >= 2)
 	{
 	    if(sscanf(params, "u", pID)) return SendClientMessage(playerid, COLOR_GRAY, "/mute [id]");
 	    format(str, sizeof(str), "Admin %s has muted %s.", GetRoleplayName(playerid), GetRoleplayName(pID));
 	    SendClientMessageToAll(COLOR_GRAY, str);
-	    PlayerInfo[pID][Muted] = 1;
+	    Character[pID][Muted] = 1;
 	    format(astr, sizeof(astr), "%s has muted %s!", GetRoleplayName(playerid), GetRoleplayName(pID));
 		SendAdminsMessage(1, COLOR_RED, astr);
 	}
@@ -6879,12 +6704,12 @@ CMD:mute(playerid, params[])
 CMD:unmute(playerid, params[])
 {
 	new str[128], pID, astr[128];
-	if(MasterAccount[playerid][Admin] >= 2)
+	if(Account[playerid][Admin] >= 2)
 	{
 	    if(sscanf(params, "u", pID)) return SendClientMessage(playerid, COLOR_GRAY, "/unmute [id]");
 	    format(str, sizeof(str), "Admin %s has unmuted you.", GetRoleplayName(playerid));
 	    SendClientMessage(pID, COLOR_RED, str);
-	    PlayerInfo[pID][Muted] = 0;
+	    Character[pID][Muted] = 0;
  	    format(astr, sizeof(astr), "%s has unmuted %s!", GetRoleplayName(playerid), GetRoleplayName(pID));
 		SendAdminsMessage(1, COLOR_RED, astr);
 	}
@@ -6899,7 +6724,7 @@ CMD:unmute(playerid, params[])
 CMD:freeze(playerid, params[])
 {
 	new pID, str[128];
-	if(MasterAccount[playerid][Admin] >= 2)
+	if(Account[playerid][Admin] >= 2)
 	{
 	    if(sscanf(params, "u", pID)) return SendClientMessage(playerid, COLOR_GRAY, "/freeze [id]");
 		TogglePlayerControllable(pID, 0);
@@ -6919,7 +6744,7 @@ CMD:freeze(playerid, params[])
 CMD:slap(playerid, params[])
 {
 	new pID, str[128],Float:px, Float:py, Float:pz;
-	if(MasterAccount[playerid][Admin] >= 1)
+	if(Account[playerid][Admin] >= 1)
 	{
 	    if(sscanf(params, "u", pID)) return SendClientMessage(playerid, COLOR_GRAY, "/slap [id]");
 	    PlayerPlaySound(playerid, 1130, 0.0, 0.0, 10.0);
@@ -6950,7 +6775,7 @@ CMD:slap(playerid, params[])
 CMD:downslap(playerid, params[])
 {
 	new pID, str[128],Float:px, Float:py, Float:pz;
-	if(MasterAccount[playerid][Admin] >= 1)
+	if(Account[playerid][Admin] >= 1)
 	{
 	    if(sscanf(params, "u", pID)) return SendClientMessage(playerid, COLOR_GRAY, "/downslap [id]");
 		GetPlayerPos(pID, px, py, pz);
@@ -6972,14 +6797,14 @@ public SpectatePlayer(playerid, targetid)
 	{
 		new str[128];
 
-		if(PlayerInfo[playerid][IsSpec] == -1)
+		if(Character[playerid][IsSpec] == -1)
 	    {
-        	GetPlayerPos(playerid, PlayerInfo[playerid][PosX], PlayerInfo[playerid][PosY], PlayerInfo[playerid][PosZ]);
-            PlayerInfo[playerid][Interior] = GetPlayerInterior(playerid);
-            PlayerInfo[playerid][VWorld] = GetPlayerVirtualWorld(playerid);
+        	GetPlayerPos(playerid, Character[playerid][PosX], Character[playerid][PosY], Character[playerid][PosZ]);
+            Character[playerid][Interior] = GetPlayerInterior(playerid);
+            Character[playerid][VWorld] = GetPlayerVirtualWorld(playerid);
 	    }
 	    
-		PlayerInfo[playerid][IsSpec] = targetid;
+		Character[playerid][IsSpec] = targetid;
 
 		if(IsPlayerInAnyVehicle(targetid))
 		{
@@ -6999,8 +6824,8 @@ public SpectatePlayer(playerid, targetid)
 		    SetPlayerInterior(playerid, GetPlayerInterior(targetid));
 		    SetPlayerVirtualWorld(playerid, GetPlayerVirtualWorld(targetid));
 
-		    PlayerInfo[playerid][bEntered] = PlayerInfo[targetid][bEntered];
-		    PlayerInfo[playerid][hEntered] = PlayerInfo[targetid][hEntered];
+		    Character[playerid][bEntered] = Character[targetid][bEntered];
+		    Character[playerid][hEntered] = Character[targetid][hEntered];
 
 			TogglePlayerSpectating(playerid, 1);
 		    PlayerSpectatePlayer(playerid, targetid);
@@ -7021,12 +6846,12 @@ public SpectatePlayer(playerid, targetid)
 CMD:spec(playerid, params[])
 {
 	new TargetPlayer;
-	if(MasterAccount[playerid][Admin] > 0)
+	if(Account[playerid][Admin] > 0)
 	{
 	    if(sscanf(params, "u", TargetPlayer)) return SendClientMessage(playerid, COLOR_GRAY, "/spec [id]");
-		if(PlayerInfo[TargetPlayer][IsSpec] > -1) return SendClientMessage(playerid, COLOR_GRAY, "Player is spectating!");
+		if(Character[TargetPlayer][IsSpec] > -1) return SendClientMessage(playerid, COLOR_GRAY, "Player is spectating!");
 		if(TargetPlayer == playerid) return SendClientMessage(playerid, COLOR_GRAY, "No speccing yourself!");
-		if(PlayerInfo[TargetPlayer][LoggedIn] == 0) return SendErrorMessage(playerid, "Player not logged in!");
+		if(LoggedIn[TargetPlayer] == 0) return SendErrorMessage(playerid, "Player not logged in!");
 
 		SpectatePlayer(playerid, TargetPlayer);
 	}
@@ -7039,12 +6864,12 @@ CMD:spec(playerid, params[])
 
 CMD:specoff(playerid, params[])
 {
-	if(MasterAccount[playerid][Admin] > 0)
+	if(Account[playerid][Admin] > 0)
 	{
-        if(PlayerInfo[playerid][IsSpec] == -1) return SendClientMessage(playerid, COLOR_GRAY, "You are NOT speccing anyone!");
-        PlayerInfo[playerid][IsSpec] = -1;
+        if(Character[playerid][IsSpec] == -1) return SendClientMessage(playerid, COLOR_GRAY, "You are NOT speccing anyone!");
+        Character[playerid][IsSpec] = -1;
 		TogglePlayerSpectating(playerid, 0);
-	    SetPlayerPosEx(playerid, PlayerInfo[playerid][PosX], PlayerInfo[playerid][PosY], PlayerInfo[playerid][PosZ], PlayerInfo[playerid][Interior], PlayerInfo[playerid][VWorld]);
+	    SetPlayerPosEx(playerid, Character[playerid][PosX], Character[playerid][PosY], Character[playerid][PosZ], Character[playerid][Interior], Character[playerid][VWorld]);
         UpdatePlayerWeapons(playerid);
 	}
 	return 1;
@@ -7149,7 +6974,7 @@ public OnPlayerEnterDynamicRaceCP(playerid, checkpointid)
 				}
 				else if(Trucking[playerid][SectionID] == 3)
 				{
-					new Time = gettime(), Float:TruckLevel = PlayerInfo[playerid][TruckingCompleted], Float:Multiplier, Payment, Earnings, Pay, Bonus, Float:vDamage, DamageCost;
+					new Time = gettime(), Float:TruckLevel = Character[playerid][TruckingCompleted], Float:Multiplier, Payment, Earnings, Pay, Bonus, Float:vDamage, DamageCost;
 					printf("%d",Time);
 					Time -= Trucking[playerid][TimeTaken];
 					printf("%d",Time);
@@ -7201,7 +7026,7 @@ public OnPlayerEnterDynamicRaceCP(playerid, checkpointid)
 					Trucking[playerid][CheckpointID] = 0;
 					Trucking[playerid][TimeTaken] = 0;
 
-					PlayerInfo[playerid][TruckingCompleted]++;
+					Character[playerid][TruckingCompleted]++;
 
 					if(Vehicles[vID][Type] == 5)
 					{
@@ -7242,7 +7067,7 @@ CMD:dmv(playerid, params[])
 	{
 		if(InRangeOfIcon(playerid,12))
 		{
-			if(PlayerInfo[playerid][Cash] >= 1000)
+			if(Character[playerid][Cash] >= 1000)
 			{
 				new id = 0;
     			GDL_Test[playerid] = CreateDynamicRaceCP(0, GDL_ROUTE[id][0], GDL_ROUTE[id][1], GDL_ROUTE[id][2], GDL_ROUTE[id+1][0], GDL_ROUTE[id+1][1], GDL_ROUTE[id+1][2], 3, GetPlayerVirtualWorld(playerid), GetPlayerInterior(playerid), playerid, 500);
@@ -7315,19 +7140,19 @@ CMD:starttrucking(playerid, params[])
 
 	if(Trucking[playerid][CheckpointID] == 0)
 	{
-		if(gettime() - PlayerInfo[playerid][TruckCoolDown] < 600) return SendErrorMessage(playerid, "Your trucking cool-down period of 10 minutes hasn't ended.");
+		if(gettime() - Character[playerid][TruckCoolDown] < 600) return SendErrorMessage(playerid, "Your trucking cool-down period of 10 minutes hasn't ended.");
 		if(Vehicles[GetPlayerVehicleID(playerid)][Type] == 5)
 		{
 			new vModel = GetVehicleModel(GetPlayerVehicleID(playerid));
-			if(vModel == 482 && PlayerInfo[playerid][TruckingCompleted] < 50) return SendErrorMessage(playerid, "You need to have done at least 50 missions before you can use this vehicle."); // burrito
-			if(vModel == 515 && PlayerInfo[playerid][TruckingCompleted] < 40) return SendErrorMessage(playerid, "You need to have done at least 40 missions before you can use this vehicle."); //road train
-			if(vModel == 422 && PlayerInfo[playerid][TruckingCompleted] < 30) return SendErrorMessage(playerid, "You need to have done at least 30 missions before you can use this vehicle."); //bobcat
-			if(vModel == 403 && PlayerInfo[playerid][TruckingCompleted] < 20) return SendErrorMessage(playerid, "You need to have done at least 20 missions before you can use this vehicle."); // linerunner
-			if(vModel == 440 && PlayerInfo[playerid][TruckingCompleted] < 10) return SendErrorMessage(playerid, "You need to have done at least 10 missions before you can use this vehicle."); // rumpo
+			if(vModel == 482 && Character[playerid][TruckingCompleted] < 50) return SendErrorMessage(playerid, "You need to have done at least 50 missions before you can use this vehicle."); // burrito
+			if(vModel == 515 && Character[playerid][TruckingCompleted] < 40) return SendErrorMessage(playerid, "You need to have done at least 40 missions before you can use this vehicle."); //road train
+			if(vModel == 422 && Character[playerid][TruckingCompleted] < 30) return SendErrorMessage(playerid, "You need to have done at least 30 missions before you can use this vehicle."); //bobcat
+			if(vModel == 403 && Character[playerid][TruckingCompleted] < 20) return SendErrorMessage(playerid, "You need to have done at least 20 missions before you can use this vehicle."); // linerunner
+			if(vModel == 440 && Character[playerid][TruckingCompleted] < 10) return SendErrorMessage(playerid, "You need to have done at least 10 missions before you can use this vehicle."); // rumpo
 			new id = 0;
 			Trucking[playerid][RouteID] = 0;
 			Trucking[playerid][TruckID] = GetPlayerVehicleID(playerid);
-			PlayerInfo[playerid][TruckCoolDown] = gettime();
+			Character[playerid][TruckCoolDown] = gettime();
 			Trucking[playerid][TimeTaken] = gettime();
 
 			//GivePlayerMoneyEx(playerid, -1000);
@@ -7399,7 +7224,7 @@ CMD:endmission(playerid, params[])
 CMD:installstereo(playerid, params[])
 {
 	new vid = GetPlayerVehicleID(playerid);
-	if(PlayerInfo[playerid][Job] == MECHANIC_JOB)
+	if(Character[playerid][Job] == MECHANIC_JOB)
 	{
 		if(Inventory[playerid][VehicleRadio] > 0)
 		{
@@ -7430,7 +7255,7 @@ CMD:installstereo(playerid, params[])
 
 CMD:tow(playerid, params[])
 {
-	if(PlayerInfo[playerid][Job] != MECHANIC_JOB) return SendErrorMessage(playerid, "You must be a mechanic to tow vehicles.");
+	if(Character[playerid][Job] != MECHANIC_JOB) return SendErrorMessage(playerid, "You must be a mechanic to tow vehicles.");
 
 	new vehicleid = GetPlayerVehicleID(playerid), modelid = GetVehicleModel(vehicleid);
 	if(modelid != 525 && modelid != 531) return SendErrorMessage(playerid, "You must be in a tow truck or tractor.");
@@ -7645,7 +7470,7 @@ Dialog:VehicleMods_Hydraulics(playerid, response, listitem, inputtext[])
 	if(listitem != sizeof(Mod_Hydraulics))
 	{
 		if(component == Mod_Hydraulics[listitem][0]) return SendErrorMessage(playerid, "You already have hydraulics installed.");
-		if(PlayerInfo[playerid][Cash] < Mod_Hydraulics[listitem][1]) return SendErrorMessage(playerid, ERROR_MONEY);
+		if(Character[playerid][Cash] < Mod_Hydraulics[listitem][1]) return SendErrorMessage(playerid, ERROR_MONEY);
 		GivePlayerMoneyEx(playerid, -Mod_Hydraulics[listitem][1]);
 		AddVehicleComponent(vid, Mod_Hydraulics[listitem][0]);
 		Query_Set_PlayerVehicle(vid, "Hydraulics", Mod_Hydraulics[listitem][0]);
@@ -7688,7 +7513,7 @@ Dialog:VehicleMods_Nitrous(playerid, response, listitem, inputtext[])
 	if(listitem != sizeof(Mod_NOS))
 	{
 		if(component == Mod_NOS[listitem][0]) return SendErrorMessage(playerid, "You already have this type of NOS installed.");
-		if(PlayerInfo[playerid][Cash] < Mod_NOS[listitem][1]) return SendErrorMessage(playerid, ERROR_MONEY);
+		if(Character[playerid][Cash] < Mod_NOS[listitem][1]) return SendErrorMessage(playerid, ERROR_MONEY);
 		GivePlayerMoneyEx(playerid, -Mod_NOS[listitem][1]);
 		AddVehicleComponent(vid, Mod_NOS[listitem][0]);
 		Query_Set_PlayerVehicle(vid, "Nitrous", Mod_NOS[listitem][0]);
@@ -7732,7 +7557,7 @@ Dialog:VehicleMod_Wheels(playerid, response, listitem, inputtext[])
 	if(listitem != sizeof(Mod_Wheels))
 	{
 		if(component == Mod_Wheels[listitem][0]) return SendErrorMessage(playerid, "You already have these wheels installed.");
-		if(PlayerInfo[playerid][Cash] < Mod_Wheels[listitem][1]) return SendErrorMessage(playerid, ERROR_MONEY);
+		if(Character[playerid][Cash] < Mod_Wheels[listitem][1]) return SendErrorMessage(playerid, ERROR_MONEY);
 		GivePlayerMoneyEx(playerid, -Mod_Wheels[listitem][1]);
 		AddVehicleComponent(vid, Mod_Wheels[listitem][0]);
 		Query_Set_PlayerVehicle(vid, "Wheels", Mod_Wheels[listitem][0]);
@@ -7755,13 +7580,13 @@ Dialog:VehicleMod_Wheels(playerid, response, listitem, inputtext[])
 CMD:vmods(playerid, params[])
 {
 	new vid = GetPlayerVehicleID(playerid);
-	if(PlayerInfo[playerid][Job] == MECHANIC_JOB)
+	if(Character[playerid][Job] == MECHANIC_JOB)
 	{	
 		if(InRangeOfIcon(playerid, 14))
 		{
 			if(vid != INVALID_VEHICLE_ID)
 			{
-				if(Vehicles[vid][Type] == 1)// Command to offer vmods?  && Vehicles[vid][Owner] == PlayerInfo[playerid][SQLID]
+				if(Vehicles[vid][Type] == 1)// Command to offer vmods?  && Vehicles[vid][Owner] == Character[playerid][ID]
 				{
 					VehicleMods_MainMenu(playerid);		
 				}
@@ -7779,7 +7604,7 @@ CMD:vmods(playerid, params[])
 CMD:setfare(playerid, params[])
 {
 
-	if(PlayerInfo[playerid][Job] == TAXI_JOB)
+	if(Character[playerid][Job] == TAXI_JOB)
 	{
 		if(IsVehicleTaxi(GetVehicleModel(GetPlayerVehicleID(playerid))))
 		{
@@ -7815,7 +7640,7 @@ CMD:setfare(playerid, params[])
 
 CMD:endfare(playerid, params[])
 {
-	if(PlayerInfo[playerid][Job] == TAXI_JOB)
+	if(Character[playerid][Job] == TAXI_JOB)
 	{
 		if(!IsVehicleTaxi(GetVehicleModel(GetPlayerVehicleID(playerid)))) return SendErrorMessage(playerid, "You may only do this inside the taxi.");
 		EndTaxiMeter(playerid);
@@ -7832,7 +7657,7 @@ CMD:endfare(playerid, params[])
 CMD:offertaxi(playerid, params[])
 {
 
-	if(PlayerInfo[playerid][Job] == TAXI_JOB)
+	if(Character[playerid][Job] == TAXI_JOB)
 	{
 		new player, str[128];
 		if(!IsVehicleTaxi(GetVehicleModel(GetPlayerVehicleID(playerid)))) return SendErrorMessage(playerid, "You may only do this inside the taxi.");
@@ -7951,7 +7776,7 @@ CMD:pay(playerid, params[])
 	{
 		if(IsInRangeOfPlayer(playerid, player, 5))
 		{
-			if(amount > PlayerInfo[playerid][Cash] || amount > 250000 || amount <= 0 || PlayerInfo[playerid][Cash] <= 0 || playerid == player) return SendErrorMessage(playerid, ERROR_VALUE);
+			if(amount > Character[playerid][Cash] || amount > 250000 || amount <= 0 || Character[playerid][Cash] <= 0 || playerid == player) return SendErrorMessage(playerid, ERROR_VALUE);
 			
 			format(str, sizeof(str), "* %s withdraws their wallet, and takes out some cash before giving it to %s. *", GetRoleplayName(playerid), GetRoleplayName(player));
 			SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
@@ -8024,7 +7849,7 @@ CMD:give(playerid, params[])
 CMD:gotop(playerid, params[])
 {
 	new TargetPlayer, str[128],Float:X, Float:Y, Float:Z;
-	if(MasterAccount[playerid][Admin] >= 1)
+	if(Account[playerid][Admin] >= 1)
 	{
 	    if(sscanf(params, "u", TargetPlayer)) return SendClientMessage(playerid, COLOR_GRAY, "/gotop [id]");
 	    if(!IsPlayerConnected(TargetPlayer)) return SendErrorMessage(playerid, ERROR_OPTION);
@@ -8036,8 +7861,8 @@ CMD:gotop(playerid, params[])
 		  	SetPlayerInterior(playerid, GetPlayerInterior(TargetPlayer));
 		    SetPlayerVirtualWorld(playerid, GetPlayerVirtualWorld(TargetPlayer));
 
-		    PlayerInfo[playerid][bEntered] = PlayerInfo[TargetPlayer][bEntered];
-		    PlayerInfo[playerid][hEntered] = PlayerInfo[TargetPlayer][hEntered];
+		    Character[playerid][bEntered] = Character[TargetPlayer][bEntered];
+		    Character[playerid][hEntered] = Character[TargetPlayer][hEntered];
 
 		    format(str, sizeof(str), "You have teleported to %s.", GetRoleplayName(TargetPlayer));
 			SendClientMessage(playerid, COLOR_LBLUE, str);
@@ -8050,8 +7875,8 @@ CMD:gotop(playerid, params[])
 		    GetPlayerPos(TargetPlayer, X, Y, Z);
 		    SetPlayerPosEx(playerid, X, Y, Z+2, GetPlayerInterior(TargetPlayer), GetPlayerVirtualWorld(TargetPlayer));
 
-		    PlayerInfo[playerid][bEntered] = PlayerInfo[TargetPlayer][bEntered];
-		    PlayerInfo[playerid][hEntered] = PlayerInfo[TargetPlayer][hEntered];
+		    Character[playerid][bEntered] = Character[TargetPlayer][bEntered];
+		    Character[playerid][hEntered] = Character[TargetPlayer][hEntered];
 
 		    format(str, sizeof(str), "You have teleported to %s.", GetRoleplayName(TargetPlayer));
 			SendClientMessage(playerid, COLOR_LBLUE, str);
@@ -8070,7 +7895,7 @@ CMD:gotop(playerid, params[])
 CMD:getp(playerid, params[])
 {
 	new TargetPlayer, str[128],Float:X, Float:Y, Float:Z;
-	if(MasterAccount[playerid][Admin] >= 1)
+	if(Account[playerid][Admin] >= 1)
 	{
 	    if(sscanf(params, "u", TargetPlayer)) return SendClientMessage(playerid, COLOR_GRAY, "/getp [playerid]");
         if(IsPlayerInAnyVehicle(TargetPlayer))
@@ -8081,8 +7906,8 @@ CMD:getp(playerid, params[])
 		  	SetPlayerInterior(TargetPlayer, GetPlayerInterior(playerid));
 		    SetPlayerVirtualWorld(TargetPlayer, GetPlayerVirtualWorld(playerid));
 
-		    PlayerInfo[TargetPlayer][bEntered] = PlayerInfo[playerid][bEntered];
-		    PlayerInfo[TargetPlayer][hEntered] = PlayerInfo[playerid][hEntered];
+		    Character[TargetPlayer][bEntered] = Character[playerid][bEntered];
+		    Character[TargetPlayer][hEntered] = Character[playerid][hEntered];
 
 		    format(str, sizeof(str), "You have teleported %s to your position.", GetRoleplayName(TargetPlayer));
 			SendClientMessage(playerid, COLOR_LBLUE, str);
@@ -8095,8 +7920,8 @@ CMD:getp(playerid, params[])
 		    GetPlayerPos(playerid, X, Y, Z);
 		    SetPlayerPosEx(TargetPlayer, X, Y, Z+2, GetPlayerInterior(playerid), GetPlayerVirtualWorld(playerid));
 
-		    PlayerInfo[TargetPlayer][bEntered] = PlayerInfo[playerid][bEntered];
-		    PlayerInfo[TargetPlayer][hEntered] = PlayerInfo[playerid][hEntered];
+		    Character[TargetPlayer][bEntered] = Character[playerid][bEntered];
+		    Character[TargetPlayer][hEntered] = Character[playerid][hEntered];
 
 		    format(str, sizeof(str), "You have teleported %s to your position.", GetRoleplayName(TargetPlayer));
 			SendClientMessage(playerid, COLOR_LBLUE, str);
@@ -8114,7 +7939,7 @@ CMD:getp(playerid, params[])
 
 CMD:gotoh(playerid,params[])
 {
-	if(MasterAccount[playerid][Admin] >= 2)
+	if(Account[playerid][Admin] >= 2)
 	{
 	    new id, name[32], str[128];
 
@@ -8125,8 +7950,8 @@ CMD:gotoh(playerid,params[])
 	            if(strfind(Houses[id][Name], name, true) != -1)
 	            {
 					SetPlayerPosEx(playerid, Houses[id][PosX], Houses[id][PosY], Houses[id][PosZ], 0, 0);
-			        PlayerInfo[playerid][hEntered] = 0;
-			        PlayerInfo[playerid][bEntered] = 0;
+			        Character[playerid][hEntered] = 0;
+			        Character[playerid][bEntered] = 0;
 		   			format(str, sizeof(str), "%s has teleported to house %s(%d).", GetRoleplayName(playerid), Houses[id][Name], id);
 					SendAdminsMessage(1, COLOR_SLATEGRAY, str);
 					return 1;
@@ -8143,7 +7968,7 @@ CMD:gotoh(playerid,params[])
 
 CMD:gotob(playerid,params[])
 {
-	if(MasterAccount[playerid][Admin] >= 2)
+	if(Account[playerid][Admin] >= 2)
 	{
 	    new id, idi[32], str[128];
 
@@ -8154,8 +7979,8 @@ CMD:gotob(playerid,params[])
 	            if(strfind(Business[id][Name], idi, true) != -1)
 	            {
 					SetPlayerPosEx(playerid, Business[id][PosX], Business[id][PosY], Business[id][PosZ], 0, 0);
-			        PlayerInfo[playerid][hEntered] = 0;
-			        PlayerInfo[playerid][bEntered] = 0;
+			        Character[playerid][hEntered] = 0;
+			        Character[playerid][bEntered] = 0;
 		   			format(str, sizeof(str), "%s has teleported to business %s(%d).", GetRoleplayName(playerid), Business[id][Name], id);
 					SendAdminsMessage(1, COLOR_SLATEGRAY, str);
 					return 1;
@@ -8172,7 +7997,7 @@ CMD:gotob(playerid,params[])
 
 CMD:gotoi(playerid,params[])
 {
-	if(MasterAccount[playerid][Admin] >= 2)
+	if(Account[playerid][Admin] >= 2)
 	{
 	    new id, str[128];
 		if(sscanf(params, "d", id)) return SendClientMessage(playerid, COLOR_GRAY, "/gotoi [icon id]");
@@ -8180,8 +8005,8 @@ CMD:gotoi(playerid,params[])
 			if(id <= Total_Icons_Created)
 			{
 				SetPlayerPosEx(playerid, Icons[id][PosX], Icons[id][PosY], Icons[id][PosZ], Icons[id][Interior], Icons[id][World]);
-		        PlayerInfo[playerid][hEntered] = 0;
-		        PlayerInfo[playerid][bEntered] = 0;
+		        Character[playerid][hEntered] = 0;
+		        Character[playerid][bEntered] = 0;
 	   			format(str, sizeof(str), "%s has teleported to Icon(%d).", GetRoleplayName(playerid), id);
 				SendAdminsMessage(1, COLOR_SLATEGRAY, str);
 			}
@@ -8200,7 +8025,7 @@ CMD:gotoi(playerid,params[])
 
 CMD:gotov(playerid, params[])
 {
-	if(MasterAccount[playerid][Admin] >= 1)
+	if(Account[playerid][Admin] >= 1)
 	{
 	    new TargetVehicle, Float:X, Float:Y, Float:Z, str[128];
 		if(sscanf(params, "d", TargetVehicle)) return SendClientMessage(playerid, COLOR_GRAY, "/gotov [VehicleID]");
@@ -8212,8 +8037,8 @@ CMD:gotov(playerid, params[])
 		        GetVehiclePos(TargetVehicle, X, Y, Z);
 		        SetVehiclePos(GetPlayerVehicleID(playerid), X, Y, Z+5);
 
-		        PlayerInfo[playerid][hEntered] = 0;
-	        	PlayerInfo[playerid][bEntered] = 0;
+		        Character[playerid][hEntered] = 0;
+	        	Character[playerid][bEntered] = 0;
 
 	        	format(str, sizeof(str), "You have TPed to vehicle %d.", TargetVehicle);
 				SendClientMessage(playerid, COLOR_LBLUE, str);
@@ -8221,8 +8046,8 @@ CMD:gotov(playerid, params[])
 			GetVehiclePos(TargetVehicle, X, Y, Z);
 			SetPlayerPos(playerid, X, Y, Z+5);
 
-			PlayerInfo[playerid][hEntered] = 0;
-	        PlayerInfo[playerid][bEntered] = 0;
+			Character[playerid][hEntered] = 0;
+	        Character[playerid][bEntered] = 0;
 
 			format(str, sizeof(str), "You have been teleported to vehicle %d position.", TargetVehicle);
 			SendClientMessage(playerid, COLOR_LBLUE, str);
@@ -8242,7 +8067,7 @@ CMD:gotov(playerid, params[])
 CMD:getv(playerid, params[])
 {
 	new TargetVehicle, Float:X, Float:Y, Float:Z, str[128];
-	if(MasterAccount[playerid][Admin] >= 4)
+	if(Account[playerid][Admin] >= 4)
 	{
 		if(sscanf(params, "d", TargetVehicle)) return SendClientMessage(playerid, COLOR_GRAY, "/getv [VehicleID]");
 		GetPlayerPos(playerid, X, Y, Z);
@@ -8267,15 +8092,15 @@ CMD:admins(playerid, params[])
 	{
 		if(IsPlayerConnected(player))
 		{
-		    if(MasterAccount[player][Admin] > 0)
+		    if(Account[player][Admin] > 0)
 	  		{
-	  			if(PlayerInfo[player][AdminDuty] == 0) 
+	  			if(Character[player][AdminDuty] == 0) 
 	  			{
-	  				format(str, sizeof(str), "%s (Off Duty): %s", AdminNames[MasterAccount[player][Admin]][0],  GetRoleplayName(player));
+	  				format(str, sizeof(str), "%s (Off Duty): %s", AdminNames[Account[player][Admin]][0],  GetRoleplayName(player));
   				}
   				else 
 				{
-					format(str, sizeof(str), "%s (Administrating): %s", AdminNames[MasterAccount[player][Admin]][0], GetRoleplayName(player));
+					format(str, sizeof(str), "%s (Administrating): %s", AdminNames[Account[player][Admin]][0], GetRoleplayName(player));
 				}
 				SendClientMessage(playerid, COLOR_GRAY, str);
 		    }
@@ -8288,19 +8113,19 @@ CMD:admins(playerid, params[])
 CMD:adminduty(playerid, params[])
 {
 	new str[128], option[24];
-	if(MasterAccount[playerid][Admin] > 0)
+	if(Account[playerid][Admin] > 0)
 	{
 		if(sscanf(params, "s[12]", option)) return SendClientMessage(playerid, COLOR_GRAY, "/adminduty [on/off]");
 		if(!strcmp(option, "on", true))
 		{
-			if(PlayerInfo[playerid][AdminDuty] == 0)
+			if(Character[playerid][AdminDuty] == 0)
 			{
-				PlayerInfo[playerid][AdminDuty] = 1;
+				Character[playerid][AdminDuty] = 1;
 				for (new i = 0; i < MAX_PLAYERS; ++i)
 				{
-					if(PlayerInfo[i][LoggedIn] == 1)
+					if(LoggedIn[i] == 1)
 					{
-						format(str, sizeof(str), "%s %s is now on admin duty, feel free to request their help.", AdminNames[MasterAccount[playerid][Admin]][0], GetRoleplayName(playerid));
+						format(str, sizeof(str), "%s %s is now on admin duty, feel free to request their help.", AdminNames[Account[playerid][Admin]][0], GetRoleplayName(playerid));
 						SendInfoMessage(i, str);
 					}
 				}
@@ -8311,9 +8136,9 @@ CMD:adminduty(playerid, params[])
 		}
 		else if(!strcmp(option, "off", true))
 		{
-			if(PlayerInfo[playerid][AdminDuty] == 1)
+			if(Character[playerid][AdminDuty] == 1)
 			{
-			    PlayerInfo[playerid][AdminDuty] = 0;
+			    Character[playerid][AdminDuty] = 0;
 			    SendClientMessage(playerid, COLOR_YELLOW, "You are now off admin duty.");
 			    SetPlayerColor(playerid, COLOR_WHITE);
 			}
@@ -8349,7 +8174,7 @@ CMD:report(playerid, params[])
 CMD:deleteicon(playerid, params[])
 {
 	new id, query[100], str[128];
-	if(MasterAccount[playerid][Admin] == 6)
+	if(Account[playerid][Admin] == 6)
 	{
 	    if(sscanf(params, "d", id)) return SendClientMessage(playerid, COLOR_GRAY, "/deleteicon [id]");
 		mysql_format(SQL_CONNECTION, query, sizeof(query), "DELETE FROM `Icons` WHERE `Icons`.`SQLID` = %d", Icons[id][SQLID]);
@@ -8369,10 +8194,10 @@ CMD:deleteicon(playerid, params[])
 CMD:deletebiz(playerid, params[])
 {
 	new bizid, query[100], str[128];
-	if(MasterAccount[playerid][Admin] == 6)
+	if(Account[playerid][Admin] == 6)
 	{
 	    if(sscanf(params, "d", bizid)) return SendClientMessage(playerid, COLOR_GRAY, "/deletebiz [id]");
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "DELETE FROM `%e`.`Biz` WHERE `Biz`.`ID` = %d", SQL_DB, Business[bizid][SQLID]);
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "DELETE FROM `%e`.`Business` WHERE `Business`.`ID` = %d", SQL_DB, Business[bizid][SQLID]);
 		mysql_tquery(SQL_CONNECTION, query);
 		Total_Biz_Created --;
 		format(str, sizeof(str), "%s has deleted a business(ID:%d).", GetRoleplayName(playerid), bizid);
@@ -8389,7 +8214,7 @@ CMD:deletebiz(playerid, params[])
 CMD:deletehouse(playerid, params[])
 {
 	new hid, query[100], str[128];
-	if(MasterAccount[playerid][Admin] == 6)
+	if(Account[playerid][Admin] == 6)
 	{
 	    if(sscanf(params, "d", hid)) return SendClientMessage(playerid, COLOR_GRAY, "/deletehouse [id]");
 		mysql_format(SQL_CONNECTION, query, sizeof(query), "DELETE FROM `Houses` WHERE `Houses`.`SQLID` = %d", Houses[hid][SQLID]);
@@ -8408,7 +8233,7 @@ CMD:deletehouse(playerid, params[])
 
 CMD:billcosby(playerid, params[])
 {
-    if(PlayerInfo[playerid][LoggedIn] == 0) return 1;
+    if(LoggedIn[playerid] == 0) return 1;
 
     GameTextForPlayer(playerid, "~w~zip ~r~zop ~b~zoopity ~y~bop!", 5000, 0);
 
@@ -8420,11 +8245,11 @@ CMD:billcosby(playerid, params[])
 CMD:setplayer(playerid, params[])
 {
 	new str[128], player, option1[24], option2;
-	if(MasterAccount[playerid][Admin] > 0)
+	if(Account[playerid][Admin] > 0)
 	{
         if(sscanf(params, "us[12]d", player, option1, option2)) return SendClientMessage(playerid, COLOR_GRAY, "/setplayer [id] [option] [value]");
 		{
-		    if(MasterAccount[player][Admin] > MasterAccount[playerid][Admin]) return SendErrorMessage(playerid, ERROR_ADMINLEVEL);
+		    if(Account[player][Admin] > Account[playerid][Admin]) return SendErrorMessage(playerid, ERROR_ADMINLEVEL);
     		if(IsPlayerConnected(player))
 			{
 	            if(player != INVALID_PLAYER_ID)
@@ -8432,11 +8257,11 @@ CMD:setplayer(playerid, params[])
 
 				    if(!strcmp(option1, "level", true))
 					{
-					    if (MasterAccount[playerid][Admin] >= 6)
+					    if (Account[playerid][Admin] >= 6)
 						{
 			                SetPlayerScore(player, option2);
-							PlayerInfo[player][Level] = option2;
-							MYSQL_Update_Account(player, option1, option2);
+							Character[player][Level] = option2;
+							MYSQL_Update_Character(player, option1, option2);
 							SendSetMessages(player, playerid, option1, option2);
 							return 1;
 					    }
@@ -8448,7 +8273,7 @@ CMD:setplayer(playerid, params[])
 
 				    else if(!strcmp(option1, "skin", true))
 					{
-					    if (MasterAccount[playerid][Admin] > 0)
+					    if (Account[playerid][Admin] > 0)
 						{
 							if(option2 < 1 || option2 > 299)
 							{
@@ -8458,7 +8283,7 @@ CMD:setplayer(playerid, params[])
 							else
 							{
 					        	SetPlayerSkinEx(player, option2);
-								MYSQL_Update_Account(player, option1, option2);
+								MYSQL_Update_Character(player, option1, option2);
 				                SendSetMessages(player, playerid, option1, option2);
 								return 1;
 						    }
@@ -8467,11 +8292,11 @@ CMD:setplayer(playerid, params[])
 
 				    else if(!strcmp(option1, "vworld", true))
 					{
-					    if (MasterAccount[playerid][Admin] > 0)
+					    if (Account[playerid][Admin] > 0)
 						{
 			                SetPlayerVirtualWorld(player, option2);
-							PlayerInfo[player][VWorld] = option2;
-							MYSQL_Update_Account(player, option1, option2);
+							Character[player][VWorld] = option2;
+							MYSQL_Update_Character(player, option1, option2);
 			                SendSetMessages(player, playerid, option1, option2);
 							return 1;
 				        }
@@ -8479,11 +8304,11 @@ CMD:setplayer(playerid, params[])
 
 				    else if(!strcmp(option1, "interior", true))
 					{
-					    if (MasterAccount[playerid][Admin] > 0)
+					    if (Account[playerid][Admin] > 0)
 						{
 			                SetPlayerInterior(player, option2);
-							PlayerInfo[player][Interior] = option2;
-							MYSQL_Update_Account(player, option1, option2);
+							Character[player][Interior] = option2;
+							MYSQL_Update_Character(player, option1, option2);
 							SendSetMessages(player, playerid, option1, option2);
 							return 1;
 						}
@@ -8491,12 +8316,12 @@ CMD:setplayer(playerid, params[])
 
 					else if(!strcmp(option1, "hp", true))
 					{
-					    if (MasterAccount[playerid][Admin] > 0)
+					    if (Account[playerid][Admin] > 0)
 						{
 							if(option2 > 0 && option2 < 101)
 							{
 				                SetPlayerHealth(player, option2);
-								PlayerInfo[player][Health] = option2;
+								Character[player][Health] = option2;
 
 				                format(str, sizeof(str), " Admin %s has set %s's %s to %d.", GetRoleplayName(playerid), GetRoleplayName(player), option1, option2);
 				                SendClientMessage(player, COLOR_YELLOW, str);
@@ -8512,12 +8337,12 @@ CMD:setplayer(playerid, params[])
 
 				    else if(!strcmp(option1, "armour", true))
 					{
-					    if (MasterAccount[playerid][Admin] > 0)
+					    if (Account[playerid][Admin] > 0)
 						{
 							if(option2 > 0 && option2 < 101)
 							{
 				                SetPlayerArmour(player, option2);
-								PlayerInfo[player][Armour] = option2;
+								Character[player][Armour] = option2;
 								SendSetMessages(player, playerid, option1, option2);
 								return 1;
 				            }
@@ -8530,15 +8355,15 @@ CMD:setplayer(playerid, params[])
 
 				    else if(!strcmp(option1, "faction", true))
 					{
-					    if (MasterAccount[playerid][Admin] > 4)
+					    if (Account[playerid][Admin] > 4)
 						{
 						    if(option2 > 0 && option2 <= MAX_FACTIONS)
 						    {
-						        PlayerInfo[player][Faction] = Factions[option2][SQLID];
-						        PlayerInfo[player][Rank] = 1;
-								MYSQL_Update_Account(player, option1, option2);
-								MYSQL_Update_Account(player, "Rank", 1);
-								new fid = GetFactionIDFromSQLID(PlayerInfo[player][Faction]);
+						        Character[player][Faction] = Factions[option2][SQLID];
+						        Character[player][Rank] = 1;
+								MYSQL_Update_Character(player, option1, option2);
+								MYSQL_Update_Character(player, "Rank", 1);
+								new fid = GetFactionIDFromSQLID(Character[player][Faction]);
 						        format(str, sizeof(str), " Admin %s has set %s's %s to %s(%d).", GetRoleplayName(playerid), GetRoleplayName(player), option1, Factions[fid][Name], option2);
 				                SendClientMessage(player, COLOR_YELLOW, str);
 								SendAdminsMessage(1, COLOR_YELLOW, str);
@@ -8546,11 +8371,11 @@ CMD:setplayer(playerid, params[])
 						    }
 						    else if(option2 == 0)
 							{
-						        PlayerInfo[player][Faction] = option2;
-						        PlayerInfo[player][Rank] = 0;
-								MYSQL_Update_Account(player, option1, option2);
-								MYSQL_Update_Account(player, "Rank", 0);
-              					format(str, sizeof(str), " Admin %s has set %s's %s to factionless(%d).", GetRoleplayName(playerid), GetRoleplayName(player), option1, Factions[PlayerInfo[player][Faction]][Name], option2);
+						        Character[player][Faction] = option2;
+						        Character[player][Rank] = 0;
+								MYSQL_Update_Character(player, option1, option2);
+								MYSQL_Update_Character(player, "Rank", 0);
+              					format(str, sizeof(str), " Admin %s has set %s's %s to factionless(%d).", GetRoleplayName(playerid), GetRoleplayName(player), option1, Factions[Character[player][Faction]][Name], option2);
 				                SendClientMessage(player, COLOR_YELLOW, str);
 								SendAdminsMessage(1, COLOR_YELLOW, str);
 								return 1;
@@ -8563,13 +8388,13 @@ CMD:setplayer(playerid, params[])
 					}
 				    else if(!strcmp(option1, "rank", true))
 					{
-					    if (MasterAccount[playerid][Admin] > 4)
+					    if (Account[playerid][Admin] > 4)
 						{
-							new fid = GetFactionIDFromSQLID(PlayerInfo[player][Faction]);
+							new fid = GetFactionIDFromSQLID(Character[player][Faction]);
          					if(option2 > 0 && option2 <= Factions[fid][MaxRank])
 						    {
-						        PlayerInfo[player][Rank] = option2;
-						        MYSQL_Update_Account(player, option1, option2);
+						        Character[player][Rank] = option2;
+						        MYSQL_Update_Character(player, option1, option2);
 						        SendSetMessages(player, playerid, option1, option2);
 								return 1;
 						    }
@@ -8582,12 +8407,12 @@ CMD:setplayer(playerid, params[])
 
 				    else if(!strcmp(option1, "age", true))
 					{
-					    if (MasterAccount[playerid][Admin] > 0)
+					    if (Account[playerid][Admin] > 0)
 						{
 	                        if(option2 > 0 && option2 <= 90)
 							{
-	                            PlayerInfo[player][Age] = option2;
-	                            MYSQL_Update_Account(player, option1, option2);
+	                            Character[player][Age] = option2;
+	                            MYSQL_Update_Character(player, option1, option2);
 						        SendSetMessages(player, playerid, option1, option2);
 	                            return 1;
 						    }
@@ -8599,12 +8424,12 @@ CMD:setplayer(playerid, params[])
 					}
 				    else if(!strcmp(option1, "gender", true))
 					{
-					    if (MasterAccount[playerid][Admin] > 0)
+					    if (Account[playerid][Admin] > 0)
 						{
 	                        if(option2 > 0 && option2 <= 2)
 							{
-	                            PlayerInfo[player][Gender] = option2;
-	                            MYSQL_Update_Account(player, option1, option2);
+	                            Character[player][Gender] = option2;
+	                            MYSQL_Update_Character(player, option1, option2);
 						        SendSetMessages(player, playerid, option1, option2);
 	                            return 1;
 						    }
@@ -8617,11 +8442,11 @@ CMD:setplayer(playerid, params[])
 					}
 				    else if(!strcmp(option1, "house", true))
 					{
-					    if (MasterAccount[playerid][Admin] >= 6)
+					    if (Account[playerid][Admin] >= 6)
 						{
 	                        if(option2 > 0 && option2 <= MAX_HOUSES)
 							{
-	                            PlayerInfo[player][House] = option2;
+	                            Character[player][House] = option2;
 						        SendSetMessages(player, playerid, option1, option2);
 	                            return 1;
 						    }
@@ -8633,11 +8458,11 @@ CMD:setplayer(playerid, params[])
 					}
 				    else if(!strcmp(option1, "business", true))
 					{
-					    if (MasterAccount[playerid][Admin] >= 6)
+					    if (Account[playerid][Admin] >= 6)
 						{
 	                        if(option2 > 0 && option2 <= MAX_BIZ)
 							{
-	                            PlayerInfo[player][Business_1] = option2;
+	                            Character[player][Business_1] = option2;
 						        SendSetMessages(player, playerid, option1, option2);
 	                            return 1;
 						    }
@@ -8649,11 +8474,11 @@ CMD:setplayer(playerid, params[])
 					}
 					else if(!strcmp(option1, "Business_2", true))
 					{
-					    if (MasterAccount[playerid][Admin] >= 6)
+					    if (Account[playerid][Admin] >= 6)
 						{
 	                        if(option2 > 0 && option2 <= MAX_BIZ)
 							{
-	                            PlayerInfo[player][Business_2] = option2;
+	                            Character[player][Business_2] = option2;
 						        SendSetMessages(player, playerid, option1, option2);
 	                            return 1;
 						    }
@@ -8665,11 +8490,11 @@ CMD:setplayer(playerid, params[])
 					}
 				    else if(!strcmp(option1, "hentered", true))
 					{
-					    if (MasterAccount[playerid][Admin] >= 4)
+					    if (Account[playerid][Admin] >= 4)
 						{
 	                        if(option2 > 0 && option2 <= MAX_HOUSES)
 							{
-	                            PlayerInfo[player][hEntered] = option2;
+	                            Character[player][hEntered] = option2;
 						        SendSetMessages(player, playerid, option1, option2);
 	                            return 1;
 						    }
@@ -8681,11 +8506,11 @@ CMD:setplayer(playerid, params[])
 					}
 				    else if(!strcmp(option1, "bentered", true))
 					{
-					    if (MasterAccount[playerid][Admin] >= 4)
+					    if (Account[playerid][Admin] >= 4)
 						{
 	                        if(option2 > 0 && option2 <= MAX_BIZ)
 							{
-	                            PlayerInfo[player][bEntered] = option2;
+	                            Character[player][bEntered] = option2;
 						        SendSetMessages(player, playerid, option1, option2);
 	                            return 1;
 						    }
@@ -8697,33 +8522,33 @@ CMD:setplayer(playerid, params[])
 					}
 				    else if(!strcmp(option1, "bank", true))
 					{
-					    if (MasterAccount[playerid][Admin] >= 6)
+					    if (Account[playerid][Admin] >= 6)
 						{
-	                            PlayerInfo[player][Bank] = option2;
-	                            MYSQL_Update_Account(player, option1, option2);
+	                            Character[player][Bank] = option2;
+	                            MYSQL_Update_Character(player, option1, option2);
 						        SendSetMessages(player, playerid, option1, option2);
 	                            return 1;
 				        }
 					}
 				    else if(!strcmp(option1, "cash", true))
 					{
-					    if (MasterAccount[playerid][Admin] >= 6)
+					    if (Account[playerid][Admin] >= 6)
 						{
-	                            PlayerInfo[player][Cash] = option2;
+	                            Character[player][Cash] = option2;
 	                            GivePlayerMoneyEx(player, 0);
-	                            MYSQL_Update_Account(player, option1, option2);
+	                            MYSQL_Update_Character(player, option1, option2);
 						        SendSetMessages(player, playerid, option1, option2);
 	                            return 1;
 				        }
 					}
-				    else if(!strcmp(option1, "ma_admin", true))
+				    else if(!strcmp(option1, "admin", true))
 					{
-					    if (MasterAccount[playerid][Admin] >= 6)
+					    if (Account[playerid][Admin] >= 6)
 						{
                             if(option2 > 0 && option2 <= 6)
 							{
-	                            MasterAccount[player][Admin] = option2;
-	                            MYSQL_Update_Interger(MasterAccount[player][SQLID], "MasterAccounts", "MA_Admin", MasterAccount[player][Admin]);
+	                            Account[player][Admin] = option2;
+	                            MYSQL_Update_Interger(Account[player][SQLID], "Accounts", "Admin", Account[player][Admin]);
 						        SendSetMessages(player, playerid, option1, option2);
 	                            return 1;
 							}
@@ -8731,12 +8556,12 @@ CMD:setplayer(playerid, params[])
 					}
 				    else if(!strcmp(option1, "ExemptIP", true))
 					{
-					    if (MasterAccount[playerid][Admin] >= 6)
+					    if (Account[playerid][Admin] >= 6)
 						{
                             if(option2 >= 0 && option2 <= 1)
 							{
-	                            PlayerInfo[player][ExemptIP] = option2;
-	                            MYSQL_Update_Account(player, option1, option2);
+	                            Character[player][ExemptIP] = option2;
+	                            MYSQL_Update_Character(player, option1, option2);
                                 SendSetMessages(player, playerid, option1, option2);
 	                            return 1;
 							}
@@ -8744,12 +8569,12 @@ CMD:setplayer(playerid, params[])
 					}
 				    else if(!strcmp(option1, "Job", true))
 					{
-					    if (MasterAccount[playerid][Admin] >= 4)
+					    if (Account[playerid][Admin] >= 4)
 						{
                             if(option2 >= 0 && option2 <= MAX_JOBS)
 							{
-	                            PlayerInfo[player][Job] = option2;
-	                            MYSQL_Update_Account(player, option1, option2);
+	                            Character[player][Job] = option2;
+	                            MYSQL_Update_Character(player, option1, option2);
                                 SendSetMessages(player, playerid, option1, option2);
 	                            return 1;
 							}
@@ -8757,14 +8582,14 @@ CMD:setplayer(playerid, params[])
 					}
 				    else if(!strcmp(option1, "PhoneStatus", true))
 					{
-					    if(MasterAccount[playerid][Admin] >= 2)
+					    if(Account[playerid][Admin] >= 2)
 						{
 						    if(Inventory[player][PhoneNumber] > 0)
 						    {
 	                            if(option2 >= 0 && option2 <= 5)
 								{
 		                            Inventory[player][PhoneStatus] = option2;
-		                            MYSQL_Update_Account(player, option1, option2);
+		                            MYSQL_Update_Character(player, option1, option2);
 	                                SendSetMessages(player, playerid, option1, option2);
 		                            return 1;
 								}
@@ -8798,7 +8623,7 @@ ALTCMD:setp->setplayer;
 CMD:setskill(playerid, params[])
 {
 	new weapon, level;
-	if(MasterAccount[playerid][Admin] >= 5)
+	if(Account[playerid][Admin] >= 5)
 	{
 
         if(sscanf(params, "dd", weapon, level)) return SendClientMessage(playerid, COLOR_GRAY, "/setskill [weaponid] [level]");
@@ -8961,7 +8786,7 @@ stock SendSetMessages(player, playerid, option1[], option2)
 CMD:setbiz(playerid, params[])
 {
 	new str[128], query[128], id, option2[24], option3;
-	if(MasterAccount[playerid][Admin] > 5)
+	if(Account[playerid][Admin] > 5)
 	{
 
         if(sscanf(params, "ds[12]d", id, option2, option3)) return SendClientMessage(playerid, COLOR_GRAY, "/setbiz [id] [interior/exterior/owner/owned/price/payout/type] [value]");
@@ -8973,7 +8798,7 @@ CMD:setbiz(playerid, params[])
 				Business[id][Interior] = int;
 				GetPlayerPos(playerid, Business[id][InteriorX], Business[id][InteriorY], Business[id][InteriorZ]);
 
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Interior = %d, InteriorX = %f, InteriorY = %f, InteriorZ = %f WHERE SQLID = %d LIMIT 1", Business[id][Interior], Business[id][InteriorX], Business[id][InteriorY], Business[id][InteriorZ], Business[id][SQLID]);
+				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Business SET Interior = %d, InteriorX = %f, InteriorY = %f, InteriorZ = %f WHERE SQLID = %d LIMIT 1", Business[id][Interior], Business[id][InteriorX], Business[id][InteriorY], Business[id][InteriorZ], Business[id][SQLID]);
 				mysql_tquery(SQL_CONNECTION, query);
 
 				format(str, sizeof(str), "Biz id: "COL_BLUE"%i "COL_WHITE"interior has been set to "COL_BLUE"%i", id, int);
@@ -8986,7 +8811,7 @@ CMD:setbiz(playerid, params[])
 			{
 				GetPlayerPos(playerid, Business[id][PosX],Business[id][PosY],Business[id][PosZ]);
 
-				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET PosX = %f, PosY = %f, PosZ = %f WHERE SQLID = %d LIMIT 1",
+				mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Business SET PosX = %f, PosY = %f, PosZ = %f WHERE SQLID = %d LIMIT 1",
 
 												Business[id][PosX],
 												Business[id][PosY],
@@ -9072,7 +8897,7 @@ CMD:setbiz(playerid, params[])
 CMD:seticon(playerid, params[])
 {
 	new query[128], id, option2[24];
-	if(MasterAccount[playerid][Admin] == 6)
+	if(Account[playerid][Admin] == 6)
 	{
 		if(sscanf(params, "ds[64]", id, option2)) return SendClientMessage(playerid, COLOR_GRAY, "/seticon [id] [pos] ");
 		{
@@ -9100,7 +8925,7 @@ CMD:sethouse(playerid, params[])
 {
 	new str[128], query[128], id, option[24], option2;
 
-	if(MasterAccount[playerid][Admin] == 6)
+	if(Account[playerid][Admin] == 6)
 	{
 		if(sscanf(params, "ds[24]d", id, option, option2)) return SendClientMessage(playerid, COLOR_GRAY, "/sethouse [id] [interiorhere/exterior/owner/price/interior/world/locked/safe] [value]");
 		{
@@ -9184,7 +9009,7 @@ CMD:sethouse(playerid, params[])
 CMD:reload(playerid, params[])
 {
 	new option[6];
-	if(MasterAccount[playerid][Admin] == 6)
+	if(Account[playerid][Admin] == 6)
 	{
 		if(sscanf(params, "s[24]", option)) return SendClientMessage(playerid, COLOR_GRAY, "/reload [biz/houses]");
 		{
@@ -9220,7 +9045,7 @@ CMD:reload(playerid, params[])
 
 CMD:createservervehicle(playerid, params[])
 {
-    if(MasterAccount[playerid][Admin] >= 6)
+    if(Account[playerid][Admin] >= 6)
 	{
 		new model[24], color1, color2, str[128], query[400], Float:pos[4], type;
 		if(sscanf(params, "s[24]ddD(1)", model, color1, color2, type)) return SendClientMessage(playerid, COLOR_GRAY, "/createsv [vehiclemodel] [color1] [color2]");
@@ -9231,7 +9056,7 @@ CMD:createservervehicle(playerid, params[])
             vID = strval(model);
             if(!(399 < vID < 612)) return SendClientMessage(playerid, COLOR_YELLOW, "ERROR: That ID is not a valid car id!");
         }
-        if(MasterAccount[playerid][Admin] != 6 && Restricted_Vehicle(vID)) return SendErrorMessage(playerid, ERROR_OPTION);
+        if(Account[playerid][Admin] != 6 && Restricted_Vehicle(vID)) return SendErrorMessage(playerid, ERROR_OPTION);
 		GetPlayerPos(playerid, pos[0], pos[1], pos[2]);
 		GetPlayerFacingAngle(playerid, pos[3]);
 
@@ -9300,7 +9125,7 @@ public VehicleInsertID(vid)
 
 CMD:createfactionvehicle(playerid, params[])
 {
-    if(MasterAccount[playerid][Admin] >= 5)
+    if(Account[playerid][Admin] >= 5)
 	{
 		new model[24], color1, color2, str[128], query[400], factionid, rank, Float:pos[4];
 		if(sscanf(params, "s[24]dddd", model, color1, color2, factionid, rank)) return SendClientMessage(playerid, COLOR_GRAY, "/createfv [vehiclemodel] [color1] [color2] [factionslotid] [rank]");
@@ -9317,7 +9142,7 @@ CMD:createfactionvehicle(playerid, params[])
             SendErrorMessage(playerid, ERROR_OPTION);
             return 1;
         }
-        if(MasterAccount[playerid][Admin] != 6 && Restricted_Vehicle(vID)) return SendErrorMessage(playerid, ERROR_OPTION);
+        if(Account[playerid][Admin] != 6 && Restricted_Vehicle(vID)) return SendErrorMessage(playerid, ERROR_OPTION);
 
 		GetPlayerPos(playerid, pos[0], pos[1], pos[2]);
 		GetPlayerFacingAngle(playerid, pos[3]);
@@ -9378,7 +9203,7 @@ ALTCMD:createfv->createfactionvehicle;
 CMD:delv(playerid, params[])
 {
 	new Vehicle;
-    if(MasterAccount[playerid][Admin] < 0) return SendErrorMessage(playerid, ERROR_ADMIN);
+    if(Account[playerid][Admin] < 0) return SendErrorMessage(playerid, ERROR_ADMIN);
     {
    		if(!IsPlayerInAnyVehicle(playerid)) return SendErrorMessage(playerid, ERROR_VEHICLE);
    		{
@@ -9401,7 +9226,7 @@ CMD:delv(playerid, params[])
 
 CMD:delvall(playerid, params[])
 {
-    if(MasterAccount[playerid][Admin] < 1) return SendErrorMessage(playerid, ERROR_ADMIN);
+    if(Account[playerid][Admin] < 1) return SendErrorMessage(playerid, ERROR_ADMIN);
     {
    		DeleteAdminVehicles();
 	}
@@ -9477,9 +9302,9 @@ CMD:savecar(playerid, params[])
    			mysql_tquery(SQL_CONNECTION, query);
    			return 1;
 		}
-		else if(PlayerInfo[playerid][Faction] == Vehicles[vid][Faction])
+		else if(Character[playerid][Faction] == Vehicles[vid][Faction])
 		{
-		    if(PlayerInfo[playerid][Rank] < 7) return SendErrorMessage(playerid, ERROR_RANK);
+		    if(Character[playerid][Rank] < 7) return SendErrorMessage(playerid, ERROR_RANK);
 		    if(Vehicles[vid][Type] == 3)
 		    {
 	     		GetVehiclePos(vid, Vehicles[vid][PosX],Vehicles[vid][PosY],Vehicles[vid][PosZ]);
@@ -9501,13 +9326,13 @@ CMD:setrank(playerid, params[])
 {
 	if(IsPlayerInAnyVehicle(playerid))
 	{
-		new vid = GetPlayerVehicleID(playerid), str[128], rank, fid = GetFactionIDFromSQLID(PlayerInfo[playerid][Faction]);
-	 	if(Vehicles[vid][Faction] == PlayerInfo[playerid][Faction] && PlayerInfo[playerid][Rank] >= Factions[fid][CommandRank])
+		new vid = GetPlayerVehicleID(playerid), str[128], rank, fid = GetFactionIDFromSQLID(Character[playerid][Faction]);
+	 	if(Vehicles[vid][Faction] == Character[playerid][Faction] && Character[playerid][Rank] >= Factions[fid][CommandRank])
 	    {
 	    	if(sscanf(params, "d", rank)) return SendClientMessage(playerid, COLOR_GRAY, "/setrank [1-max faction rank] (sets the vehicle's rank)");
 	    	if(rank < 1 || rank > Factions[fid][MaxRank]) return SendErrorMessage(playerid, "Invalid rank.");
-    		if(rank > PlayerInfo[playerid][Rank]) return SendErrorMessage(playerid, "You cannot set the rank of the vehicle past your rank.");
-			if(Vehicles[vid][Rank] > PlayerInfo[playerid][Rank]) return SendErrorMessage(playerid, "The vehicle is ranked higher than you.");
+    		if(rank > Character[playerid][Rank]) return SendErrorMessage(playerid, "You cannot set the rank of the vehicle past your rank.");
+			if(Vehicles[vid][Rank] > Character[playerid][Rank]) return SendErrorMessage(playerid, "The vehicle is ranked higher than you.");
 
 			Vehicles[vid][Rank] = rank;
 
@@ -9525,8 +9350,8 @@ CMD:setrank(playerid, params[])
 CMD:setspawn(playerid, params[])
 {
 
-	new fid = GetFactionIDFromSQLID(PlayerInfo[playerid][Faction]);
- 	if(PlayerInfo[playerid][Rank] == Factions[fid][MaxRank])
+	new fid = GetFactionIDFromSQLID(Character[playerid][Faction]);
+ 	if(Character[playerid][Rank] == Factions[fid][MaxRank])
     {
     	new Float:pos[3], query[200];
     	GetPlayerPos(playerid, pos[0], pos[1], pos[2]);
@@ -9546,7 +9371,7 @@ CMD:setspawn(playerid, params[])
 
 CMD:setvehicle(playerid, params[])
 {
-    if(MasterAccount[playerid][Admin] >= 4)
+    if(Account[playerid][Admin] >= 4)
 	{
 	    new option[64];
 		if(sscanf(params, "s[64]", option)) return SendClientMessage(playerid, COLOR_GRAY, "/setvehicle [pos][color1][color2][model] [id]");
@@ -9709,7 +9534,7 @@ CMD:setvehicle(playerid, params[])
 //				| Option 4 | Model |
 				if(!strcmp(option, "model", true))
 				{
-					if(MasterAccount[playerid][Admin])
+					if(Account[playerid][Admin])
 					{
 						if(!(399 < option2 < 612)) return SendClientMessage(playerid, COLOR_YELLOW, "ERROR: That ID is not a valid car id!");
 						
@@ -9848,7 +9673,7 @@ CMD:spray(playerid, params[])
 
 CMD:respawnvehicle(playerid, params[])
 {
-	if(MasterAccount[playerid][Admin] >= 1)
+	if(Account[playerid][Admin] >= 1)
 	{
 		if(IsPlayerInAnyVehicle(playerid))
 		{
@@ -9872,9 +9697,9 @@ CMD:respawnvehicle(playerid, params[])
 
 CMD:frespawn(playerid, params[])
 {
-	if(PlayerInfo[playerid][Faction] > 0)
+	if(Character[playerid][Faction] > 0)
     {
-        if(PlayerInfo[playerid][Rank] > 6)
+        if(Character[playerid][Rank] > 6)
     	{
 		    new optiona[8];
 		    if(sscanf(params, "s[8]", optiona)) return SendClientMessage(playerid, COLOR_GRAY, "/frespawn [all]");
@@ -9888,7 +9713,7 @@ CMD:frespawn(playerid, params[])
 					    {
 					    	if(!IsVehicleOccupied(id))
 				    		{
-								if(Vehicles[id][Faction] == PlayerInfo[playerid][Faction])
+								if(Vehicles[id][Faction] == Character[playerid][Faction])
 								{
 									new Panels, Doors, Lightz, Tires, Float:VehicleHP, NewV;	
 
@@ -9907,7 +9732,7 @@ CMD:frespawn(playerid, params[])
 						}
 				    }
 				}
-				SendFactionMessage(PlayerInfo[playerid][Faction], COLOR_YELLOW, "[INFO] The unoccupied faction vehicles have been respawned.");
+				SendFactionMessage(Character[playerid][Faction], COLOR_YELLOW, "[INFO] The unoccupied faction vehicles have been respawned.");
 	        }
         }
 	}
@@ -9917,7 +9742,7 @@ CMD:frespawn(playerid, params[])
 
 CMD:businessmanager(playerid, params[])
 {
-	if(MasterAccount[playerid][Admin] >= 5)
+	if(Account[playerid][Admin] >= 5)
 	{
 		Dialog_Show(playerid, BUSINESSMENU, DIALOG_STYLE_LIST, "Business System", "Create Business\nEdit Business Name\nChange Business Interior\nBusiness List", "Select","Cancel");
 	}
@@ -9932,7 +9757,7 @@ ALTCMD:bmanager->businessmanager;
 
 CMD:createbiz(playerid, params[])
 {
-	if(MasterAccount[playerid][Admin] >= 5)
+	if(Account[playerid][Admin] >= 5)
 	{
 		Dialog_Show(playerid, CREATEBUSINESS, DIALOG_STYLE_INPUT, "Business Creation","Enter the name of the business you wish\nto create.","Continue","Cancel");
 	}
@@ -9946,7 +9771,7 @@ CMD:createbiz(playerid, params[])
 
 CMD:housemanager(playerid, params[])
 {
-	if(MasterAccount[playerid][Admin] >= 5)
+	if(Account[playerid][Admin] >= 5)
 	{
 		Dialog_Show(playerid, HOUSEMENU, DIALOG_STYLE_LIST, "House Management", "Create House\nEdit House Name\nChange House Interior\nHouse List", "Select","Cancel");
 	}
@@ -9975,20 +9800,20 @@ ALTCMD:clearanim->clearanimation;
 
 CMD:hire(playerid, params[])
 {
-	if(PlayerInfo[playerid][Faction] > 0)
+	if(Character[playerid][Faction] > 0)
 	{
-		new fid = GetFactionIDFromSQLID(PlayerInfo[playerid][Faction]);
-		if(PlayerInfo[playerid][Rank] >= Factions[fid][CommandRank])
+		new fid = GetFactionIDFromSQLID(Character[playerid][Faction]);
+		if(Character[playerid][Rank] >= Factions[fid][CommandRank])
 		{
 			new option1[24], player, str[128];
 		    if(sscanf(params, "us[24]", player, option1)) return SendClientMessage(playerid, COLOR_GRAY, "/hire [playerid] [confirm/decline]");
 			{
 				if(player == playerid) return SendErrorMessage(playerid, "You cannot hire yourself.");
-				if(PlayerInfo[player][Faction] > 0) return SendErrorMessage(playerid, "This player is already in a faction.");
+				if(Character[player][Faction] > 0) return SendErrorMessage(playerid, "This player is already in a faction.");
 
 		 		if(!strcmp(option1, "confirm", true))
 				{
-					PlayerInfo[player][FactionOffer] = PlayerInfo[playerid][Faction];
+					Character[player][FactionOffer] = Character[playerid][Faction];
 					
 		    		format(str, sizeof(str), "%s is offering for you to join the faction %s. Use /joinfaction to proceed with the offer.", GetRoleplayName(playerid), Factions[fid][Name]);
 		    		SendClientMessage(player, COLOR_LIMEGREEN, str);
@@ -10013,7 +9838,7 @@ CMD:hire(playerid, params[])
 
 CMD:joinfaction(playerid, params[])
 {
-	if(PlayerInfo[playerid][FactionOffer] > 0)
+	if(Character[playerid][FactionOffer] > 0)
 	{
 
 		new option1[24], str[128];
@@ -10021,20 +9846,20 @@ CMD:joinfaction(playerid, params[])
 		{
 	 		if(!strcmp(option1, "accept", true))
 			{
-				PlayerInfo[playerid][Faction] = PlayerInfo[playerid][FactionOffer];
-				PlayerInfo[playerid][Rank] = 1;
-				PlayerInfo[playerid][FactionOffer] = 0;
+				Character[playerid][Faction] = Character[playerid][FactionOffer];
+				Character[playerid][Rank] = 1;
+				Character[playerid][FactionOffer] = 0;
 
-				MYSQL_Update_Account(playerid, "Faction", PlayerInfo[playerid][Faction]);
-				MYSQL_Update_Account(playerid, "Rank", 1);
+				MYSQL_Update_Character(playerid, "Faction", Character[playerid][Faction]);
+				MYSQL_Update_Character(playerid, "Rank", 1);
 
 	    		format(str, sizeof(str), "%s has joined the faction.", GetRoleplayName(playerid));
-	    		SendFactionMessage(PlayerInfo[playerid][Faction], COLOR_LEMONCHIFFON, str);
+	    		SendFactionMessage(Character[playerid][Faction], COLOR_LEMONCHIFFON, str);
 	        }	
 
 	        else if(!strcmp(option1, "decline", true))
 			{
-				PlayerInfo[playerid][FactionOffer] = 0;
+				Character[playerid][FactionOffer] = 0;
 	    		SendErrorMessage(playerid, "You decided not to join the faction.");
 	        }	
 	    }
@@ -10046,10 +9871,10 @@ CMD:joinfaction(playerid, params[])
 
 CMD:fire(playerid, params[])
 {
-	if(PlayerInfo[playerid][Faction] > 0)
+	if(Character[playerid][Faction] > 0)
 	{
-		new fid = GetFactionIDFromSQLID(PlayerInfo[playerid][Faction]);
-		if(PlayerInfo[playerid][Rank] >= Factions[fid][CommandRank])
+		new fid = GetFactionIDFromSQLID(Character[playerid][Faction]);
+		if(Character[playerid][Rank] >= Factions[fid][CommandRank])
 		{
 			new option1[24], player, str[128];
 		    if(sscanf(params, "us[24]", player, option1)) return SendClientMessage(playerid, COLOR_GRAY, "/fire [playerid] [confirm/decline]");
@@ -10058,18 +9883,18 @@ CMD:fire(playerid, params[])
 
 		 		if(!strcmp(option1, "confirm", true))
 				{
-					MYSQL_Update_Account(player, "Faction", 0);
-					MYSQL_Update_Account(player, "Rank", 0);
+					MYSQL_Update_Character(player, "Faction", 0);
+					MYSQL_Update_Character(player, "Rank", 0);
 
-					PlayerInfo[player][Faction] = 0;
-					PlayerInfo[player][Rank] = 0;
+					Character[player][Faction] = 0;
+					Character[player][Rank] = 0;
 
 		    		
 		    		format(str, sizeof(str), "%s has fired you from the %s.", GetRoleplayName(playerid), Factions[fid][Name]);
 		    		SendClientMessage(player, COLOR_INDIANRED, str);
 
 		    		format(str, sizeof(str), "%s has been fired from the %s.", GetRoleplayName(player), Factions[fid][Name]);
-		    		SendFactionMessage(PlayerInfo[playerid][Faction] , COLOR_INDIANRED, str);
+		    		SendFactionMessage(Character[playerid][Faction] , COLOR_INDIANRED, str);
 		        }	
 
 		        else if(!strcmp(option1, "decline", true))
@@ -10087,25 +9912,25 @@ CMD:fire(playerid, params[])
 
 CMD:promote(playerid, params[])
 {
-	if(PlayerInfo[playerid][Faction] > 0)
+	if(Character[playerid][Faction] > 0)
 	{
-		if(PlayerInfo[playerid][Rank] >= Factions[playerid][CommandRank])
+		if(Character[playerid][Rank] >= Factions[playerid][CommandRank])
 		{
 			new player, str[128];
 		    if(sscanf(params, "u", player)) return SendClientMessage(playerid, COLOR_GRAY, "/promote [playerid]");
 			{
 				if(player == playerid) return SendErrorMessage(playerid, "You cannot promote yourself.");
-				new fid = GetFactionIDFromSQLID(PlayerInfo[playerid][Faction]);
-				if(PlayerInfo[playerid][Faction] != PlayerInfo[player][Faction]) return SendErrorMessage(playerid, "That person isn't in your faction.");
-				if(PlayerInfo[player][Rank] + 1 >= PlayerInfo[playerid][Rank]) return SendErrorMessage(playerid, "This player cannot be promote to or past your rank.");
-				if(PlayerInfo[player][Rank] + 1 > Factions[fid][MaxRank]) return SendErrorMessage(playerid, "You cannot promote someone past rank 8.");
+				new fid = GetFactionIDFromSQLID(Character[playerid][Faction]);
+				if(Character[playerid][Faction] != Character[player][Faction]) return SendErrorMessage(playerid, "That person isn't in your faction.");
+				if(Character[player][Rank] + 1 >= Character[playerid][Rank]) return SendErrorMessage(playerid, "This player cannot be promote to or past your rank.");
+				if(Character[player][Rank] + 1 > Factions[fid][MaxRank]) return SendErrorMessage(playerid, "You cannot promote someone past rank 8.");
 		 		
-		 		PlayerInfo[player][Rank] += 1;
-				MYSQL_Update_Account(player, "Rank", PlayerInfo[player][Rank]);
+		 		Character[player][Rank] += 1;
+				MYSQL_Update_Character(player, "Rank", Character[player][Rank]);
 
 				
-				format(str, sizeof(str), "%s has been promoted to %s (%d).", GetRoleplayName(player), GetPlayerRank(player), PlayerInfo[player][Rank]);
-	    		SendFactionMessage(PlayerInfo[playerid][Faction], COLOR_PALEGREEN, str);
+				format(str, sizeof(str), "%s has been promoted to %s (%d).", GetRoleplayName(player), GetPlayerRank(player), Character[player][Rank]);
+	    		SendFactionMessage(Character[playerid][Faction], COLOR_PALEGREEN, str);
 
 		    }
 		}
@@ -10120,22 +9945,22 @@ CMD:promote(playerid, params[])
 
 CMD:demote(playerid, params[])
 {
-	if(PlayerInfo[playerid][Faction] > 0)
+	if(Character[playerid][Faction] > 0)
 	{
-		if(PlayerInfo[playerid][Rank] >= Factions[playerid][CommandRank])
+		if(Character[playerid][Rank] >= Factions[playerid][CommandRank])
 		{
 			new player, str[128];
 		    if(sscanf(params, "u", player)) return SendClientMessage(playerid, COLOR_GRAY, "/demote [playerid]");
 			{
 				if(player == playerid) return SendErrorMessage(playerid, "You cannot demote yourself.");
-				if(PlayerInfo[playerid][Faction] != PlayerInfo[player][Faction]) return SendErrorMessage(playerid, "That person isn't in your faction.");
-				if(PlayerInfo[player][Rank] >= PlayerInfo[playerid][Rank]) return SendErrorMessage(playerid, "This player cannot be demoted to or past your rank.");
-				if(PlayerInfo[player][Rank] - 1 <= 0) return SendErrorMessage(playerid, "You cannot demote this person any further.");
+				if(Character[playerid][Faction] != Character[player][Faction]) return SendErrorMessage(playerid, "That person isn't in your faction.");
+				if(Character[player][Rank] >= Character[playerid][Rank]) return SendErrorMessage(playerid, "This player cannot be demoted to or past your rank.");
+				if(Character[player][Rank] - 1 <= 0) return SendErrorMessage(playerid, "You cannot demote this person any further.");
 		 		
-				MYSQL_Update_Account(player, "Rank", PlayerInfo[player][Rank]--);
+				MYSQL_Update_Character(player, "Rank", Character[player][Rank]--);
 
-				format(str, sizeof(str), "%s has been demoted to %s(%d).", GetRoleplayName(player), GetPlayerRank(player), PlayerInfo[player][Rank]);
-	    		SendFactionMessage(PlayerInfo[playerid][Faction] , COLOR_INDIANRED, str);
+				format(str, sizeof(str), "%s has been demoted to %s(%d).", GetRoleplayName(player), GetPlayerRank(player), Character[player][Rank]);
+	    		SendFactionMessage(Character[playerid][Faction] , COLOR_INDIANRED, str);
 
 		    }
 		}
@@ -10182,7 +10007,7 @@ CMD:radioon(playerid, params[])
 		{
 			new str[128];
 			Inventory[playerid][Radio] = RADIO_ON;
-			MYSQL_Update_Account(playerid, "Radio", Inventory[playerid][Radio]);
+			MYSQL_Update_Character(playerid, "Radio", Inventory[playerid][Radio]);
 			format(str, sizeof(str), "* %s flicks a switch on the side of their radio turning it on. *", GetRoleplayName(playerid));
 			SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 		}
@@ -10201,7 +10026,7 @@ CMD:radiooff(playerid, params[])
 		{
 			new str[128];
 			Inventory[playerid][Radio] = RADIO_OFF;
-			MYSQL_Update_Account(playerid, "Radio", Inventory[playerid][Radio]);
+			MYSQL_Update_Character(playerid, "Radio", Inventory[playerid][Radio]);
 			format(str, sizeof(str), "* %s flicks a switch on the side of their radio turning it off. *", GetRoleplayName(playerid));
 			SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
 		}
@@ -10224,7 +10049,7 @@ CMD:radiotune(playerid, params[])
 			if(frequency < 1 || frequency > 9999) return SendErrorMessage(playerid, "You can only tune your radio between the frequencies 1 - 9999 MHz.");
 
 			Inventory[playerid][RadioFreq] = frequency;
-			MYSQL_Update_Account(playerid, "RadioFreq", Inventory[playerid][RadioFreq]);
+			MYSQL_Update_Character(playerid, "RadioFreq", Inventory[playerid][RadioFreq]);
 
 			format(str, sizeof(str), "* %s fiddles with their radio for a moment, changing the frequency. *", GetRoleplayName(playerid));
 			SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
@@ -10261,11 +10086,11 @@ CMD:cuff(playerid, params[])
       	{
       		if(IsInRangeOfPlayer(playerid, player, 5))
   			{
-  				if(PlayerInfo[player][Cuffed] == 0)
+  				if(Character[player][Cuffed] == 0)
 				{
 	  				new str[128];
 	      			SetPlayerSpecialAction(player, SPECIAL_ACTION_CUFFED);//variable cuffed
-	      			PlayerInfo[player][Cuffed] = 1;
+	      			Character[player][Cuffed] = 1;
 
 	      			format(str, sizeof(str), "* %s has been placed into handcuffs by %s. *", GetRoleplayName(player), GetRoleplayName(playerid));
 	      			SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
@@ -10292,11 +10117,11 @@ CMD:uncuff(playerid, params[])
       	{
       		if(IsInRangeOfPlayer(playerid, player, 5))
   			{
-  				if(PlayerInfo[player][Cuffed] == 1)
+  				if(Character[player][Cuffed] == 1)
 				{
 					new str[128];
 	      			SetPlayerSpecialAction(player, SPECIAL_ACTION_NONE);
-	      			PlayerInfo[player][Cuffed] = 0;
+	      			Character[player][Cuffed] = 0;
 
 	      			format(str, sizeof(str), "* %s has been uncuffed by %s. *", GetRoleplayName(player), GetRoleplayName(playerid));
 	      			SendLocalMessage(playerid, str, Range_Short, COLOR_RP, COLOR_RP);
@@ -10325,23 +10150,23 @@ CMD:jail(playerid, params[])
       		if(player == playerid) return SendErrorMessage(playerid, "You cannot jail yourself.");
       		if(IsInRangeOfPlayer(playerid, player, 5))
   			{
-  				if(PlayerInfo[player][Cuffed] == 1)
+  				if(Character[player][Cuffed] == 1)
 				{
-	  				if(PlayerInfo[player][Jail] == 0)
+	  				if(Character[player][Jail] == 0)
 					{
 						if(minutes <= 90 && minutes > 0)
 						{
 
-							PlayerInfo[player][Jail] = minutes;
-							MYSQL_Update_Account(player, "Jail", PlayerInfo[player][Jail]);
+							Character[player][Jail] = minutes;
+							MYSQL_Update_Character(player, "Jail", Character[player][Jail]);
 		      				SendToJail(player);
 
 	      					ClearPlayerWeapons(player);
 
-							Add_PoliceNationalComputer(PlayerInfo[player][SQLID], playerid, PNC_JAIL, "", minutes);
+							Add_PoliceNationalComputer(Character[player][ID], playerid, PNC_JAIL, "", minutes);
 
 							SetPlayerSpecialAction(player, SPECIAL_ACTION_NONE);
-			      			PlayerInfo[player][Cuffed] = 0;
+			      			Character[player][Cuffed] = 0;
 
 							new str[128];
 		      				format(str, sizeof(str), "[INFO] %s has been jailed by %s for %d minutes.", GetRoleplayName(player), GetRoleplayName(playerid), minutes);
@@ -10373,11 +10198,11 @@ CMD:unjail(playerid, params[])
       		if(player == playerid) return SendErrorMessage(playerid, "You cannot unjail yourself.");
       		if(IsInRangeOfPlayer(playerid, player, 5))
   			{
-	  				if(PlayerInfo[player][Jail] > 0)
+	  				if(Character[player][Jail] > 0)
 					{
 							new str[128];
-							PlayerInfo[player][Jail] = 0;
-							MYSQL_Update_Account(player, "Jail", PlayerInfo[player][Jail]);
+							Character[player][Jail] = 0;
+							MYSQL_Update_Character(player, "Jail", Character[player][Jail]);
 
 		      				SetPlayerPosEx(player, -229.1438, 971.7680, 19.4704, 0, 0);
 	      					ClearPlayerWeapons(player);
@@ -10434,7 +10259,7 @@ CMD:fine(playerid, params[])
   				if(amount > 0 && amount < 50000)
 				{
 					new str[128];
-					Add_PoliceNationalComputer(PlayerInfo[player][SQLID], playerid, PNC_FINES, reason, amount);
+					Add_PoliceNationalComputer(Character[player][ID], playerid, PNC_FINES, reason, amount);
 					GivePlayerMoneyEx(player, -amount);
 
 					format(str, sizeof(str), "[INFO] %s has fined %s $%d for %s.", GetRoleplayName(playerid), GetRoleplayName(player), amount, reason);
@@ -10453,7 +10278,7 @@ CMD:fine(playerid, params[])
 
 CMD:elm(playerid, params[])
 {
-	if(IsEmergancyService(PlayerInfo[playerid][Faction]))
+	if(IsEmergancyService(Character[playerid][Faction]))
 	{
 		new vid = GetPlayerVehicleID(playerid);
 		if(vid != INVALID_VEHICLE_ID)
@@ -10538,7 +10363,7 @@ stock SendToJail(playerid)
 stock Add_PoliceNationalComputer(player, playerid, Charge, ChargeReason[], Value)
 {
 	new query[400];
-    mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO PoliceNationalComputer (Time, Player, Officer, OfficerName, OfficerRank, Type, Reason, Value) VALUES( %d, %d, %d, '%e', '%e', %d, '%e', %d)", gettime(), player, PlayerInfo[playerid][SQLID], GetRoleplayName(playerid), GetPlayerRank(playerid), Charge, ChargeReason, Value);
+    mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO PoliceNationalComputer (Time, Player, Officer, OfficerName, OfficerRank, Type, Reason, Value) VALUES( %d, %d, %d, '%e', '%e', %d, '%e', %d)", gettime(), player, Character[playerid][ID], GetRoleplayName(playerid), GetPlayerRank(playerid), Charge, ChargeReason, Value);
 	mysql_tquery(SQL_CONNECTION, query);
 	return 1;
 }
@@ -10546,7 +10371,7 @@ stock Add_PoliceNationalComputer(player, playerid, Charge, ChargeReason[], Value
 stock Add_PoliceNationalComputer2(player, playerid, Charge, ChargeReason[], Value, pName[])
 {
 	new query[400];
-    mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO PoliceNationalComputer (Time, Player, Officer, OfficerName, OfficerRank, Type, Reason, Value, PlayerName) VALUES( %d, %d, %d, '%e', '%e', %d, '%e', %d, '%e')", gettime(), player, PlayerInfo[playerid][SQLID], GetRoleplayName(playerid), GetPlayerRank(playerid), Charge, ChargeReason, Value, pName);
+    mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO PoliceNationalComputer (Time, Player, Officer, OfficerName, OfficerRank, Type, Reason, Value, PlayerName) VALUES( %d, %d, %d, '%e', '%e', %d, '%e', %d, '%e')", gettime(), player, Character[playerid][ID], GetRoleplayName(playerid), GetPlayerRank(playerid), Charge, ChargeReason, Value, pName);
 	mysql_tquery(SQL_CONNECTION, query);
 	return 1;
 }
@@ -10558,9 +10383,9 @@ CMD:policenationalcomputer(playerid, params[])
 	{
 
 		new vid = GetPlayerVehicleID(playerid);
-		if(Vehicles[vid][Faction] == 1 || PlayerInfo[playerid][bEntered] == 22)
+		if(Vehicles[vid][Faction] == 1 || Character[playerid][bEntered] == 22)
 		{
-			PlayerInfo[playerid][PNC] = 0;
+			Character[playerid][PNC] = 0;
 			PoliceNationalComputer(playerid);
 		}
 		else SendErrorMessage(playerid, "You are not near a Police National Computer.");
@@ -10648,7 +10473,7 @@ Dialog:PNC_PSearch(playerid, response, listitem, inputtext[])
 		return PoliceNC_PersonSearch(playerid);
 	}
 
-	PlayerInfo[playerid][PNC] = CharacterID;
+	Character[playerid][PNC] = CharacterID;
 
 	PoliceNC_Records(playerid);
 
@@ -10670,18 +10495,18 @@ Dialog:PNC_VSearch(playerid, response, listitem, inputtext[])
 
 CMD:members(playerid)
 {
-	if(PlayerInfo[playerid][Faction] > 0)
+	if(Character[playerid][Faction] > 0)
 	{
 		new query[128], str[128], name[24], dialog[600], pRank;
 
-	    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT Username, Rank FROM `Accounts` WHERE Faction = %d ORDER BY Username ASC", PlayerInfo[playerid][Faction]);
+	    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT Name, Rank FROM `Characters` WHERE Faction = %d ORDER BY Name ASC", Character[playerid][Faction]);
 		new Cache:result = mysql_query(SQL_CONNECTION, query);
 		printf("%d", cache_num_rows());
         for(new id = 0; id < cache_num_rows(); id++)
         {
-			cache_get_field_content(id, "Username", name, SQL_CONNECTION, MAX_PLAYER_NAME);
+			cache_get_field_content(id, "Name", name, SQL_CONNECTION, MAX_PLAYER_NAME);
 			pRank = cache_get_field_content_int(id, "Rank", SQL_CONNECTION);
-		 	format(str, sizeof(str), "%s (%s)\n", name, GetRankName(GetFactionIDFromSQLID(PlayerInfo[playerid][Faction]), pRank));
+		 	format(str, sizeof(str), "%s (%s)\n", name, GetRankName(GetFactionIDFromSQLID(Character[playerid][Faction]), pRank));
 	        strcat(dialog, str, sizeof(dialog));
 	    }
 	 	cache_delete(result);
@@ -10699,9 +10524,9 @@ Dialog:PNC_Records(playerid, response, listitem, inputtext[])
 	{
 		new query[128], str[128], name[24], dialog[600];
 
-	    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT Username, Age, Gender, PhoneNumber, GDL, CDL, MDL FROM `Accounts` WHERE SQLID = %d LIMIT 1", PlayerInfo[playerid][PNC]);
+	    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT Name, Age, Gender, PhoneNumber, GDL, CDL, MDL FROM `Characters` WHERE SQLID = %d LIMIT 1", Character[playerid][PNC]);
 		new Cache:result = mysql_query(SQL_CONNECTION, query);
-		cache_get_field_content(0, "Username", name, SQL_CONNECTION, MAX_PLAYER_NAME);
+		cache_get_field_content(0, "Name", name, SQL_CONNECTION, MAX_PLAYER_NAME);
 		new pAge = cache_get_field_content_int(0, "Age", SQL_CONNECTION);
 		new pGender = cache_get_field_content_int(0, "Gender", SQL_CONNECTION);
 		new pPhoneNumber = cache_get_field_content_int(0, "PhoneNumber", SQL_CONNECTION);
@@ -10766,20 +10591,20 @@ Dialog:PNC_Records(playerid, response, listitem, inputtext[])
 	else if(listitem == 2)
 	{
 		new query[160];
-	    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT Time, OfficerName, OfficerRank, Value FROM `PoliceNationalComputer` WHERE Player = %d AND Type = 1 ORDER BY ID ASC", PlayerInfo[playerid][PNC]); //Jail
+	    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT Time, OfficerName, OfficerRank, Value FROM `PoliceNationalComputer` WHERE Player = %d AND Type = 1 ORDER BY ID ASC", Character[playerid][PNC]); //Jail
 		mysql_tquery(SQL_CONNECTION, query, "ViewJailRecord", "d", playerid);	
 	}
 
 	else if(listitem == 3)
 	{
 		new query[160];
-	    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT Time, OfficerName, OfficerRank, Reason FROM `PoliceNationalComputer` WHERE Player = %d AND Type = 2 ORDER BY ID ASC", PlayerInfo[playerid][PNC]); //charges
+	    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT Time, OfficerName, OfficerRank, Reason FROM `PoliceNationalComputer` WHERE Player = %d AND Type = 2 ORDER BY ID ASC", Character[playerid][PNC]); //charges
 		mysql_tquery(SQL_CONNECTION, query, "ViewCharges", "d", playerid);	
 	}
 	else if(listitem == 4)
 	{
 		new query[160];
-	    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT Time, OfficerName, OfficerRank, Reason, Value FROM `PoliceNationalComputer` WHERE Player = %d AND Type = 3 ORDER BY ID ASC", PlayerInfo[playerid][PNC]); //charges
+	    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT Time, OfficerName, OfficerRank, Reason, Value FROM `PoliceNationalComputer` WHERE Player = %d AND Type = 3 ORDER BY ID ASC", Character[playerid][PNC]); //charges
 		mysql_tquery(SQL_CONNECTION, query, "ViewFines", "d", playerid);	
 	}
 
@@ -10803,7 +10628,7 @@ Dialog:PNC_AddCharge(playerid, response, listitem, inputtext[])
 	if(!response) return PoliceNC_Records(playerid);
 	if(strlen(inputtext) > 4 && strlen(inputtext) < 128)
     {
-    	Add_PoliceNationalComputer(PlayerInfo[playerid][PNC], playerid, PNC_CHARGE, inputtext, 0);
+    	Add_PoliceNationalComputer(Character[playerid][PNC], playerid, PNC_CHARGE, inputtext, 0);
     	SendClientMessage(playerid, COLOR_YELLOW, "Charge added successfully.");
     	PoliceNC_Records(playerid);
 	}
@@ -10820,9 +10645,9 @@ Dialog:PNC_IssueWarrant(playerid, response, listitem, inputtext[])
 	if(!response) return PoliceNC_Records(playerid);
 	if(strlen(inputtext) > 4 && strlen(inputtext) < 128)
     {
-    	Add_PoliceNationalComputer2(PlayerInfo[playerid][PNC], playerid, PNC_WARRANT, inputtext, 1, GetNameFromSQLID(PlayerInfo[playerid][PNC]));
+    	Add_PoliceNationalComputer2(Character[playerid][PNC], playerid, PNC_WARRANT, inputtext, 1, GetRoleplayNameFromSQLID(Character[playerid][PNC]));
     	new str[128];
-    	format(str, sizeof(str), "[WARRANT] %s has issued a warrant for %s's arrest.", GetRoleplayName(playerid), GetNameFromSQLID(PlayerInfo[playerid][PNC]));
+    	format(str, sizeof(str), "[WARRANT] %s has issued a warrant for %s's arrest.", GetRoleplayName(playerid), GetRoleplayNameFromSQLID(Character[playerid][PNC]));
     	SendFactionMessage(1, COLOR_INDIANRED, str);
     	SendAdminsMessage(6, COLOR_SLATEGRAY, str);
 
@@ -10858,7 +10683,7 @@ public ViewVehicleInfo(playerid)
 
 	 	format(str, sizeof(str), "-> Vehicle Information\n");
         strcat(dialog, str, sizeof(dialog));
-	 	format(str, sizeof(str), "Owner:\t\t [%s]\n", GetNameFromSQLID(owner));
+	 	format(str, sizeof(str), "Owner:\t\t [%s]\n", GetRoleplayNameFromSQLID(owner));
         strcat(dialog, str, sizeof(dialog));
 	 	format(str, sizeof(str), "Model:\t\t [%s]\n", VehicleNames[model - 400][0]);
         strcat(dialog, str, sizeof(dialog));
@@ -11048,7 +10873,7 @@ public ViewJailRecord(playerid)
 stock GetSQLIDFromName(name[])
 {
 	new query[128], CID;
-    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT SQLID FROM `Accounts` WHERE Username = '%e' LIMIT 1", name);
+    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT SQLID FROM `Characters` WHERE Name = '%e' LIMIT 1", name);
 	new Cache:result = mysql_query(SQL_CONNECTION, query);
 	CID = cache_get_field_content_int(0, "SQLID", SQL_CONNECTION);
  	cache_delete(result);
@@ -11056,12 +10881,12 @@ stock GetSQLIDFromName(name[])
 }
 
 
-stock GetNameFromSQLID(sqlid)
+stock GetRoleplayNameFromSQLID(sqlid)
 {
 	new query[128], name[64];
-    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT Username FROM `Accounts` WHERE SQLID = %d LIMIT 1", sqlid);
+    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT Name FROM `Characters` WHERE SQLID = %d LIMIT 1", sqlid);
 	new Cache:result = mysql_query(SQL_CONNECTION, query);
-	cache_get_field_content(0, "Username", name, SQL_CONNECTION, 64);
+	cache_get_field_content(0, "Name", name, SQL_CONNECTION, 64);
  	cache_delete(result);
 	return name;
 }
@@ -11078,7 +10903,7 @@ stock ReplaceSpaces(str[])
 
 stock IsLawEnforcement(playerid)
 {
-	if(Factions[GetFactionIDFromSQLID(PlayerInfo[playerid][Faction])][Type] == 2)
+	if(Factions[GetFactionIDFromSQLID(Character[playerid][Faction])][Type] == 2)
 	{
 		return 1;
 	}
@@ -11102,7 +10927,7 @@ stock SendFactionMessage(fac, color, msg[])
 	{
 		if(IsPlayerConnected(x))
 		{
-		    if(PlayerInfo[x][Faction] == fac)
+		    if(Character[x][Faction] == fac)
 		    {
 				SendClientMessage(x, color, msg);
 			}
@@ -11138,12 +10963,12 @@ stock SendFreqMessage(pid, freq, msg[])
 CMD:fac(playerid, params[])
 {
 	new msg[128], str[128];
-	if(PlayerInfo[playerid][Faction] > 0)
+	if(Character[playerid][Faction] > 0)
 	{
 		if(sscanf(params, "s[128]", msg)) return SendClientMessage(playerid, COLOR_GRAY, "/fac [message]");
 
 		format(str, sizeof(str), "(( %s %s: %s ))", GetPlayerRank(playerid), GetRoleplayName(playerid), msg);
-		SendFactionMessage(PlayerInfo[playerid][Faction], COLOR_GREEN, str);
+		SendFactionMessage(Character[playerid][Faction], COLOR_GREEN, str);
 			
 		
 	}
@@ -11158,14 +10983,14 @@ ALTCMD:f->fac;
 CMD:membersonline(playerid, params[])
 {
 	new str[128];
-	if(PlayerInfo[playerid][Faction] > 0)
+	if(Character[playerid][Faction] > 0)
 	{
-		new fid = GetFactionIDFromSQLID(PlayerInfo[playerid][Faction]);
+		new fid = GetFactionIDFromSQLID(Character[playerid][Faction]);
 		format(str, sizeof(str), "%s members ONLINE",Factions[fid][Name]);
 		SendClientMessage(playerid, COLOR_YELLOW, str);
 	    foreach(Player, x)
 		{
-		    if(PlayerInfo[x][Faction] == PlayerInfo[playerid][Faction])
+		    if(Character[x][Faction] == Character[playerid][Faction])
 		    {
 
 				format(str, sizeof(str), "%s %s",GetPlayerRank(playerid), GetRoleplayName(x));
@@ -11221,12 +11046,12 @@ public UpdateTime()
 
 			for(new playerid; playerid < MAX_PLAYERS; playerid++)
 			{
-				if(IsPlayerConnected(playerid) && PlayerInfo[playerid][LoggedIn])
+				if(IsPlayerConnected(playerid) && LoggedIn[playerid])
 				{
-					if(PlayerInfo[playerid][OnlinePeriod] > 29)
+					if(Character[playerid][OnlinePeriod] > 29)
 					{
 						GivePayday(playerid);
-                        PlayerInfo[playerid][OnlinePeriod] = 0;
+                        Character[playerid][OnlinePeriod] = 0;
 
 				    }
 				    else
@@ -11246,21 +11071,21 @@ public UpdateTime()
 
 		for(new i = 0; i<MAX_PLAYERS; i++)
         {
-            if(IsPlayerConnected(i) && PlayerInfo[i][LoggedIn])
+            if(IsPlayerConnected(i) && LoggedIn[i])
             {
                 SetPlayerTime(i, ClockHours, ClockMinutes);
-                PlayerInfo[i][TotalTimePlayed]++;
-                PlayerInfo[i][OnlinePeriod]++;
+                Character[i][TotalTimePlayed]++;
+                Character[i][OnlinePeriod]++;
                 PickedUpPickup[i] = false;
 
-                if(PlayerInfo[i][Jail] > 0)
+                if(Character[i][Jail] > 0)
             	{
-            		PlayerInfo[i][Jail] --;
-            		MYSQL_Update_Account(i, "Jail", PlayerInfo[i][Jail]);
+            		Character[i][Jail] --;
+            		MYSQL_Update_Character(i, "Jail", Character[i][Jail]);
             		new str[64];
-            		format(str, sizeof(str), "Time left: %d minutes", PlayerInfo[i][Jail]);
+            		format(str, sizeof(str), "Time left: %d minutes", Character[i][Jail]);
             		GameTextForPlayer(i, str, 5000, 1);
-            		if(PlayerInfo[i][Jail] == 0) 
+            		if(Character[i][Jail] == 0) 
         			{
         				SetPlayerPosEx(i, -229.1438, 971.7680, 19.4704, 0, 0);
         				SendClientMessage(i, COLOR_DARKVIOLET, "You have been released from prison, we hope you've learned from your mistakes!");
@@ -11278,7 +11103,7 @@ public UpdateTime()
 
 		for(new i = 0; i<MAX_PLAYERS; i++)
 	    {
-	        if(IsPlayerConnected(i) && PlayerInfo[i][LoggedIn])
+	        if(IsPlayerConnected(i) && LoggedIn[i])
 	        {
 
 
@@ -11319,12 +11144,12 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 
 	LastCommandTime[playerid] = gettime();
 
-	if(PlayerInfo[playerid][LoggedIn] == 0)
+	if(LoggedIn[playerid] == 0)
 	{
 	    SendErrorMessage(playerid, ERROR_LOGGEDIN);
 	    return 0;
 	}
-	else if(PlayerInfo[playerid][Jail])
+	else if(Character[playerid][Jail])
 	{
 		if(strfind(cmdtext, "/s ", true) == 0) return 1;
 		else if(strfind(cmdtext, "/ame ", true) == 0) return 1;
@@ -11342,12 +11167,12 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 			return 0;
 		}
 	}
-	else if(PlayerInfo[playerid][ClothesSelection] == 1)
+	else if(Character[playerid][ClothesSelection] == 1)
 	{
 	    SendErrorMessage(playerid, "You cannot perform commands at this point in time.");
 	    return 0;
 	}
-	else if(PlayerInfo[playerid][InHospital] == 1)
+	else if(Character[playerid][InHospital] == 1)
 	{
 	    SendErrorMessage(playerid, "You cannot perform commands at this point in time.");
 	    return 0;
@@ -11379,11 +11204,11 @@ Dialog:REG1(playerid, response, listitem, inputtext[])
 			new str[64];
 	        TogglePlayerSpectating(playerid, 0);
 	        
-	        MYSQL_Update_Account(playerid, "Age", strval(inputtext));
-	        MYSQL_Update_Account(playerid, "Tutorial", 2);
+	        MYSQL_Update_Character(playerid, "Age", strval(inputtext));
+	        MYSQL_Update_Character(playerid, "Tutorial", 2);
 
-	        PlayerInfo[playerid][Tutorial] = 2;
-	        PlayerInfo[playerid][Age] = strval(inputtext);
+	        Character[playerid][Tutorial] = 2;
+	        Character[playerid][Age] = strval(inputtext);
 	        
 	        format(str, sizeof(str), "You are %d years old.",strval(inputtext));
 	        InfoBoxForPlayer(playerid, str);
@@ -11401,13 +11226,13 @@ Dialog:REG2(playerid, response, listitem, inputtext[])
 {
 	if(!response)
     {
-        PlayerInfo[playerid][Gender] = 2;
+        Character[playerid][Gender] = 2;
         SetPlayerSkinEx(playerid, 31);
     	
     }
 	if(response)
 	{
-        PlayerInfo[playerid][Gender] = 1;
+        Character[playerid][Gender] = 1;
         SetPlayerSkinEx(playerid, 1);
         
 	}
@@ -11430,10 +11255,10 @@ Dialog:SPAWN_SELECT(playerid, response, listitem, inputtext[])
        	SetPlayerFacingAngle(playerid, 269.4926);
        	SetPlayerPosEx(playerid, -204.5245, 1119.2860, 19.7422, 0, 0);
        	
-       	PlayerInfo[playerid][LoggedIn] = 1;
-       	PlayerInfo[playerid][ClothesSelection] = 0;
-       	PlayerInfo[playerid][Skin] = GetPlayerSkin(playerid);
-       	PlayerInfo[playerid][Tutorial] = 5;
+       	LoggedIn[playerid] = 1;
+       	Character[playerid][ClothesSelection] = 0;
+       	Character[playerid][Skin] = GetPlayerSkin(playerid);
+       	Character[playerid][Tutorial] = 5;
 
 		
 		TextDrawShowForPlayer(playerid, Clock);
@@ -11450,7 +11275,7 @@ Dialog:SPAWN_SELECT(playerid, response, listitem, inputtext[])
 
 CMD:factionmanager(playerid, params[])
 {
-	if(MasterAccount[playerid][Admin] >= 5)//create name type list
+	if(Account[playerid][Admin] >= 5)//create name type list
 	{
 		new str[600];
 		strcat(str, "Create Faction\n");
@@ -11509,7 +11334,7 @@ Dialog:FLIST(playerid, response, listitem, inputtext[])
 	 	format(str, sizeof(str), "Faction Rank Names\n");
         strcat(dialog, str, sizeof(dialog));
 
-        if(MasterAccount[playerid][Admin] > 5)
+        if(Account[playerid][Admin] > 5)
     	{
     		format(str, sizeof(str), "Faction Payouts\n");
         	strcat(dialog, str, sizeof(dialog));
@@ -11724,9 +11549,9 @@ Dialog:FTYPE(playerid, response, listitem, inputtext[])
 CMD:editranks(playerid, params[])
 {
 
-	if(PlayerInfo[playerid][Rank] == Factions[GetFactionIDFromSQLID(PlayerInfo[playerid][Faction])][MaxRank])
+	if(Character[playerid][Rank] == Factions[GetFactionIDFromSQLID(Character[playerid][Faction])][MaxRank])
 	{
-        facid[playerid] = GetFactionIDFromSQLID(PlayerInfo[playerid][Faction]);
+        facid[playerid] = GetFactionIDFromSQLID(Character[playerid][Faction]);
 		
 		Dialog_Show(playerid, RANK, DIALOG_STYLE_LIST, "Faction Rank Editor", GetRankList(facid[playerid]), "Select","Cancel");
 	}
@@ -11755,8 +11580,8 @@ Dialog:RANK(playerid, response, listitem, inputtext[])
 	if(response)
 	{
 		new str[128], rid = listitem + 1;
-		PlayerInfo[playerid][NewID] = rid;
-		format(str, sizeof(str), "Enter the new rank name:[Rank ID: %d]", PlayerInfo[playerid][NewID]);
+		Character[playerid][NewID] = rid;
+		format(str, sizeof(str), "Enter the new rank name:[Rank ID: %d]", Character[playerid][NewID]);
 		Dialog_Show(playerid, RANK_SET, DIALOG_STYLE_INPUT, "Faction Rank Editor", str, "Change","Cancel");
 
 	}
@@ -11772,14 +11597,14 @@ Dialog:RANK_SET(playerid, response, listitem, inputtext[])
 	if(response)
     {
 		new str[8], str2[128];
-		format(str, sizeof(str), "Rank%d", PlayerInfo[playerid][NewID]);
+		format(str, sizeof(str), "Rank%d", Character[playerid][NewID]);
 
 		MYSQL_Update_String(Factions[facid[playerid]][SQLID], "Factions", str, inputtext);
 
-		format(str2, sizeof(str2), "You have successfully updated Rank %d to %s", PlayerInfo[playerid][NewID], inputtext);
+		format(str2, sizeof(str2), "You have successfully updated Rank %d to %s", Character[playerid][NewID], inputtext);
 		SendClientMessage(playerid, COLOR_LBLUE, str2);
 		//format(Faction[facid[playerid]][Rank1], 32, "%s", inputtext);
-		switch(PlayerInfo[playerid][NewID])
+		switch(Character[playerid][NewID])
 		{
 			case 1: format(Factions[facid[playerid]][Rank1], 32, "%s", inputtext);
 			case 2: format(Factions[facid[playerid]][Rank2], 32, "%s", inputtext);
@@ -11890,7 +11715,7 @@ new HouseInteriorInfo[][][32] =
 
 CMD:houseinteriors(playerid, params[])
 {
-	if(MasterAccount[playerid][Admin] > 0)
+	if(Account[playerid][Admin] > 0)
 	{
 		new str[128], dialog[600];
 		for (new i = 0; i < sizeof(HouseInteriorInfo); ++i)
@@ -11974,7 +11799,7 @@ Dialog:BIZINTERIORS(playerid, response, listitem, inputtext[])
 
 CMD:bizinteriors(playerid,params[])
 {
-	if(MasterAccount[playerid][Admin] > 0)
+	if(Account[playerid][Admin] > 0)
 	{
 		new str[128], dialog[400];
 		for (new i = 0; i < sizeof(BusinessInteriors); ++i)
@@ -12046,7 +11871,7 @@ Dialog:CREATEBUSINESS(playerid, response, listitem, inputtext[])
 		Total_Biz_Created++;
 
         GetPlayerPos(playerid, pos[0], pos[1], pos[2]);
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO Biz (Name,PosX,PosY,PosZ,World,Interior,Owned,Owner,Price,Payout,Type) VALUES('%e', %f, %f, %f, 0, 0, 0, 0, 0, 0, 0)",
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO Business (Name,PosX,PosY,PosZ,World,Interior,Owned,Owner,Price,Payout,Type) VALUES('%e', %f, %f, %f, 0, 0, 0, 0, 0, 0, 0)",
 
 										inputtext,
 										pos[0],
@@ -12058,7 +11883,7 @@ Dialog:CREATEBUSINESS(playerid, response, listitem, inputtext[])
 
 
 		//GetPlayerPos(playerid, Business[Create_New_Biz_ID[playerid]][PosX],Business[Create_New_Biz_ID[playerid]][PosY],Business[Create_New_Biz_ID[playerid]][PosZ]);
-		//format(Business[PlayerInfo[playerid][NewID]][Name], 32, "%s", inputtext);
+		//format(Business[Character[playerid][NewID]][Name], 32, "%s", inputtext);
 
 		Dialog_Show(playerid, CREATEBusiness_2, DIALOG_STYLE_INPUT, "Business Creation", "Enter the price of the business you have created:", "Continue","Cancel");
 	}
@@ -12130,7 +11955,7 @@ Dialog:CREATEBUSINESS3(playerid, response, listitem, inputtext[])
 		Business[Create_New_Biz_ID[playerid]][World] = Create_New_Biz_ID[playerid];
 		Business[Create_New_Biz_ID[playerid]][Interior] = BusinessInteriors[listitem][2][0];
 		Business[Create_New_Biz_ID[playerid]][Type] = BusinessInteriors[listitem][0][0];
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Biz SET Interior = %d, World = %d, Type = %d, InteriorX = %f, InteriorY = %f, InteriorZ = %f WHERE SQLID = %d LIMIT 1", BusinessInteriors[listitem][2][0], Business[Create_New_Biz_ID[playerid]][World], BusinessInteriors[listitem][0][0], BusinessInteriorPos[listitem][0], BusinessInteriorPos[listitem][1], BusinessInteriorPos[listitem][2], Business[Create_New_Biz_ID[playerid]][SQLID]);
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Business SET Interior = %d, World = %d, Type = %d, InteriorX = %f, InteriorY = %f, InteriorZ = %f WHERE SQLID = %d LIMIT 1", BusinessInteriors[listitem][2][0], Business[Create_New_Biz_ID[playerid]][World], BusinessInteriors[listitem][0][0], BusinessInteriorPos[listitem][0], BusinessInteriorPos[listitem][1], BusinessInteriorPos[listitem][2], Business[Create_New_Biz_ID[playerid]][SQLID]);
 		mysql_tquery(SQL_CONNECTION, query);
 		format(str, sizeof(str), "%s has created/updated business: %s.", GetRoleplayName(playerid), Business[Create_New_Biz_ID[playerid]][Name]);
 		SendAdminsMessage(1, COLOR_ORANGERED, str);
@@ -12200,7 +12025,7 @@ Dialog:ChangeHouseName(playerid, response, listitem, inputtext[])
 
 CMD:gotopos(playerid,params[])
 {
-	if(MasterAccount[playerid][Admin] > 4)
+	if(Account[playerid][Admin] > 4)
 	{
 		new Float:pos[3], int;
 	    if(sscanf(params, "fffi", pos[0], pos[1], pos[2], int)) return SendClientMessage(playerid, COLOR_GRAY, "/gotopos [x] [y] [z] [int]");
@@ -12501,7 +12326,7 @@ Dialog:HOUSEMENU(playerid, response, listitem, inputtext[])
 				new id = InRangeOfHouse(playerid);
 			   	if(id)
 			   	{
-					PlayerInfo[playerid][NewID] = id;
+					Character[playerid][NewID] = id;
 					new str[128], dialog[600];
 					for (new i = 0; i < sizeof(HouseInteriorInfo); ++i)
 					{
@@ -12524,8 +12349,8 @@ Dialog:HOUSEMENU(playerid, response, listitem, inputtext[])
 forward GetHouseID(playerid);
 public GetHouseID(playerid)
 {
-	PlayerInfo[playerid][NewID] = cache_insert_id();
-	Houses[PlayerInfo[playerid][NewID]][SQLID] = PlayerInfo[playerid][NewID];
+	Character[playerid][NewID] = cache_insert_id();
+	Houses[Character[playerid][NewID]][SQLID] = Character[playerid][NewID];
 	return 1;
 }
 
@@ -12560,7 +12385,7 @@ Dialog:CREATEHOUSE2(playerid, response, listitem, inputtext[])
     {
         if(strval(inputtext) >= 0)
         {
-	        new hID = PlayerInfo[playerid][NewID];
+	        new hID = Character[playerid][NewID];
 			Houses[hID][Price] = strval(inputtext);
 
 			new str[128], dialog[600];
@@ -12610,7 +12435,7 @@ Dialog:CREATEHOUSE3(playerid, response, listitem, inputtext[])
 {
     if(response)
     {
-    	new query[300], hID = PlayerInfo[playerid][NewID];
+    	new query[300], hID = Character[playerid][NewID];
     	printf("%d", hID);
 
         Houses[hID][IntX] = HouseInteriorCoords[listitem][0];
@@ -12619,7 +12444,7 @@ Dialog:CREATEHOUSE3(playerid, response, listitem, inputtext[])
         Houses[hID][Interior] = HouseInteriorInfo[listitem][1][0];
    
         
-        Houses[hID][World] = PlayerInfo[playerid][NewID];
+        Houses[hID][World] = Character[playerid][NewID];
         WorldFreeIdCheck(hID, Houses[hID][World]);
 
 		mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE Houses SET Interior = %d, IntX = %f, IntY = %f, IntZ = %f, Price = %d WHERE SQLID = %d LIMIT 1", Houses[hID][Interior], Houses[hID][IntX], Houses[hID][IntY], Houses[hID][IntZ], Houses[hID][Price], Houses[hID][SQLID]);
@@ -12637,7 +12462,7 @@ Dialog:CREATEHOUSE3(playerid, response, listitem, inputtext[])
 
 CMD:deletefactionvehicle(playerid, params[])
 {
-	if(MasterAccount[playerid][Admin] >= 5)
+	if(Account[playerid][Admin] >= 5)
 	{
 		if(IsPlayerInAnyVehicle(playerid))
 		{
@@ -12678,7 +12503,7 @@ ALTCMD:deletefv->deletefactionvehicle;
 
 CMD:deleteservervehicle(playerid, params[])
 {
-	if(MasterAccount[playerid][Admin] >= 6)
+	if(Account[playerid][Admin] >= 6)
 	{
 		if(IsPlayerInAnyVehicle(playerid))
 		{
@@ -12718,7 +12543,7 @@ ALTCMD:deletesv->deleteservervehicle;
 
 CMD:deleteplayervehicle(playerid, params[])
 {
-	if(MasterAccount[playerid][Admin] >= 5)
+	if(Account[playerid][Admin] >= 5)
 	{
 		if(IsPlayerInAnyVehicle(playerid))
 		{
@@ -12769,7 +12594,7 @@ CMD:scrapcar(playerid, params[])
 
 			    mysql_format(SQL_CONNECTION, query, sizeof(query), "DELETE FROM `PlayerVehicles` WHERE `SQLID` = %d", Vehicles[vid][SQLID]);
 				mysql_tquery(SQL_CONNECTION, query);
-				PlayerInfo[playerid][TotalVehicles] --;
+				Character[playerid][TotalVehicles] --;
 
 
 				validvehicle[vid] = false;
@@ -12851,7 +12676,7 @@ Dialog:VEHICLELIST(playerid, response, listitem, inputtext[])
     if(!response) return 0;
 	if(response)
     {
-		if(PlayerInfo[playerid][Cash] < DealershipData_Normal[listitem][1]) return SendClientMessage(playerid,COLOR_GRAY, ERROR_MONEY);
+		if(Character[playerid][Cash] < DealershipData_Normal[listitem][1]) return SendClientMessage(playerid,COLOR_GRAY, ERROR_MONEY);
 		{
    			new ConfirmationMessage[128], name[MAX_PLAYER_NAME+1];
 			VehicleModel[playerid] = DealershipData_Normal[listitem][0];
@@ -12863,9 +12688,9 @@ Dialog:VEHICLELIST(playerid, response, listitem, inputtext[])
 
 			SetPlayerCameraLookAt(playerid, 94.5747, 1045.5946, 13.7615);
 
-			PlayerInfo[playerid][Dealership] = CreateVehicle(VehicleModel[playerid],84.7893,1048.24,13.6436,229.316,1,2, -1);
+			Character[playerid][Dealership] = CreateVehicle(VehicleModel[playerid],84.7893,1048.24,13.6436,229.316,1,2, -1);
             GetPlayerName(playerid, name, sizeof(name));
-			SetVehicleVirtualWorld(PlayerInfo[playerid][Dealership], GetPlayerID(name) + 1000);
+			SetVehicleVirtualWorld(Character[playerid][Dealership], GetPlayerID(name) + 1000);
 			SetPlayerVirtualWorld(playerid, GetPlayerID(name) + 1000);
 
 			format(ConfirmationMessage, sizeof(ConfirmationMessage), "Are you sure that you want to buy a "COL_DGREEN"%s "COL_WHITE"for "COL_DGREEN"$%s"COL_WHITE"?", VehicleNames[DealershipData_Normal[listitem][0]-400], FormatNumber(VehiclePrice[playerid]));
@@ -12884,16 +12709,16 @@ Dialog:VEHICLE_CONFIRM(playerid, response, listitem, inputtext[])
 		SetPlayerVirtualWorld(playerid, 0);
 		SetCameraBehindPlayer(playerid);
 		TogglePlayerControllable(playerid, true);
-		DestroyVehicle(PlayerInfo[playerid][Dealership]);
+		DestroyVehicle(Character[playerid][Dealership]);
 		ShowVehicleDialog(playerid);
 		return 0;
 	}
-	else if(PlayerInfo[playerid][TotalVehicles] >= 3)
+	else if(Character[playerid][TotalVehicles] >= 3)
 	{
 		SetPlayerVirtualWorld(playerid, 0);
 		SetCameraBehindPlayer(playerid);
 		TogglePlayerControllable(playerid, true);
-		DestroyVehicle(PlayerInfo[playerid][Dealership]);
+		DestroyVehicle(Character[playerid][Dealership]);
 		SendClientMessage(playerid, COLOR_GRAY, "[ERR--] Too many owned vehicles");
 		ShowVehicleDialog(playerid);
 	    return 0;
@@ -12909,11 +12734,11 @@ Dialog:VEHICLE_CONFIRM(playerid, response, listitem, inputtext[])
     Vehicles[Vehicle][PosY] = 1066.5261;
     Vehicles[Vehicle][PosZ] = 13.3817;
     Vehicles[Vehicle][PosA] = 269.8916;
-    Vehicles[Vehicle][Owner] = PlayerInfo[playerid][SQLID];
+    Vehicles[Vehicle][Owner] = Character[playerid][ID];
     Vehicles[Vehicle][Type] = 1;
     Vehicles[Vehicle][Fuel] = 100;
     Lights[Vehicle] = 0;
-    PlayerInfo[playerid][TotalVehicles]++;
+    Character[playerid][TotalVehicles]++;
 
 
     format(str, sizeof(str), "%s%s%d%d%s%s%s", LetterList[random(sizeof(LetterList))], LetterList[random(sizeof(LetterList))], random(9), random(9), LetterList[random(sizeof(LetterList))], LetterList[random(sizeof(LetterList))], LetterList[random(sizeof(LetterList))]);
@@ -12929,7 +12754,7 @@ Dialog:VEHICLE_CONFIRM(playerid, response, listitem, inputtext[])
 	SetPlayerVirtualWorld(playerid, 0);
 	SetCameraBehindPlayer(playerid);
 	TogglePlayerControllable(playerid, true);
-	DestroyVehicle(PlayerInfo[playerid][Dealership]);
+	DestroyVehicle(Character[playerid][Dealership]);
 
 	mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO `PlayerVehicles` (Model, PosX, PosY, PosZ, PosA, Color1, Color2, Type, Plate, Owner, Fuel, Damage) VALUES(%d, %f, %f, %f, %f, 0, 0, 1, '%e', '%d', 100, 1000.0)",
 
@@ -12954,13 +12779,13 @@ Dialog:VEHICLE_CONFIRM(playerid, response, listitem, inputtext[])
 		SetPlayerVirtualWorld(playerid, 0);
 		SetCameraBehindPlayer(playerid);
 		TogglePlayerControllable(playerid, true);
-		DestroyVehicle(PlayerInfo[playerid][Dealership]);
+		DestroyVehicle(Character[playerid][Dealership]);
 		return 1;
 	}
 	new query[128];
-	ChangeVehicleColor(PlayerInfo[playerid][Dealership],listitem,listitem);
-	ChangeVehicleColor(PlayerInfo[playerid][NewVehicle],listitem,listitem);
-	mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE PlayerVehicles SET Color1 = %d, Color2 = %d WHERE SQLID = %d LIMIT 1",listitem,listitem,PlayerInfo[playerid][NewVehicle]);
+	ChangeVehicleColor(Character[playerid][Dealership],listitem,listitem);
+	ChangeVehicleColor(Character[playerid][NewVehicle],listitem,listitem);
+	mysql_format(SQL_CONNECTION, query, sizeof(query), "UPDATE PlayerVehicles SET Color1 = %d, Color2 = %d WHERE SQLID = %d LIMIT 1",listitem,listitem,Character[playerid][NewVehicle]);
 	mysql_tquery(SQL_CONNECTION, query);throat 
 	Dialog_Show(playerid, VEHICLE_COLOR, DIALOG_STYLE_LIST, "Vehicle Dialog", "Black\nWhite\nBlue\nRed\nDark Green\nPink\nYellow\nSilver","Select","Finish");
 	return 1;
@@ -12990,7 +12815,7 @@ Dialog:VEHICLELIST2(playerid, response, listitem, inputtext[])
     if(!response) return 0;
 	if(response)
     {
-		if(PlayerInfo[playerid][Cash] < DealershipData_Commercial[listitem][1]) return SendClientMessage(playerid,COLOR_GRAY, ERROR_MONEY);
+		if(Character[playerid][Cash] < DealershipData_Commercial[listitem][1]) return SendClientMessage(playerid,COLOR_GRAY, ERROR_MONEY);
 		{
    			new ConfirmationMessage[128];
 			VehicleModel[playerid] = DealershipData_Commercial[listitem][0];
@@ -12998,10 +12823,10 @@ Dialog:VEHICLELIST2(playerid, response, listitem, inputtext[])
 
 			TogglePlayerControllable(playerid, false);
 			
-			PlayerInfo[playerid][Dealership] = CreateVehicle(VehicleModel[playerid], -138.3560, 1082.1108, 20.1789, 358.3029,1,2, -1);
+			Character[playerid][Dealership] = CreateVehicle(VehicleModel[playerid], -138.3560, 1082.1108, 20.1789, 358.3029,1,2, -1);
 			SetPlayerCameraPos(playerid, -145.4871, 1094.8253, 22.6712);
 			SetPlayerCameraLookAt(playerid, -144.8873, 1094.0190, 22.2362);
-			SetVehicleVirtualWorld(PlayerInfo[playerid][Dealership], playerid + 1000);
+			SetVehicleVirtualWorld(Character[playerid][Dealership], playerid + 1000);
 			SetPlayerVirtualWorld(playerid, playerid + 1000);
 
 			format(ConfirmationMessage, sizeof(ConfirmationMessage), "Are you sure that you want to buy a "COL_DGREEN"%s "COL_WHITE"for "COL_DGREEN"$%d"COL_WHITE"?", VehicleNames[DealershipData_Commercial[listitem][0]-400], VehiclePrice[playerid]);
@@ -13020,16 +12845,16 @@ Dialog:VEHICLE_CONFIRM2(playerid, response, listitem, inputtext[])
 		SetPlayerVirtualWorld(playerid, 0);
 		SetCameraBehindPlayer(playerid);
 		TogglePlayerControllable(playerid, true);
-		DestroyVehicle(PlayerInfo[playerid][Dealership]);
+		DestroyVehicle(Character[playerid][Dealership]);
 		ShowVehicleDialog2(playerid);
 		return 0;
 	}
-	else if(PlayerInfo[playerid][TotalVehicles] >= 3)
+	else if(Character[playerid][TotalVehicles] >= 3)
 	{
 		SetPlayerVirtualWorld(playerid, 0);
 		SetCameraBehindPlayer(playerid);
 		TogglePlayerControllable(playerid, true);
-		DestroyVehicle(PlayerInfo[playerid][Dealership]);
+		DestroyVehicle(Character[playerid][Dealership]);
 		SendClientMessage(playerid, COLOR_GRAY, "[ERROR] Too many owned vehicles");
 		ShowVehicleDialog2(playerid);
 	    return 0;
@@ -13045,11 +12870,11 @@ Dialog:VEHICLE_CONFIRM2(playerid, response, listitem, inputtext[])
     Vehicles[Vehicle][PosY] = 1082.1108;
     Vehicles[Vehicle][PosZ] = 19.5789;
     Vehicles[Vehicle][PosA] = 358.3029;
-    Vehicles[Vehicle][Owner] = PlayerInfo[playerid][SQLID];
+    Vehicles[Vehicle][Owner] = Character[playerid][ID];
     Vehicles[Vehicle][Type] = 1;
     Vehicles[Vehicle][Fuel] = 100;
     Lights[Vehicle] = 0;
-    PlayerInfo[playerid][TotalVehicles]++;
+    Character[playerid][TotalVehicles]++;
 
 
     format(str, sizeof(str), "%s%s%d%d%s%s%s", LetterList[random(sizeof(LetterList))], LetterList[random(sizeof(LetterList))], random(9), random(9), LetterList[random(sizeof(LetterList))], LetterList[random(sizeof(LetterList))], LetterList[random(sizeof(LetterList))]);
@@ -13065,7 +12890,7 @@ Dialog:VEHICLE_CONFIRM2(playerid, response, listitem, inputtext[])
 	SetPlayerVirtualWorld(playerid, 0);
 	SetCameraBehindPlayer(playerid);
 	TogglePlayerControllable(playerid, true);
-	DestroyVehicle(PlayerInfo[playerid][Dealership]);
+	DestroyVehicle(Character[playerid][Dealership]);
 
 	mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO `PlayerVehicles` (Model, PosX, PosY, PosZ, PosA, Color1, Color2, Type, Plate, Owner, Fuel, Damage) VALUES(%d, %f, %f, %f, %f, 0, 0, 1, '%e', '%d', 100, 1000.0)",
 
@@ -13085,7 +12910,7 @@ Dialog:VEHICLE_CONFIRM2(playerid, response, listitem, inputtext[])
 
 CMD:iconmanager(playerid, params[])
 {
-	if(MasterAccount[playerid][Admin] >= 5)
+	if(Account[playerid][Admin] >= 5)
 	{
 		Dialog_Show(playerid, ICONMENU, DIALOG_STYLE_LIST, "Icon System", "Create Icon\nChange Type\nEdit Label\nChange Icon", "Select","Cancel");
 	}
@@ -13099,7 +12924,7 @@ CMD:iconmanager(playerid, params[])
 
 CMD:iconinfo(playerid,params[])
 {
-	if(MasterAccount[playerid][Admin] >= 1)
+	if(Account[playerid][Admin] >= 1)
 	{
 		if(InRangeOfAnyIcon(playerid) > 0)
 		{
@@ -13309,11 +13134,11 @@ Dialog:IconChange(playerid, response, listitem, inputtext[])
 
 CMD:changeuniform(playerid,params[])
 {
-	if(PlayerInfo[playerid][Faction] > 0)
+	if(Character[playerid][Faction] > 0)
 	{
-		if(PlayerInfo[playerid][Uniform] != 0 || PlayerInfo[playerid][Uniform] != PlayerInfo[playerid][Skin])
+		if(Character[playerid][Uniform] != 0 || Character[playerid][Uniform] != Character[playerid][Skin])
 		{
-			SetPlayerSkin(playerid, PlayerInfo[playerid][Uniform]);
+			SetPlayerSkin(playerid, Character[playerid][Uniform]);
 		}
 		else SendErrorMessage(playerid, "Uniform not set.");
 	}
@@ -13322,10 +13147,10 @@ CMD:changeuniform(playerid,params[])
 
 CMD:locker(playerid,params[])
 {
-	if(PlayerInfo[playerid][Faction] > 0)
+	if(Character[playerid][Faction] > 0)
 	{
 		new id = InRangeOfIconID(playerid);
-		if(id > 0 && Icons[id][Faction] == PlayerInfo[playerid][Faction] && Icons[id][Type] == 13)
+		if(id > 0 && Icons[id][Faction] == Character[playerid][Faction] && Icons[id][Type] == 13)
 		{
 		    Locker_Main(playerid);
 		}
@@ -13346,7 +13171,7 @@ stock Locker_Uniform(playerid)
 	{
     	Dialog_Show(playerid, LockerUniform, DIALOG_STYLE_LIST, "Locker - Uniform","Black Uniform - White\nBlack Uniform - White 2\nBeige Uniform - White\nBlack & Beige Uniform - White\nBeige & Black Uniform - White\nBiking Uniform\nSWAT Uniform\nBlack Uniform - Black\nBlack Uniform - Hispanic\n","Select","Cancel");
 	}
-	else if(PlayerInfo[playerid][Faction] == 3)
+	else if(Character[playerid][Faction] == 3)
 	{
 		Dialog_Show(playerid, LockerUniform, DIALOG_STYLE_LIST, "Locker - Uniform", "Fire 1\nFire 2\nFire 3\n \nParamedic 1\nParamedic 2\nParamedic 3", "Select", "Cancel");
 	}	
@@ -13359,7 +13184,7 @@ stock Locker_Equipment(playerid)
 	{
     	Dialog_Show(playerid, LockerEquipment, DIALOG_STYLE_LIST, "Locker - Equipment","Baton\nKevlar Vest\nPepper Spray\nService Pistol","Select","Cancel");		
 	}
-	else if(PlayerInfo[playerid][Faction] == 3)
+	else if(Character[playerid][Faction] == 3)
 	{
 		Dialog_Show(playerid, LockerEquipment, DIALOG_STYLE_LIST, "Locker - Equipment","Extinguisher","Select","Cancel");
 	}
@@ -13372,17 +13197,17 @@ Dialog:LockerMain(playerid, response, listitem, inputtext[])
 	if(listitem == 0)
 	{
 		new str[128];
-		if(PlayerInfo[playerid][Duty] == 0)
+		if(Character[playerid][Duty] == 0)
 		{
-			PlayerInfo[playerid][Duty] = 1;
+			Character[playerid][Duty] = 1;
 			format(str, sizeof(str), "[INFO] %s has gone on duty!", GetRoleplayName(playerid));
-			SendFactionMessage(PlayerInfo[playerid][Faction], COLOR_GRAY, str);
+			SendFactionMessage(Character[playerid][Faction], COLOR_GRAY, str);
 		}
-		else if(PlayerInfo[playerid][Duty] == 1)
+		else if(Character[playerid][Duty] == 1)
 		{
-			PlayerInfo[playerid][Duty] = 0;
+			Character[playerid][Duty] = 0;
 			format(str, sizeof(str), "[INFO] %s has gone off duty!", GetRoleplayName(playerid));
-			SendFactionMessage(PlayerInfo[playerid][Faction], COLOR_GRAY, str);
+			SendFactionMessage(Character[playerid][Faction], COLOR_GRAY, str);
 		}
 	}
 	else if(listitem == 1)
@@ -13399,7 +13224,7 @@ Dialog:LockerMain(playerid, response, listitem, inputtext[])
 SetPlayerSkinEx(playerid, skinid)
 {
 	SetPlayerSkin(playerid, skinid);
-	PlayerInfo[playerid][Skin] = skinid;
+	Character[playerid][Skin] = skinid;
 	return 1;
 }
 
@@ -13427,7 +13252,7 @@ Dialog:LockerUniform(playerid, response, listitem, inputtext[])
 		else if(listitem == 8) SetPlayerSkin(playerid, 267);
 	}
 
-	else if(PlayerInfo[playerid][Faction] == 3)
+	else if(Character[playerid][Faction] == 3)
 	{
 		if(listitem == 0) SetPlayerSkin(playerid, 277);
 
@@ -13441,7 +13266,7 @@ Dialog:LockerUniform(playerid, response, listitem, inputtext[])
 
 		else if(listitem == 6) SetPlayerSkin(playerid, 276);
 	}
-	PlayerInfo[playerid][Uniform] = GetPlayerSkin(playerid);
+	Character[playerid][Uniform] = GetPlayerSkin(playerid);
     return 1;
 }
 
@@ -13460,7 +13285,7 @@ Dialog:LockerEquipment(playerid, response, listitem, inputtext[])
 		else if(listitem == 3) GivePlayerGun(playerid, 24, 35);
 	}
 
-	else if(PlayerInfo[playerid][Faction] == 3)
+	else if(Character[playerid][Faction] == 3)
 	{
 		if(listitem == 0)
 		{
@@ -13474,10 +13299,10 @@ Dialog:LockerEquipment(playerid, response, listitem, inputtext[])
 
 CMD:weaponcache(playerid,params[])
 {
-	if(PlayerInfo[playerid][Faction] > 0)
+	if(Character[playerid][Faction] > 0)
 	{
 		new id = InRangeOfIconID(playerid);
-		if(id > 0 && Icons[id][Faction] == PlayerInfo[playerid][Faction] && Icons[id][Type] == 15 && Icons[id][Faction] == PlayerInfo[playerid][Faction])
+		if(id > 0 && Icons[id][Faction] == Character[playerid][Faction] && Icons[id][Type] == 15 && Icons[id][Faction] == Character[playerid][Faction])
 		{
 	    	FWeapons_Main(playerid);
 		}
@@ -13490,11 +13315,11 @@ stock FWeapons_Main(playerid)
 {
 	new str[600], query[200];
 	
-	if(PlayerInfo[playerid][Faction] == 1)
+	if(Character[playerid][Faction] == 1)
 	{
 		strcat(str, "Purchase Weapons\n");
 	}
-	mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT SQLID, Weapon, Ammo FROM `FactionWeapons` WHERE Faction = %d AND Status = 1", PlayerInfo[playerid][Faction]);
+	mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT SQLID, Weapon, Ammo FROM `FactionWeapons` WHERE Faction = %d AND Status = 1", Character[playerid][Faction]);
 	new Cache:result = mysql_query(SQL_CONNECTION, query);
 
 	for(new i=0; i<cache_num_rows(); i++)
@@ -13519,7 +13344,7 @@ stock FWeapons_Buy(playerid)
 Dialog:FWeaponsMain(playerid, response, listitem, inputtext[])
 {
 	if(!response) return 1;
-	if(PlayerInfo[playerid][Faction] == 1)
+	if(Character[playerid][Faction] == 1)
 	{
 		if(listitem == 0)
 		{
@@ -13548,7 +13373,7 @@ Dialog:FWeaponsMain(playerid, response, listitem, inputtext[])
 		GivePlayerGun(playerid, Weap, Ammo);
 		MYSQL_Update_Interger(strval(WeapSQLID), "FactionWeapons", "Status", 0);
 
-		if(PlayerInfo[playerid][Faction] == 1)
+		if(Character[playerid][Faction] == 1)
 		{
 			format(str, sizeof(str), "Weapon OUT at %d:%d - %s with %d rounds.", ClockHours, ClockMinutes, WeaponNameList[Weap], Ammo);
 			Add_PoliceNationalComputer(0, playerid, PNC_WLOG, str, 0);
@@ -13565,7 +13390,7 @@ Dialog:FWeaponsMain(playerid, response, listitem, inputtext[])
 stock BuyFactionWeapon(playerid, weap, ammo)
 {
 	new query[300];
-    mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO FactionWeapons (Weapon, Ammo, Faction, Status) VALUES(%d, %d, %d, 1)", weap, ammo, PlayerInfo[playerid][Faction]);
+    mysql_format(SQL_CONNECTION, query, sizeof(query), "INSERT INTO FactionWeapons (Weapon, Ammo, Faction, Status) VALUES(%d, %d, %d, 1)", weap, ammo, Character[playerid][Faction]);
 	mysql_tquery(SQL_CONNECTION, query);
 
 	SendInfoMessage(playerid, "Weapon successfully purchased.");
@@ -13580,7 +13405,7 @@ Dialog:FWeaponsBuy(playerid, response, listitem, inputtext[])
     strmid(extractprice, inputtext, strfind(inputtext, "$") + 1,  strfind(inputtext, ")"));
     weapprice = strval(extractprice);
 
-    if(PlayerInfo[playerid][Cash] < weapprice) return SendErrorMessage(playerid, ERROR_MONEY);
+    if(Character[playerid][Cash] < weapprice) return SendErrorMessage(playerid, ERROR_MONEY);
     GivePlayerMoneyEx(playerid, -weapprice);
 
 
@@ -13706,14 +13531,14 @@ Dialog:BuyLegalWeapons(playerid, response, listitem, inputtext[])
     strmid(extractprice, inputtext, strfind(inputtext, "$") + 1,  strfind(inputtext, " |"));
     weapprice = strval(extractprice);
 
-    if(weapprice > PlayerInfo[playerid][Bank])
+    if(weapprice > Character[playerid][Bank])
     {
     	WebError(playerid, 402, "www.legalweapons.com/buy");
     	return 0;
     }
     else
 	{
-		PlayerInfo[playerid][Bank] -= weapprice;
+		Character[playerid][Bank] -= weapprice;
 		format(str, sizeof(str), "$%d has been deducted from your bank account. You should recieve more information on your weapon shortly.", weapprice);
 		SendInfoMessage(playerid, str);
 	}

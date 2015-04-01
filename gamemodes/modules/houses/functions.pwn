@@ -131,7 +131,7 @@ public Create_House(id)
 	else if(Houses[id][Owner] > 0)
 	{
 	    new query[128];
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT `Username` FROM Accounts WHERE SQLID = %d LIMIT 1", Houses[id][Owner]);
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT `Name` FROM Characters WHERE ID = %d LIMIT 1", Houses[id][Owner]);
         mysql_tquery(SQL_CONNECTION, query, "Create_HouseLabel", "i", id);
 
 		Houses[id][PickupID] = CreateDynamicPickup(1273, 23, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 0, 0, -1, 250);
@@ -144,7 +144,7 @@ forward Create_HouseLabel(id);
 public Create_HouseLabel(id)
 {
 	new str[128], houseowner[MAX_PLAYER_NAME];
-	cache_get_field_content(0, "Username", houseowner, SQL_CONNECTION, MAX_PLAYER_NAME);
+	cache_get_field_content(0, "Name", houseowner, SQL_CONNECTION, MAX_PLAYER_NAME);
 	format(str, sizeof(str), "%s\n"COL_GRAY"Owner: %s", Houses[id][Name], houseowner);
   	Houses[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Houses[id][PosX],Houses[id][PosY],Houses[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, -1, -1, -1, 10.0);
 	return 1;

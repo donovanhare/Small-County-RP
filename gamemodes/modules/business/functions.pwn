@@ -148,7 +148,7 @@ public Create_Business(id)
 	}
 	else if(Business[id][Owned] == 1)
     {
-		mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT `Username` FROM Accounts WHERE SQLID = %d LIMIT 1", Business[id][Owner]);
+		mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT `Name` FROM Characters WHERE ID = %d LIMIT 1", Business[id][Owner]);
         mysql_tquery(SQL_CONNECTION, query, "Create_BusinessLabel", "i", id);
 
         if(Business[id][Type] == 5)//clothes shop
@@ -178,7 +178,7 @@ forward Create_BusinessLabel(id);
 public Create_BusinessLabel(id)
 {
 	new str[128], OwnerName[MAX_PLAYER_NAME];
-	cache_get_field_content(0, "Username", OwnerName, SQL_CONNECTION, MAX_PLAYER_NAME);
+	cache_get_field_content(0, "Name", OwnerName, SQL_CONNECTION, MAX_PLAYER_NAME);
 	format(str, sizeof(str), ""COL_ORANGE" %s \n"COL_GRAY" Owner: %s \n Payout: $%s \n Entrance Fee: $%s", Business[id][Name], OwnerName, FormatNumber(Business[id][Payout]), FormatNumber(Business[id][EntranceFee]));
 	Business[id][LabelID] = CreateDynamic3DTextLabel(str, COLOR_WHITE, Business[id][PosX],Business[id][PosY],Business[id][PosZ], 100, INVALID_PLAYER_ID, INVALID_VEHICLE_ID, 1, -1, -1, -1, 10.0);
 	return 1;
