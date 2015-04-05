@@ -3,6 +3,8 @@ forward Login_Camera(playerid);
 public Login_Camera(playerid)
 {
 	TogglePlayerSpectating(playerid, 1);
+	SetPlayerInterior(playerid, 0);
+	SetPlayerVirtualWorld(playerid, 1000);
 	Camera_1(playerid);
 	return 1;
 }

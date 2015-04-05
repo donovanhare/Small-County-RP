@@ -7,7 +7,7 @@
 			|                                       	  | Small County Roleplay |     	         	                                  |
 			|-----------------------------------------------------------------------------------------------------------------------------|
 
-
+something like fmanager 4 biz & house
 */
 //==============================================================================
 //          -- > Includes
@@ -682,6 +682,150 @@ new WeaponNameList[][] =
     "Parachute"
 };
 
+new Float:BusinessInteriorPos[][] =
+{
+    { -25.7114, -187.821, 1003.5469 },
+    { 315.2440, -140.885, 999.60160 },
+    { 386.5259, 173.6381, 1008.3828 },
+    { 961.9308, -51.9071, 1001.1172 },
+	{ 161.4048, -94.2416, 1001.8047 },
+	{ 378.0260, -190.515, 1000.6328 },
+	{ 296.9199, -108.071, 1001.5156 },
+	{ 833.2697, 10.58841, 1004.1796 },
+	{ -103.559, -24.2256, 1000.7187 },
+	{ -2240.46, 137.0604, 1035.4140 },
+	{ 663.8362, -575.605, 16.343263 },
+	{ 207.7379, -109.019, 1005.1328 },
+	{ 204.3329, -166.694, 1000.5234 },
+	{ 493.3909, -22.7227, 1000.6796 },
+	{ 501.9809, -69.1501, 998.75781 },
+	{ -227.020, 1401.220, 27.760000 },
+	{ 457.3047, -88.4284, 999.55468 },
+	{ 454.9739, -110.104, 1000.0772 },
+	{ 375.9624, -65.8168, 1001.5078 },
+	{ 369.5795, -4.48720, 1001.8588 }
+};
+
+new BusinessInteriors[][][32] =
+{
+    { 1, "Convenience Store", 17},
+    { 2, "Ammunation", 	 7},
+    { 3, "News Agency", 3},
+    { 4, " Betting Shop", 3},
+	{ 5, "Clothes Shop(Zip)", 18},
+	{ 6, "Doughnut Place", 17},
+	{ 2, "Ammunation 3", 6},
+	{ 4, "Off Track Betting", 3},
+	{ 7, "Sex Shop",  3},
+	{ 8, "Electronic Shop", 6},
+	{ 1, "Gas Station", 0},
+	{ 5, "Binco",  15},
+	{ 5, "Didier Sachs", 14},
+	{ 9, "Club", 17},
+	{ 9, "Bar", 11},
+	{ 9, "Lil Prob Inn", 18},
+	{ 6, "Jay's' Diner", 4},
+	{ 6, "Grant Diner", 5},
+	{ 10, "Burger Shot", 10},
+	{ 10, "Cluckin' Bell", 9}
+};
+
+new BusinessTypeNames[][] = 
+{
+	"None",
+	"General Store",
+	"Ammunation",
+	"News",
+	"Betting",
+	"Clothes",
+	"Doughnut",
+	"Sex",
+	"Electronic Store",
+	"Club",
+	"Fast Food"
+};
+
+
+
+new Float:HouseInteriorCoords[][] =
+{
+	{ -33.6552, 1564.2339, 1080.2109 },
+	{ 5.2788, 1612.1793,   1084.3750 },
+	{ 18.3167, 1566.3641,  1084.4297 },
+	{ -33.0208, 1614.3723, 1084.4297 },
+	{ 62.3589, 1557.1005,  1083.8662 },
+	{ 59.8227, 1612.7520,  1083.8594 },
+	{ 106.9103, 1561.0291, 1084.4375 },
+	{ 109.5615, 1620.7977, 1084.3047 },
+	{ 146.0323, 1562.4762, 1082.1406 },
+	{ 151.6272, 1623.3051, 1081.8254 },
+	{ 198.2629, 1624.6292, 1080.9965 },
+	{ 217.3181, 1555.3815, 1084.0154 },
+	{ 264.7508, 1625.2355, 1083.8828 },
+	{ 275.7429, 1559.3079, 1080.2578 },
+	
+	{ 2260.268798, -1136.082885, 1050.632812},
+	{ 2269.389404, -1210.436767, 1047.562500},
+	{ 2365.161865,-1135.018554,1050.875},
+	{ 2237.725097,-1080.449096,1049.023437},
+	{ 2308.842529,-1211.722167,1049.023437},
+	{ 2283.092529,-1139.795166,1050.898437},
+	{ 2317.780273,-1025.810302,1050.217773},
+	{ 244.125152,304.773101,999.148437},
+	{ 2324.419921,-1145.568359,1050.710083},
+	{ 1298.597900, -796.083007, 1084.0},
+	{ 2332.923828, -1076.169433, 1049.023437},
+	{ 385.8040,1471.7699,1080.1875},
+	{ 375.9720,1417.2699,1081.3281},
+	{ 328.0446,1478.8771,1084.4375},
+	{ 446.8716,1397.5302,1084.3047},
+	{ 227.7230,1114.3899,1080.9922},
+	{ 261.1731,1285.9613,1080.2578},
+	{ 140.3826,1368.5656,1083.8632},
+	{ -42.3809,1407.2510,1084.4297},
+	{ 83.2081,1323.7213,1083.8594},
+	{ 260.9420,1238.5099,1084.2578}
+};
+
+new HouseInteriorInfo[][][32] =
+{
+	{ "Robada", 			3 },
+	{ "Bayside Yellow", 	2 },
+	{ "Small Outer",		1 },
+	{ "Med Robada", 		7 },
+	{ "2 Floor Lade", 	   15 },
+	{ "Bayside Large Stairs", 15 },
+	{ "Shite Hole", 	   15 },
+	{ "Granny Wallpaper",   8 },
+	{ "Small Flat Green",   9 },
+	{ "Dark Blue House",   10 },
+	{ "vLarge 2 floor",     3 },
+	{ "Large Lade",         8 },
+	{ "Med Stripe Wall",    1 },
+	{ "Unknown",            1 },
+	
+	{ "House 1", 10},
+	{ "House 2", 10},
+	{ "House 3", 8},
+	{ "House 4", 2},
+	{ "House 5", 6},
+	{ "House 6", 11},
+	{ "House 7", 9},
+	{ "House 8", 1},
+	{ "House 9", 12},
+	{ "House 10", 5},
+	{ "House 11", 6},
+	{ "House 19", 15},
+	{ "House 20", 15},
+	{ "House 21", 15},
+	{ "House 22", 2},
+	{ "House 23", 5},
+	{ "House 24", 4},
+	{ "House 25", 5},
+	{ "House 26", 8},
+	{ "House 27", 9},
+	{ "House 28", 9}
+};
 
 //==============================================================================
 main()
@@ -951,7 +1095,7 @@ forward Characters_Fetch(playerid);
 public Characters_Fetch(playerid)
 {
     new query[128];
-    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT ID, Name FROM Characters WHERE A_ID = %d LIMIT 3", Account[playerid][SQLID]);
+    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT ID, Name, Level FROM Characters WHERE A_ID = %d LIMIT 3", Account[playerid][SQLID]);
     mysql_tquery(SQL_CONNECTION, query, "Characters_Menu", "i", playerid);
     return 1;
 }
@@ -959,24 +1103,29 @@ public Characters_Fetch(playerid)
 forward Characters_Menu(playerid);
 public Characters_Menu(playerid)
 {
-    new str[64], string[256], C_ID, C_Name[24];
+    new str[64], dialog[512], C_ID, C_Name[24], C_LVL;
+
+    format(str, sizeof(str), "C_ID\tCharacter Name\tLevel\n");
+    strcat(dialog, str, sizeof(dialog));
+
     for( new id = 0; id < cache_num_rows(); id++)
     {
         C_ID = cache_get_field_content_int(id, "ID", SQL_CONNECTION);
         cache_get_field_content(id, "Name", C_Name, SQL_CONNECTION, 24);
+        C_LVL = cache_get_field_content_int(id, "Level", SQL_CONNECTION);
 
-        format(str, sizeof(str), "(%d) %s\n", C_ID, C_Name);
-        strcat(string, str, sizeof(string));
+        format(str, sizeof(str), "[%d] \t%s\t%d\n", C_ID, C_Name, C_LVL);
+        strcat(dialog, str, sizeof(dialog));
     }
 
     if(cache_num_rows() < 3) 
     {
-        format(str, sizeof(str), "Create Character\n");
-        strcat(string, str, sizeof(string));
+        format(str, sizeof(str), " \tCreate Character\t\n");
+        strcat(dialog, str, sizeof(dialog));
     }
 
     format(str, sizeof(str), "%s's Characters", Account[playerid][Name]);
-    Dialog_Show(playerid, Character_Select, DIALOG_STYLE_LIST, str, string, "Select","Leave");
+    Dialog_Show(playerid, Character_Select, DIALOG_STYLE_TABLIST_HEADERS, str, dialog, "Select","Leave");
 
     return 1;
 }
@@ -987,7 +1136,7 @@ Dialog:Character_Select(playerid, response, listitem, inputtext[])
     if(response)
     {
         new C_ID[6];
-        strmid(C_ID, inputtext, strfind(inputtext, "(") + 1,  strfind(inputtext, ")"));
+        strmid(C_ID, inputtext, strfind(inputtext, "[") + 1,  strfind(inputtext, "]"));
         printf("%d",strval(C_ID));//continue onto character selection (maybe tutorial in brackets)
         Character_Fetch(playerid, strval(C_ID));
     }
@@ -1210,6 +1359,8 @@ CMD:logout(playerid,params[])
 	Character_Vehicles_Unload(playerid);
 
 	LoggedIn[playerid] = 0;
+	SetPlayerName(playerid, Account[playerid][Name]);
+
 	Login_Camera(playerid);
 	Character_Reset(playerid);
 	Characters_Fetch(playerid);
@@ -6245,7 +6396,7 @@ CMD:entrancefee(playerid,params[])
 		if(bid)
 		{
 			if(sscanf(params, "d", amount)) return SendClientMessage(playerid, COLOR_GRAY, "/entrancefee [amount]");
-			if(amount < 0 && amount >= 50)
+			if(amount > 0 && amount <= 50)
 			{
 			    Business[bid][EntranceFee] = amount;
 			    MYSQL_Update_Interger(Business[bid][SQLID], "Business", "EntranceFee", Business[bid][EntranceFee]);
@@ -6255,7 +6406,7 @@ CMD:entrancefee(playerid,params[])
 			}
 			else
 			{
-			SendErrorMessage(playerid, ERROR_MONEY);
+				SendErrorMessage(playerid, ERROR_MONEY);
 			}
 		}
 		else
@@ -8275,9 +8426,9 @@ CMD:setplayer(playerid, params[])
 					{
 					    if (Account[playerid][Admin] > 0)
 						{
-							if(option2 < 1 || option2 > 299)
+							if(option2 < 1 || option2 > 311)
 							{
-								SendClientMessage(playerid, COLOR_GREY, "Skin can't be below 1 or above 299 !");
+								SendClientMessage(playerid, COLOR_GREY, "Skin can't be below 1 or above 311 !");
 								return 1;
 							}
 							else
@@ -9754,6 +9905,42 @@ CMD:businessmanager(playerid, params[])
 }
 ALTCMD:bmanager->businessmanager;
 
+CMD:bizeditor(playerid, params[])
+{
+	if(Account[playerid][Admin] >= 5)
+	{
+		new bID = InRangeOfBiz(playerid), str[128], dialog[512];
+		if(bID)
+		{
+			format(str, sizeof(str), "Option\tValue\n");
+        	strcat(dialog, str, sizeof(dialog));
+
+			format(str, sizeof(str), "Name:\t ["COL_LBLUE"%s"COL_WHITE"]\n", Business[bID][Name]);
+        	strcat(dialog, str, sizeof(dialog));
+
+	 		format(str, sizeof(str), "Type:\t ["COL_LBLUE"%s"COL_WHITE"]\n", BusinessTypeNames[Business[bID][Type]][0]);
+        	strcat(dialog, str, sizeof(dialog));
+
+        	format(str, sizeof(str), "Price:\t ["COL_LBLUE"$%s"COL_WHITE"]\n", FormatNumber(Business[bID][Price]));
+        	strcat(dialog, str, sizeof(dialog));
+
+        	format(str, sizeof(str), "Payout:\t ["COL_LBLUE"$%s"COL_WHITE"]\n", FormatNumber(Business[bID][Payout]));
+        	strcat(dialog, str, sizeof(dialog));
+
+        	format(str, sizeof(str), "EntranceFee:\t ["COL_LBLUE"$%s"COL_WHITE"]\n", FormatNumber(Business[bID][EntranceFee]));
+        	strcat(dialog, str, sizeof(dialog));
+
+			Dialog_Show(playerid, BUSINESSMEU, DIALOG_STYLE_TABLIST_HEADERS, Business[bID][Name], dialog, "Select","Cancel");//flist2
+		}
+		else SendErrorMessage(playerid, ERROR_LOCATION);
+	}
+	else
+	{
+	    SendErrorMessage(playerid, ERROR_ADMIN);
+	}
+	return 1;
+}
+//interior/exterior/owner/owned/
 
 CMD:createbiz(playerid, params[])
 {
@@ -11633,86 +11820,6 @@ Dialog:RANK_SET(playerid, response, listitem, inputtext[])
 
 
 
-new Float:HouseInteriorCoords[][] =
-{
-	{ -33.6552, 1564.2339, 1080.2109 },
-	{ 5.2788, 1612.1793,   1084.3750 },
-	{ 18.3167, 1566.3641,  1084.4297 },
-	{ -33.0208, 1614.3723, 1084.4297 },
-	{ 62.3589, 1557.1005,  1083.8662 },
-	{ 59.8227, 1612.7520,  1083.8594 },
-	{ 106.9103, 1561.0291, 1084.4375 },
-	{ 109.5615, 1620.7977, 1084.3047 },
-	{ 146.0323, 1562.4762, 1082.1406 },
-	{ 151.6272, 1623.3051, 1081.8254 },
-	{ 198.2629, 1624.6292, 1080.9965 },
-	{ 217.3181, 1555.3815, 1084.0154 },
-	{ 264.7508, 1625.2355, 1083.8828 },
-	{ 275.7429, 1559.3079, 1080.2578 },
-	
-	{ 2260.268798, -1136.082885, 1050.632812},
-	{ 2269.389404, -1210.436767, 1047.562500},
-	{ 2365.161865,-1135.018554,1050.875},
-	{ 2237.725097,-1080.449096,1049.023437},
-	{ 2308.842529,-1211.722167,1049.023437},
-	{ 2283.092529,-1139.795166,1050.898437},
-	{ 2317.780273,-1025.810302,1050.217773},
-	{ 244.125152,304.773101,999.148437},
-	{ 2324.419921,-1145.568359,1050.710083},
-	{ 1298.597900, -796.083007, 1084.0},
-	{ 2332.923828, -1076.169433, 1049.023437},
-	{ 385.8040,1471.7699,1080.1875},
-	{ 375.9720,1417.2699,1081.3281},
-	{ 328.0446,1478.8771,1084.4375},
-	{ 446.8716,1397.5302,1084.3047},
-	{ 227.7230,1114.3899,1080.9922},
-	{ 261.1731,1285.9613,1080.2578},
-	{ 140.3826,1368.5656,1083.8632},
-	{ -42.3809,1407.2510,1084.4297},
-	{ 83.2081,1323.7213,1083.8594},
-	{ 260.9420,1238.5099,1084.2578}
-};
-
-new HouseInteriorInfo[][][32] =
-{
-	{ "Robada", 			3 },
-	{ "Bayside Yellow", 	2 },
-	{ "Small Outer",		1 },
-	{ "Med Robada", 		7 },
-	{ "2 Floor Lade", 	   15 },
-	{ "Bayside Large Stairs", 15 },
-	{ "Shite Hole", 	   15 },
-	{ "Granny Wallpaper",   8 },
-	{ "Small Flat Green",   9 },
-	{ "Dark Blue House",   10 },
-	{ "vLarge 2 floor",     3 },
-	{ "Large Lade",         8 },
-	{ "Med Stripe Wall",    1 },
-	{ "Unknown",            1 },
-	
-	{ "House 1", 10},
-	{ "House 2", 10},
-	{ "House 3", 8},
-	{ "House 4", 2},
-	{ "House 5", 6},
-	{ "House 6", 11},
-	{ "House 7", 9},
-	{ "House 8", 1},
-	{ "House 9", 12},
-	{ "House 10", 5},
-	{ "House 11", 6},
-	{ "House 19", 15},
-	{ "House 20", 15},
-	{ "House 21", 15},
-	{ "House 22", 2},
-	{ "House 23", 5},
-	{ "House 24", 4},
-	{ "House 25", 5},
-	{ "House 26", 8},
-	{ "House 27", 9},
-	{ "House 28", 9}
-};
-
 CMD:houseinteriors(playerid, params[])
 {
 	if(Account[playerid][Admin] > 0)
@@ -11740,53 +11847,7 @@ Dialog:HOUSEINTERIORS(playerid, response, listitem, inputtext[])
 }
 
 
-new Float:BusinessInteriorPos[][] =
-{
-    { -25.7114, -187.821, 1003.5469 },
-    { 315.2440, -140.885, 999.60160 },
-    { 386.5259, 173.6381, 1008.3828 },
-    { 961.9308, -51.9071, 1001.1172 },
-	{ 161.4048, -94.2416, 1001.8047 },
-	{ 378.0260, -190.515, 1000.6328 },
-	{ 296.9199, -108.071, 1001.5156 },
-	{ 833.2697, 10.58841, 1004.1796 },
-	{ -103.559, -24.2256, 1000.7187 },
-	{ -2240.46, 137.0604, 1035.4140 },
-	{ 663.8362, -575.605, 16.343263 },
-	{ 207.7379, -109.019, 1005.1328 },
-	{ 204.3329, -166.694, 1000.5234 },
-	{ 493.3909, -22.7227, 1000.6796 },
-	{ 501.9809, -69.1501, 998.75781 },
-	{ -227.020, 1401.220, 27.760000 },
-	{ 457.3047, -88.4284, 999.55468 },
-	{ 454.9739, -110.104, 1000.0772 },
-	{ 375.9624, -65.8168, 1001.5078 },
-	{ 369.5795, -4.48720, 1001.8588 }
-};
 
-new BusinessInteriors[][][32] =
-{
-    { 1, "Convenience Store", 17},
-    { 2, "Ammunation", 	 7},
-    { 3, "News Agency", 3},
-    { 4, " Betting Shop", 3},
-	{ 5, "Clothes Shop(Zip)", 18},
-	{ 6, "Doughnut Place", 17},
-	{ 2, "Ammunation 3", 6},
-	{ 4, "Off Track Betting", 3},
-	{ 7, "Sex Shop",  3},
-	{ 8, "Electronic Shop", 6},
-	{ 1, "Gas Station", 0},
-	{ 5, "Binco",  15},
-	{ 5, "Didier Sachs", 14},
-	{ 9, "Club", 17},
-	{ 9, "Bar", 11},
-	{ 9, "Lil Prob Inn", 18},
-	{ 6, "Jay's' Diner", 4},
-	{ 6, "Grant Diner", 5},
-	{ 10, "Burger Shot", 10},
-	{ 10, "Cluckin' Bell", 9}
-};
 
 Dialog:BIZINTERIORS(playerid, response, listitem, inputtext[])
 {
