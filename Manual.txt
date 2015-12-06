@@ -3,7 +3,7 @@
 
 START SERVER
 screen ./samp03svr
-
+nohup ./samp03svr &
 
 SCREEN NUMBER
 screen -ls 
@@ -14,6 +14,8 @@ screen -X -S [session # you want to kill] quit
 
 STOP SERVER
 # killall -9 samp03svr
+
+killall -15 screen
 
 TEAMSPEAK
 ps x
