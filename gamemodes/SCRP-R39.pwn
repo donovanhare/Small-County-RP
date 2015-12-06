@@ -1,13 +1,15 @@
 /*
 
+								 _____                 _ _   _____                   _          ____________ 
+								/  ___|               | | | /  __ \                 | |         | ___ \ ___ \
+								\ `--. _ __ ___   __ _| | | | /  \/ ___  _   _ _ __ | |_ _   _  | |_/ / |_/ /
+								 `--. \ '_ ` _ \ / _` | | | | |    / _ \| | | | '_ \| __| | | | |    /|  __/ 
+								/\__/ / | | | | | (_| | | | | \__/\ (_) | |_| | | | | |_| |_| | | |\ \| |    
+								\____/|_| |_| |_|\__,_|_|_|  \____/\___/ \__,_|_| |_|\__|\__, | \_| \_\_|    
+								                                                          __/ |              
+								                                                         |___/
+	                                                      By: donsta3000/Foster               
 
-			|-----------------------------------------------------------------------------------------------------------------------------|
-			|				||                                    BY: Donovan            	                 		 	||                |
-       		|  				   ------------------------------------------------------------------------------------------                 |
-			|                                       	  | Small County Roleplay |     	         	                                  |
-			|-----------------------------------------------------------------------------------------------------------------------------|
-
-something like fmanager 4 biz & house
 */
 //==============================================================================
 //          -- > Includes
@@ -395,26 +397,6 @@ new Float:InactivtyCheck_Z[MAX_PLAYERS];
 //==============================================================================
 
 
-new CompactDisks[][][] =
-{
-    {"Barry White - Love's Theme Tune","http://www.soselettricista.com/musica.mp3"},
-    {"Barry White - Can't Get Enough of Your Love, Babe", "http://hyra-en-stuga.se/assets/multimedia/02-Barry_White-Can_T_Get_Enough_Of_Your_Love_Babe.mp3"},
-    {"Sugar Hill Gang - Rappers Delight","http://www.exxxplosivo.com/music/HipHop2004/15%20Rappers%20Delight.mp3"},
-    {"Conscious Daughters - Something To Ride To", "http://a.tumblr.com/tumblr_la7mo9xNWH1qzcg1so1.mp3"}
-
-};
-
-new RadioStations[][][] =
-{
-	{"Hot 108 Jamz", "http://sc.hot108.com:4020/listen.pls"},
-	{"Kiss 100", "http://icy-e-02.sharp-stream.com/kiss100.mp3"},
-	{"Gay FM", "http://87.230.82.13:80/listen.pls "},
-	{"Absolute Classic Rock", "http://icecast.timlradio.co.uk/ac128.mp3"},
-	{"Abacus FM Country", "http://dir.xiph.org/listen/1016913/listen.m3u"},
-	{"VWCountry", "http://dir.xiph.org/listen/1016913/listen.m3u"},
-	{"ABCJazz", "http://dir.xiph.org/listen/1297135/listen.m3u"},
-	{"Party Vibe Radio", "http://yp.shoutcast.com/sbin/tunein-station.pls?id=205366"}
-};
 
 
 //new LastQuestion;
@@ -708,26 +690,26 @@ new Float:BusinessInteriorPos[][] =
 
 new BusinessInteriors[][][32] =
 {
-    { 1, "Convenience Store", 17},
-    { 2, "Ammunation", 	 7},
-    { 3, "News Agency", 3},
-    { 4, " Betting Shop", 3},
-	{ 5, "Clothes Shop(Zip)", 18},
-	{ 6, "Doughnut Place", 17},
-	{ 2, "Ammunation 3", 6},
-	{ 4, "Off Track Betting", 3},
-	{ 7, "Sex Shop",  3},
-	{ 8, "Electronic Shop", 6},
-	{ 1, "Gas Station", 0},
-	{ 5, "Binco",  15},
-	{ 5, "Didier Sachs", 14},
-	{ 9, "Club", 17},
-	{ 9, "Bar", 11},
-	{ 9, "Lil Prob Inn", 18},
-	{ 6, "Jay's' Diner", 4},
-	{ 6, "Grant Diner", 5},
-	{ 10, "Burger Shot", 10},
-	{ 10, "Cluckin' Bell", 9}
+    { 1, "Convenience Store", 17 },
+    { 2, "Ammunation", 	 7 },
+    { 3, "News Agency", 3 },
+    { 4, " Betting Shop", 3} ,
+	{ 5, "Clothes Shop(Zip)", 18 },
+	{ 6, "Doughnut Place", 17 },
+	{ 2, "Ammunation 3", 6 },
+	{ 4, "Off Track Betting", 3 },
+	{ 7, "Sex Shop",  3 },
+	{ 8, "Electronic Shop", 6 },
+	{ 1, "Gas Station", 0 },
+	{ 5, "Binco",  15 },
+	{ 5, "Didier Sachs", 14 },
+	{ 9, "Club", 17 },
+	{ 9, "Bar", 11 },
+	{ 9, "Lil Prob Inn", 18 },
+	{ 6, "Jay's' Diner", 4 },
+	{ 6, "Grant Diner", 5 },
+	{ 10, "Burger Shot", 10 },
+	{ 10, "Cluckin' Bell", 9 }
 };
 
 new BusinessTypeNames[][] = 
@@ -4080,13 +4062,7 @@ stock ReloadIcons()
 
 stock ReloadBiz()
 {
-	for(new id = 0; id < MAX_BIZ; id++)
-	{
-            Total_Biz_Created = 0;
-        	DestroyDynamic3DTextLabel(Business[id][LabelID]);
-        	DestroyDynamicPickup(Business[id][PickupID]);
-	}
-	Fetch_Businesses();
+	Reload_Businesses();
 	return 1;
 }
 
@@ -4553,7 +4529,7 @@ CMD:bhelp(playerid, params[])
 	if(Character[playerid][Business_1] > 0 || Character[playerid][Business_2] > 2)
 	{
 		SendClientMessage(playerid, COLOR_YELLOW, "Business Commands:");
-		SendClientMessage(playerid, COLOR_WHITE, "/entrancefee /checksafe /safeget /safestore /lock");
+		SendClientMessage(playerid, COLOR_WHITE, "/entrancefee /checksafe /safeget /safestore /key");
 	}
 	else
 	{
@@ -7445,6 +7421,40 @@ CMD:detach(playerid, params[])
 	return 1;
 }
 
+new CompactDisks[][][] =
+{
+    {"Barry White - Love's Theme Tune","http://www.soselettricista.com/musica.mp3"},
+    {"Barry White - Can't Get Enough of Your Love, Babe", "http://hyra-en-stuga.se/assets/multimedia/02-Barry_White-Can_T_Get_Enough_Of_Your_Love_Babe.mp3"},
+    {"Sugar Hill Gang - Rappers Delight","http://www.exxxplosivo.com/music/HipHop2004/15%20Rappers%20Delight.mp3"},
+    {"Conscious Daughters - Something To Ride To", "http://a.tumblr.com/tumblr_la7mo9xNWH1qzcg1so1.mp3"}
+
+};
+
+new RadioStations[][][] =
+{
+	{5,"Hot 108 Jamz", "http://sc.hot108.com:4020/listen.pls"},
+	{4,"Kiss 100", "http://icy-e-02.sharp-stream.com/kiss100.mp3"},
+	{4,"Gay FM", "http://87.230.82.13:80/listen.pls "},
+	{6,"Absolute Classic Rock", "http://icecast.timlradio.co.uk/ac128.mp3"},
+	{1,"Abacus FM Country", "http://dir.xiph.org/listen/1016913/listen.m3u"},
+	{1,"VWCountry", "http://dir.xiph.org/listen/1016913/listen.m3u"},
+	{3,"ABCJazz", "http://dir.xiph.org/listen/1297135/listen.m3u"},
+	{2,"Party Vibe Radio", "http://yp.shoutcast.com/sbin/tunein-station.pls?id=205366"},
+	{0,"None","None"}
+};
+
+new RadioGenres[][] = 
+{
+	"Classical",
+	"Country",
+	"House",
+	"Jazz",
+	"Pop",
+	"Rap",
+	"Rock"
+};
+
+
 CMD:vmusic(playerid, params[])
 {
 	new vid = GetPlayerVehicleID(playerid);
@@ -7466,22 +7476,96 @@ CMD:vmusic(playerid, params[])
 ALTCMD:vstereo->vmusic;
 ALTCMD:vradio->vmusic;
 
+stock RadioSystem_MainMenu(playerid)
+{
+	Dialog_Show(playerid, RadioSystem, DIALOG_STYLE_LIST, "Vehicle Radio System", ""COL_GRAY"-> "COL_WHITE"Radio Stations\n"COL_GRAY"-> "COL_WHITE"Compact Discs\n \n"COL_ORANGE"Turn [OFF]", "Select","Close");
+	return 1;
+}
+
+stock RadioSystem_Genres(playerid)
+{
+	new StationCount = sizeof(RadioGenres), MainDialog[600];
+    for (new i = 0; i < StationCount; ++i)
+    {
+    	new str[128];
+
+		format(str, sizeof(str),"%s"COL_GRAY"-> "COL_WHITE"%s\n", str, RadioGenres[i]);
+		strcat(MainDialog, str, sizeof(MainDialog));
+    	
+    }
+    strcat(MainDialog, "\n \n"COL_GRAY"-> "COL_WHITE"Custom", sizeof(MainDialog));
+    Dialog_Show(playerid, RadioSystem_Genres_2, DIALOG_STYLE_LIST, "Vehicle Radio System - Genres", MainDialog, "Select","Back");
+	return 1;
+}
+
+Dialog:RadioSystem_Genres_2(playerid, response, listitem)
+{
+	if(!response) return RadioSystem_MainMenu(playerid);
+
+	new StationCount = sizeof(RadioStations), MainDialog[600];
+	printf("Listitem: %d RadioStations: %d",listitem, sizeof(RadioGenres));
+	if(listitem == sizeof(RadioGenres) + 1)
+	{
+		new vid = Vehicles[GetPlayerVehicleID(playerid)][SQLID], str[256];
+
+		format(str, sizeof(str), "SELECT id, Name FROM `vehicleradio` WHERE vid = %d ORDER BY Name ASC LIMIT 20", vid);
+		mysql_tquery(SQL_CONNECTION, str, "ViewCustomURLs", "d", playerid);	
+		//Dialog_Show(playerid, RadioSystem_Custom, DIALOG_STYLE_INPUT, "Vehicle Radio System - Custom", "Please enter a custom radio link:", "Tune", "Back");
+	}
+
+	else if(listitem == sizeof(RadioGenres)) {
+		RadioSystem_Genres(playerid);
+	}
+
+	else {
+		for (new i = 0; i < StationCount; ++i)
+	    {
+	    	new str[128];
+	    	if(listitem == RadioStations[i][0][0])
+	    	{
+	    		format(str, sizeof(str),"%s"COL_GRAY"-> "COL_WHITE"%s\n", str, RadioStations[i][1]);
+				strcat(MainDialog, str, sizeof(MainDialog));
+	    	}
+	    }
+        Dialog_Show(playerid, RadioSystem_Stations, DIALOG_STYLE_LIST, "Vehicle Radio System - Radio", MainDialog, "Tune","Back");
+	}
+    
+	return 1;
+}
+
+
+Dialog:RadioSystem_Custom(playerid, response, listitem, inputtext[])
+{
+	if(!response) return Dialog_Show(playerid, RadioSystem_Custom, DIALOG_STYLE_INPUT, "Vehicle Radio System - Custom", "Please enter a custom radio link:", "Tune", "Back");
+
+	else if(response)
+	{
+		new vid = GetPlayerVehicleID(playerid);
+		
+		for(new i; i < MAX_PLAYERS; ++i)
+	    {
+	        if(!IsPlayerConnected(i))continue;
+	        
+	        if(IsPlayerInVehicle(i, vid))
+	        {
+	        	PlayVehicleRadio(playerid, inputtext);
+	        }
+	    }
+
+
+	}
+    
+	return 1;
+}
+
+
 Dialog:RadioSystem(playerid, response, listitem, inputtext[])
 {
 	new vid = GetPlayerVehicleID(playerid);
 	if(!response) return 1;
 	if(listitem == 0)//radio
 	{
-	    new StationCount = sizeof(RadioStations), MainDialog[600];
-	    for (new i = 0; i < StationCount; ++i)
-	    {
-	    	new str[128];
-
-			format(str, sizeof(str),"%s %s\n", str, RadioStations[i][0]);
-			strcat(MainDialog, str, sizeof(MainDialog));
-	    	
-	    }
-	    Dialog_Show(playerid, RadioSystem_Stations, DIALOG_STYLE_LIST, "Vehicle Radio System - Radio", MainDialog, "Tune","Back");
+	    RadioSystem_Genres(playerid);
 		return 1;
 	}
 	else if(listitem == 1)
@@ -7522,7 +7606,7 @@ Dialog:RadioSystem(playerid, response, listitem, inputtext[])
 
 Dialog:RadioSystem_Stations(playerid, response, listitem, inputtext[])
 {
-	if(!response) return RadioSystem_MainMenu(playerid);
+	if(!response) return RadioSystem_Genres(playerid);
 
 	new vid = GetPlayerVehicleID(playerid);
     for(new i; i < MAX_PLAYERS; ++i)
@@ -7531,10 +7615,20 @@ Dialog:RadioSystem_Stations(playerid, response, listitem, inputtext[])
         
         if(IsPlayerInVehicle(i, vid))
         {
-            PlayAudioStreamForPlayer(i, RadioStations[listitem][1]);
-            format(Vehicles[vid][RadioURL], 128, "%s", RadioStations[listitem][1]);
-            Vehicles[vid][RadioStatus] = 1;
-            print(RadioStations[listitem][1]);
+        	new x[128];
+        	strmid(x, inputtext, 3, strlen(inputtext));
+        	print(x);
+        	for(new y = 0; y < sizeof(RadioStations); y++){
+        		if(RadioStations[y][1][0] == x[0]){
+        			//printf("We have a match! %s %s", RadioStations[y][1], RadioStations[y][2]);
+        			PlayAudioStreamForPlayer(i, RadioStations[y][2]);
+		            format(Vehicles[vid][RadioURL], 128, "%s", RadioStations[y][2]);
+		            Vehicles[vid][RadioStatus] = 1;
+        		}
+        	}
+
+            
+           // print(RadioStations[listitem][2]);
             //	print(RadioStations[0][0]);// []-radionumber ----- [] 0=name 1=link //CDs chosen by player
         }
     }
@@ -7545,30 +7639,95 @@ Dialog:RadioSystem_CDs(playerid, response, listitem, inputtext[])
 {
 	if(!response) return RadioSystem_MainMenu(playerid);
 
-	new vid = GetPlayerVehicleID(playerid);
-    for(new i; i < MAX_PLAYERS; ++i)
-    {
-        if(!IsPlayerConnected(i))continue;
-        
-        if(IsPlayerInVehicle(i, vid))
-        {
-            PlayAudioStreamForPlayer(i, CompactDisks[listitem][1]);
-            format(Vehicles[vid][RadioURL], 128, "%s", CompactDisks[listitem][1]);
-            Vehicles[vid][RadioStatus] = 1;
-            print(CompactDisks[listitem][1]);
-            //	print(CompactDisks[0][0]);// []-radionumber ----- [] 0=name 1=link //CDs chosen by player
-        }
-    }
+	PlayVehicleRadio(playerid, CompactDisks[listitem][1]);
+
     return 1;
 }
 
-stock RadioSystem_MainMenu(playerid)
+
+
+
+forward ViewCustomURLs(playerid);
+public ViewCustomURLs(playerid)
 {
-	Dialog_Show(playerid, RadioSystem, DIALOG_STYLE_LIST, "Vehicle Radio System", ""COL_GRAY"-> "COL_WHITE"Radio Stations\n"COL_GRAY"-> "COL_WHITE"Compact Discs\n \n"COL_ORANGE"Turn [OFF]", "Select","Close");
+	if(cache_num_rows())
+    {
+    	new str[128], Dialog[2000], name[128], sid;
+
+        strcat(Dialog, "Add Station\n \n", sizeof(Dialog));
+
+        for(new id = 0; id < cache_num_rows(); id++)
+        {
+        	sid = cache_get_field_content_int(id, "id", SQL_CONNECTION);
+        	cache_get_field_content(id, "Name", name, SQL_CONNECTION, 128);
+
+        	format(str, sizeof(str), "(%d) %s\n", sid, name);
+        	strcat(Dialog, str, sizeof(Dialog));
+
+        }
+        Dialog_Show(playerid, RadioSystem_CustomMenu, DIALOG_STYLE_LIST, "Vehicle Radio System - Custom", Dialog, "Select", "Back");
+	}
+	else
+	{
+		Dialog_Show(playerid, RadioSystem_CustomMenu, DIALOG_STYLE_MSGBOX, "Vehicle Radio System - Custom", "None", "Return", "");
+	}
+	return 1;
+}
+
+Dialog:RadioSystem_CustomMenu(playerid, response, listitem, inputtext[])
+{
+	if(!response) RadioSystem_Genres(playerid);
+	new sid[2], str[256];
+	if(listitem == 0){
+		Dialog_Show(playerid, RadioSystem_Custom, DIALOG_STYLE_INPUT, "Vehicle Radio System - Custom", "Please enter a custom radio link:", "Tune", "Back");
+	}
+	else if(listitem == 1) return 1;
+
+	strmid(sid, inputtext, strfind(inputtext, "(") + 1,  strfind(inputtext, ")"));
+
+	format(str, sizeof(str), "SELECT streamURL FROM `vehicleradio` WHERE id = %d ORDER BY id DESC LIMIT 20", strval(sid));
+	mysql_tquery(SQL_CONNECTION, str, "PlayCustomURL", "d", playerid);	
+
 	return 1;
 }
 
 
+forward PlayCustomURL(playerid);
+public PlayCustomURL(playerid)
+{
+	if(cache_num_rows())
+    {
+    	new url[264];
+
+    	cache_get_field_content(0, "streamURL", url, SQL_CONNECTION, 256);
+    	PlayVehicleRadio(playerid, url);
+	}
+	else
+	{
+		SendErrorMessage(playerid, "The stream you selected could not be found.");
+	}
+	return 1;
+}
+
+stock PlayVehicleRadio(playerid, url[])
+{
+	new vid = GetPlayerVehicleID(playerid);
+    for(new i; i < MAX_PLAYERS; ++i)
+    {
+        if(!IsPlayerConnected(i))continue;
+        if(IsPlayerInVehicle(i, vid))
+        {
+        	if(Vehicles[vid][Radio])
+     		{
+     			PlayAudioStreamForPlayer(i, url);
+	            format(Vehicles[vid][RadioURL], 128, "%s", url);
+	            Vehicles[vid][RadioStatus] = 1;
+	            //	print(CompactDisks[0][0]);// []-radionumber ----- [] 0=name 1=link //CDs chosen by player
+     		}
+            
+        }
+    }
+}
 
 stock Query_Set_PlayerVehicle(vehicleid, option1[], option2)
 {
@@ -9909,7 +10068,8 @@ CMD:bizeditor(playerid, params[])
 {
 	if(Account[playerid][Admin] >= 5)
 	{
-		new bID = InRangeOfBiz(playerid), str[128], dialog[512];
+		new bID = InRangeOfBiz(playerid),str[128], dialog[512];
+		bizzid[playerid] = bID;
 		if(bID)
 		{
 			format(str, sizeof(str), "Option\tValue\n");
@@ -9930,7 +10090,7 @@ CMD:bizeditor(playerid, params[])
         	format(str, sizeof(str), "EntranceFee:\t ["COL_LBLUE"$%s"COL_WHITE"]\n", FormatNumber(Business[bID][EntranceFee]));
         	strcat(dialog, str, sizeof(dialog));
 
-			Dialog_Show(playerid, BUSINESSMEU, DIALOG_STYLE_TABLIST_HEADERS, Business[bID][Name], dialog, "Select","Cancel");//flist2
+			Dialog_Show(playerid, EDITOR_BIZ, DIALOG_STYLE_TABLIST_HEADERS, Business[bID][Name], dialog, "Select","Cancel");//flist2
 		}
 		else SendErrorMessage(playerid, ERROR_LOCATION);
 	}
@@ -9941,6 +10101,65 @@ CMD:bizeditor(playerid, params[])
 	return 1;
 }
 //interior/exterior/owner/owned/
+
+Dialog:EDITOR_BIZ(playerid, response, listitem, inputtext[])
+{
+	if(!response) return 0;
+    if(response)
+    {
+    	new bID = bizzid[playerid];
+        switch(listitem)
+        {
+            case 0: Dialog_Show(playerid, EDITOR_BIZ_NAME, DIALOG_STYLE_INPUT, Business[bID][Name],"Enter the business' new name:","Change","Cancel");			
+			case 1:
+			{
+				new str[128], dialog[600];
+				for (new i = 0; i < sizeof(BusinessTypeNames); ++i)
+				{
+					format(str, sizeof(str), "%s\n", BusinessTypeNames[i][0]);
+			        strcat(dialog, str, sizeof(dialog));
+				}
+				Dialog_Show(playerid, EDITOR_BIZ_TYPE, DIALOG_STYLE_LIST, Business[bID][Name], dialog, "Select", "Cancel");
+			}
+		}
+	}
+    return 1;
+}
+
+
+Dialog:EDITOR_BIZ_NAME(playerid, response, listitem, inputtext[])
+{
+	if(!response) return SendErrorMessage(playerid, ERROR_DIALOG);
+    if(response)
+    {
+    	new str[128];
+		format(Business[bizzid[playerid]][Name], 64, "%s", inputtext);
+		format(str, sizeof(str), "(Name Change) Business: [%d] -> [%s]", bizzid[playerid], Business[bizzid[playerid]][Name]);
+		
+		SendInfoMessage(playerid, str);
+
+		MYSQL_Update_String(Business[bizzid[playerid]][SQLID], "Business", "Name", Business[bizzid[playerid]][Name]);
+		Reload_Business(bizzid[playerid]);
+	}
+    return 1;
+}
+
+Dialog:EDITOR_BIZ_TYPE(playerid, response, listitem, inputtext[])
+{
+	if(!response) return 0;
+	if(response)
+	{
+		new str[128];
+		Business[bizzid[playerid]][Type] = listitem;
+		format(str, sizeof(str), "(Type Change) Business: [%s] -> [%s]", Business[bizzid[playerid]][Name], BusinessTypeNames[bizzid[playerid]][0]);
+
+		SendInfoMessage(playerid, str);
+
+		MYSQL_Update_Interger(Business[bizzid[playerid]][SQLID], "Business", "Type", Business[bizzid[playerid]][Type]);
+		Reload_Business(bizzid[playerid]);
+	}
+	return 1;
+}
 
 CMD:createbiz(playerid, params[])
 {
@@ -11060,7 +11279,7 @@ public ViewJailRecord(playerid)
 stock GetSQLIDFromName(name[])
 {
 	new query[128], CID;
-    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT SQLID FROM `Characters` WHERE Name = '%e' LIMIT 1", name);
+    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT ID FROM `Characters` WHERE Name = '%e' LIMIT 1", name);
 	new Cache:result = mysql_query(SQL_CONNECTION, query);
 	CID = cache_get_field_content_int(0, "SQLID", SQL_CONNECTION);
  	cache_delete(result);
@@ -11071,7 +11290,7 @@ stock GetSQLIDFromName(name[])
 stock GetRoleplayNameFromSQLID(sqlid)
 {
 	new query[128], name[64];
-    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT Name FROM `Characters` WHERE SQLID = %d LIMIT 1", sqlid);
+    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT Name FROM `Characters` WHERE ID = %d LIMIT 1", sqlid);
 	new Cache:result = mysql_query(SQL_CONNECTION, query);
 	cache_get_field_content(0, "Name", name, SQL_CONNECTION, 64);
  	cache_delete(result);
@@ -11891,7 +12110,7 @@ Dialog:BUSINESSMENU(playerid, response, listitem, inputtext[])
 			{
 				if(InRangeOfBiz(playerid))
 				{
-					Dialog_Show(playerid, ChangeBizName, DIALOG_STYLE_INPUT, "Business Editor","Enter the new business name:","Change Name","Cancel");
+					Dialog_Show(playerid, EDITOR_BIZ_NAME, DIALOG_STYLE_INPUT, "Business Editor","Enter the new business name:","Change Name","Cancel");
 				}
 				else SendErrorMessage(playerid, ERROR_LOCATION);
 			}
@@ -12048,22 +12267,6 @@ Dialog:CHANGEBINTERIOR(playerid, response, listitem, inputtext[])
     return 1;
 }
 
-Dialog:ChangeBizName(playerid, response, listitem, inputtext[])
-{
-	if(!response) return SendErrorMessage(playerid, ERROR_DIALOG);
-    if(response)
-    {
-		format(Business[bizzid[playerid]][Name], 64, "%s", inputtext);
-		new str[128];
-		format(str, sizeof(str), "You have set business %d's name to %s.", bizzid[playerid], Business[bizzid[playerid]][Name]);
-		SendClientMessage(playerid, COLOR_YELLOW, str);
-
-		MYSQL_Update_String(Business[bizzid[playerid]][SQLID], "Business", "Name", Business[bizzid[playerid]][Name]);
-
-		Reload_Business(bizzid[playerid]);
-	}
-    return 1;
-}
 
 Dialog:ChangeHouseName(playerid, response, listitem, inputtext[])
 {
@@ -13255,6 +13458,7 @@ stock Locker_Equipment(playerid)
 
 Dialog:LockerMain(playerid, response, listitem, inputtext[])
 {
+	if(!response) return 0;
 	if(listitem == 0)
 	{
 		new str[128];
@@ -13627,6 +13831,107 @@ Dialog:BuyLegalWeapons(playerid, response, listitem, inputtext[])
 	WebPortal(playerid);
 	return 1;
 }
+
+
+CMD:clearchat(playerid, params[])
+{
+	for(new i = 0; i < 100; i++)
+	{
+		SendClientMessage(playerid, COLOR_WHITE, "");
+	}
+	return 1;
+}
+
+stock GetPosBehindVehicle(vehicleid, &Float:x, &Float:y, &Float:z, Float:offset=0.5)
+{
+	new Float:vehicleSize[3], Float:vehiclePos[3];
+	GetVehiclePos(vehicleid, vehiclePos[0], vehiclePos[1], vehiclePos[2]);
+	GetVehicleModelInfo(GetVehicleModel(vehicleid), VEHICLE_MODEL_INFO_SIZE, vehicleSize[0], vehicleSize[1], vehicleSize[2]);
+	GetXYBehindVehicle(vehicleid, vehiclePos[0], vehiclePos[1], (vehicleSize[1]/2)+offset);
+	x = vehiclePos[0];
+	y = vehiclePos[1];
+	z = vehiclePos[2];
+	return 1;
+}
+
+stock SetVehicleHoodState(vid, setstate)
+{
+     new veh[7];
+     GetVehicleParamsEx(vid,veh[0],veh[1],veh[2],veh[3],veh[4],veh[5],veh[6]);
+	 if(setstate) SetVehicleParamsEx(vid,veh[0],veh[1],veh[2],veh[3],VEHICLE_PARAMS_ON,veh[5],veh[6]);
+	 else SetVehicleParamsEx(vid,veh[0],veh[1],veh[2],veh[3],VEHICLE_PARAMS_OFF,veh[5],veh[6]);
+}
+
+stock SetVehicleTrunkState(vid, setstate)
+{
+	 new veh[7];
+     GetVehicleParamsEx(vid,veh[0],veh[1],veh[2],veh[3],veh[4],veh[5],veh[6]);
+	 if(setstate) SetVehicleParamsEx(vid,veh[0],veh[1],veh[2],veh[3],veh[4],VEHICLE_PARAMS_ON,veh[6]);
+	 else SetVehicleParamsEx(vid,veh[0],veh[1],veh[2],veh[3],veh[4],VEHICLE_PARAMS_OFF,veh[6]);
+}
+
+stock GetVehicleTrunkState(vid)
+{
+	 new veh[7];
+     GetVehicleParamsEx(vid,veh[0],veh[1],veh[2],veh[3],veh[4],veh[5],veh[6]);
+	 return veh[5];
+}
+
+stock TogVehicleTrunkState(vid)
+{
+	 new veh[7];
+     GetVehicleParamsEx(vid,veh[0],veh[1],veh[2],veh[3],veh[4],veh[5],veh[6]);
+     if(veh[5] == VEHICLE_PARAMS_OFF) SetVehicleParamsEx(vid,veh[0],veh[1],veh[2],veh[3],veh[4],VEHICLE_PARAMS_ON,veh[6]);
+	 else SetVehicleParamsEx(vid,veh[0],veh[1],veh[2],veh[3],veh[4],VEHICLE_PARAMS_OFF,veh[6]);
+}
+
+/*stock GetNearestVehicle(playerid, Float:dis) // some stock i have found around the forums
+{
+    new Float:X, Float:Y, Float:Z;
+    if(GetPlayerPos(playerid, X, Y, Z))
+    {
+        new vehicleid = INVALID_VEHICLE_ID;
+        for(new v, Float:temp, Float:VX, Float:VY, Float:VZ; v != MAX_VEHICLES; v++)
+        {
+            if(GetVehiclePos(v, VX, VY, VZ))
+            {
+                VX -= X, VY -= Y, VZ -= Z;
+                temp = VX * VX + VY * VY + VZ * VZ;
+                if(temp < dis) dis = temp, vehicleid = v;
+            }
+        }
+        dis = floatpower(dis, 0.5);
+        return vehicleid;
+    }
+    return INVALID_VEHICLE_ID;
+}
+*/
+
+GetXYBehindVehicle(vehicleid, &Float:q, &Float:w, Float:distance)
+{
+	new Float:a;
+	GetVehiclePos(vehicleid, q, w, a);
+	GetVehicleZAngle(vehicleid, a);
+	q += (distance * -floatsin(-a, degrees));
+	w += (distance * -floatcos(-a, degrees));
+}
+
+
+
+CMD:trunk(playerid, params[])
+{
+	new Float:cPos[3], vID = GetNearestVehicle(playerid, 25.0);
+
+	if(vID == INVALID_VEHICLE_ID) return SendErrorMessage(playerid, "You are not in range of a vehicle."); 
+	GetPosBehindVehicle(vID, cPos[0], cPos[1], cPos[2], 1.0);
+	
+	if(!IsPlayerInRangeOfPoint(playerid, 1.0, cPos[0], cPos[1], cPos[2])) return SendErrorMessage(playerid, "You must be at the boot of the vehicle to do this command.");
+	
+	TogVehicleTrunkState(vID);
+ //AttachDynamicObjectToVehicle(objectid, vehicleid, Float:offsetx, Float:offsety, Float:offsetz, Float:rx, Float:ry, Float:rz);
+	return 1;
+}
+
 
 
 

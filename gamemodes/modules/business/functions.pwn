@@ -54,6 +54,17 @@ Reload_Business(id)
 	return 1;
 }
 
+stock Reload_Businesses()
+{
+	for(new id = 0; id < MAX_BIZ; id++)
+	{
+        Remove_Business(id);
+	}
+	Total_Biz_Created = 0;
+	Fetch_Businesses();
+	return 1;
+}
+
 forward Load_Businesses();
 public Load_Businesses()
 {
