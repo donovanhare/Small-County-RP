@@ -2,9 +2,9 @@
 //          -- > Database Information
 //==============================================================================
 #define SQL_HOST "127.0.0.1"
-#define SQL_USER "Server"
-#define SQL_PASS "7nWvKXZZjL5bHS6T"
-#define SQL_DB "Server01"
+#define SQL_USER "USERNAME"
+#define SQL_PASS "PASSWORD"
+#define SQL_DB "DATABASE"
 
 
 new SQL_CONNECTION;
