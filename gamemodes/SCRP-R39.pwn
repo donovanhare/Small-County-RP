@@ -1738,7 +1738,7 @@ stock NameCheck(playerid)
     new namecheck = strfind(GetName(playerid), "_", true);
 	if(namecheck >= 1)
 	{
-        InfoBoxForPlayer(playerid, "~y~== [SC:RP] == ~n~~w~ Here, on Small County Roleplay, we have a 'Master Account' system. In order to register an account you will need to join with a nickname(without the '_'), not your roleplay name.");
+        SendClientMessage(playerid, COLOR_RED, "On Small County Roleplay we operate a 'Master Account' system. In order to register an account you will need to join with a nickname(without the '_'), instead of your roleplay name.");
 		format(str, sizeof(str), "%s was kicked by the server for joining with a roleplay name.",GetName(playerid));
 		SendAdminsMessage(1, COLOR_ORANGERED, str);
 		KickPlayer(playerid);
