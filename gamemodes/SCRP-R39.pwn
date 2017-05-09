@@ -10930,7 +10930,7 @@ Dialog:PNC_Records(playerid, response, listitem, inputtext[])
 	{
 		new query[128], str[128], name[24], dialog[600];
 
-	    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT Name, Age, Gender, PhoneNumber, GDL, CDL, MDL FROM `Characters` WHERE SQLID = %d LIMIT 1", Character[playerid][PNC]);
+	    mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT Name, Age, Gender, PhoneNumber, GDL, CDL, MDL FROM `Characters` WHERE ID = %d LIMIT 1", Character[playerid][PNC]);
 		new Cache:result = mysql_query(SQL_CONNECTION, query);
 		cache_get_field_content(0, "Name", name, SQL_CONNECTION, MAX_PLAYER_NAME);
 		new pAge = cache_get_field_content_int(0, "Age", SQL_CONNECTION);
@@ -11281,7 +11281,7 @@ stock GetSQLIDFromName(name[])
 	new query[128], CID;
     mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT ID FROM `Characters` WHERE Name = '%e' LIMIT 1", name);
 	new Cache:result = mysql_query(SQL_CONNECTION, query);
-	CID = cache_get_field_content_int(0, "SQLID", SQL_CONNECTION);
+	CID = cache_get_field_content_int(0, "ID", SQL_CONNECTION);
  	cache_delete(result);
 	return CID;
 }
