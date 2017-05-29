@@ -285,7 +285,7 @@ new Weapon[MAX_PLAYERS][13];
 new WeaponAmmo[MAX_PLAYERS][13];
 
 new SkinSelection[MAX_PLAYERS] = 0;
-new LoggedIn[MAX_PLAYERS];
+new bool: LoggedIn[MAX_PLAYERS];
 
 //==========================================================================
 
@@ -980,7 +980,7 @@ public PlayerConnected(playerid)
 
 	    InfoBoxForPlayer(playerid, "== ~y~[Small County Roleplay]~w~ ==~n~Welcome to Small County Roleplay!");
 
-	    LoggedIn[playerid] = 0;
+	    LoggedIn[playerid] = false;
 	    LoginAttempts[playerid] = 0;
 
 		mysql_format(SQL_CONNECTION, query, sizeof(query), "SELECT NULL FROM `Accounts` WHERE Username = '%e' LIMIT 1", GetName(playerid));
@@ -1204,7 +1204,7 @@ public OnPlayerDisconnect(playerid, reason)
 	GetPlayerHealth(playerid, Character[playerid][Health]);
 	GetPlayerArmour(playerid, Character[playerid][Armour]);
 	Character_Save(playerid);
-	LoggedIn[playerid] = 0;
+	LoggedIn[playerid] = false;
 	Character_Vehicles_Unload(playerid);
     new pName[24], str[128];
     GetPlayerName(playerid, pName, 24);
@@ -1340,7 +1340,7 @@ CMD:logout(playerid,params[])
 	Character_Save(playerid);
 	Character_Vehicles_Unload(playerid);
 
-	LoggedIn[playerid] = 0;
+	LoggedIn[playerid] = false;
 	SetPlayerName(playerid, Account[playerid][Name]);
 
 	Login_Camera(playerid);
@@ -2156,8 +2156,7 @@ stock KickPlayer(playerid)
 
 stock Character_Save(playerid)
 {
-
-	if(LoggedIn[playerid] == 1)
+	if(LoggedIn[playerid] == true)
 	{
 		new query[3000];
 
@@ -2613,7 +2612,7 @@ public PlayerSpawnIn(playerid)
 	}
 	TogglePlayerSpectating(playerid, 0);
 
-	LoggedIn[playerid] = 1;
+	LoggedIn[playerid] = true;
 	Character[playerid][LastOnline] = gettime();
 
 	TextDrawShowForPlayer(playerid, Clock);
@@ -2795,7 +2794,7 @@ stock Register(playerid)
 	Character[playerid][PosZ] = 19.7422;
 	Character[playerid][Skin] = 1;
 	Character[playerid][Age] = 18;
-	LoggedIn[playerid] = 1;
+	LoggedIn[playerid] = true;
 	Character[playerid][ClothesSelection] = 1;
 	
 	SetSelectionPos(playerid);
@@ -5105,7 +5104,7 @@ stock SendPunishmentMessage(str[])
     {
         if(IsPlayerConnected(i))
         {
-            if(LoggedIn[i] > 0)
+            if(LoggedIn[i] == true)
             {
                 new astr[128];
                 format(astr, sizeof(astr), "[PUNISHMENT] %s", str);
@@ -5151,7 +5150,7 @@ stock SendAdminsMessage(level, color, str[])
 public OnPlayerText(playerid, text[])
 {
 	new str[600];
-	if(LoggedIn[playerid] == 0) return SendErrorMessage(playerid, ERROR_LOGGEDIN);
+	if(LoggedIn[playerid] == false) return SendErrorMessage(playerid, ERROR_LOGGEDIN);
 	if(Character[playerid][Muted] != 0) return InfoBoxForPlayer(playerid, "~r~You have been muted - you cannot speak.");
 
 	LastCommandTime[playerid] = gettime();
@@ -5389,7 +5388,7 @@ CMD:announcement(playerid, params[])
 		format(str, sizeof(str), "[Announcement] %s: %s", GetRoleplayName(playerid), str);
 		for (new i = 0; i < MAX_PLAYERS; ++i)
 		{
-			if(LoggedIn[i] == 1) SendSplitMessage(i, COLOR_VIOLET, str);
+			if(LoggedIn[i] == true) SendSplitMessage(i, COLOR_VIOLET, str);
 		}
 
 		SetPlayerChatBubble(playerid, str, COLOR_VIOLET, 20.0, SECONDS(7));
@@ -6978,7 +6977,7 @@ CMD:spec(playerid, params[])
 	    if(sscanf(params, "u", TargetPlayer)) return SendClientMessage(playerid, COLOR_GRAY, "/spec [id]");
 		if(Character[TargetPlayer][IsSpec] > -1) return SendClientMessage(playerid, COLOR_GRAY, "Player is spectating!");
 		if(TargetPlayer == playerid) return SendClientMessage(playerid, COLOR_GRAY, "No speccing yourself!");
-		if(LoggedIn[TargetPlayer] == 0) return SendErrorMessage(playerid, "Player not logged in!");
+		if(LoggedIn[TargetPlayer] == false) return SendErrorMessage(playerid, "Player not logged in!");
 
 		SpectatePlayer(playerid, TargetPlayer);
 	}
@@ -8440,7 +8439,7 @@ CMD:adminduty(playerid, params[])
 				Character[playerid][AdminDuty] = 1;
 				for (new i = 0; i < MAX_PLAYERS; ++i)
 				{
-					if(LoggedIn[i] == 1)
+					if(LoggedIn[i] == true)
 					{
 						format(str, sizeof(str), "%s %s is now on admin duty, feel free to request their help.", AdminNames[Account[playerid][Admin]][0], GetRoleplayName(playerid));
 						SendInfoMessage(i, str);
@@ -8550,14 +8549,10 @@ CMD:deletehouse(playerid, params[])
 
 CMD:billcosby(playerid, params[])
 {
-    if(LoggedIn[playerid] == 0) return 1;
-
+    if(LoggedIn[playerid] == false) return 1;
     GameTextForPlayer(playerid, "~w~zip ~r~zop ~b~zoopity ~y~bop!", 5000, 0);
-
     return 1;
 }
-
-
 
 CMD:setplayer(playerid, params[])
 {
@@ -10489,7 +10484,6 @@ CMD:radioinfo(playerid)
 	return 1;
 }
 
-
 CMD:cuff(playerid, params[])
 {
 	if(IsLawEnforcement(playerid))
@@ -11459,7 +11453,7 @@ public UpdateTime()
 
 			for(new playerid; playerid < MAX_PLAYERS; playerid++)
 			{
-				if(IsPlayerConnected(playerid) && LoggedIn[playerid])
+				if(IsPlayerConnected(playerid) && LoggedIn[playerid] == true)
 				{
 					if(Character[playerid][OnlinePeriod] > 29)
 					{
@@ -11484,7 +11478,7 @@ public UpdateTime()
 
 		for(new i = 0; i<MAX_PLAYERS; i++)
         {
-            if(IsPlayerConnected(i) && LoggedIn[i])
+            if(IsPlayerConnected(i) && LoggedIn[i] == true)
             {
                 SetPlayerTime(i, ClockHours, ClockMinutes);
                 Character[i][TotalTimePlayed]++;
@@ -11516,7 +11510,7 @@ public UpdateTime()
 
 		for(new i = 0; i<MAX_PLAYERS; i++)
 	    {
-	        if(IsPlayerConnected(i) && LoggedIn[i])
+	        if(IsPlayerConnected(i) && LoggedIn[i] == true)
 	        {
 
 
@@ -11557,7 +11551,7 @@ public OnPlayerCommandReceived(playerid, cmdtext[])
 
 	LastCommandTime[playerid] = gettime();
 
-	if(LoggedIn[playerid] == 0)
+	if(LoggedIn[playerid] == false)
 	{
 	    SendErrorMessage(playerid, ERROR_LOGGEDIN);
 	    return 0;
@@ -11656,7 +11650,6 @@ Dialog:REG2(playerid, response, listitem, inputtext[])
     return 1;
 }
 
-
 Dialog:SPAWN_SELECT(playerid, response, listitem, inputtext[])
 {
     if(response)
@@ -11668,7 +11661,7 @@ Dialog:SPAWN_SELECT(playerid, response, listitem, inputtext[])
        	SetPlayerFacingAngle(playerid, 269.4926);
        	SetPlayerPosEx(playerid, -204.5245, 1119.2860, 19.7422, 0, 0);
        	
-       	LoggedIn[playerid] = 1;
+       	LoggedIn[playerid] = true;
        	Character[playerid][ClothesSelection] = 0;
        	Character[playerid][Skin] = GetPlayerSkin(playerid);
        	Character[playerid][Tutorial] = 5;
@@ -13949,4 +13942,3 @@ Dialog:(playerid, response, listitem, inputtext[])
     return 1;
 }
 */
-
